@@ -1,0 +1,6 @@
+bin/
+obj/
+*/Env.cs
+.idea/
+.vs/
+.git/
