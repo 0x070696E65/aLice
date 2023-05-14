@@ -8,111 +8,108 @@ namespace aLice;
 
 public static class SymbolTransaction
 {
-    public static string ParseTransaction(string hex, bool embedded = false, string pubkey = "")
+    public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex, bool embedded = false)
     {
         var transaction = embedded ? EmbeddedTransactionFactory.Deserialize(hex) : TransactionFactory.Deserialize(hex);
-        if (!embedded) {
-            ((ITransaction) transaction).SignerPublicKey = new PublicKey(Converter.HexToBytes(pubkey));
-        }
         if (transaction.Type == TransactionType.TRANSFER)
         {
-            return ParseTransferTransaction(transaction, embedded);
-        } 
+            return ((ITransaction)transaction, ParseTransferTransaction(transaction, embedded));
+        }
         if(transaction.Type == TransactionType.MOSAIC_DEFINITION)
         {
-            return ParseMosaicDefinitionTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicDefinitionTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MOSAIC_SUPPLY_CHANGE)
         {
-            return ParseMosaicSupplyChangeTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicSupplyChangeTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MOSAIC_SUPPLY_REVOCATION)
         {
-            return ParseMosaicSupplyRevocationTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicSupplyRevocationTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.ACCOUNT_KEY_LINK)
         {
-            return ParseAccountKeyLinkTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseAccountKeyLinkTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.NODE_KEY_LINK)
         {
-            return ParseNodeKeyLinkTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseNodeKeyLinkTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.VOTING_KEY_LINK)
         {
-            return ParseVotingKeyLinkTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseVotingKeyLinkTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.VRF_KEY_LINK)
         {
-            return ParseVrfKeyLinkTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseVrfKeyLinkTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.HASH_LOCK)
         {
-            return ParseHashLockTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseHashLockTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.SECRET_LOCK)
         {
-            return ParseSecretLockTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseSecretLockTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.SECRET_PROOF)
         {
-            return ParseSecretProofTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseSecretProofTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.ACCOUNT_METADATA)
         {
-            return ParseAccountMetadataTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseAccountMetadataTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MOSAIC_METADATA)
         {
-            return ParseMosaicMetadataTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicMetadataTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.NAMESPACE_METADATA)
         {
-            return ParseNamespaceMetadataTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseNamespaceMetadataTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MULTISIG_ACCOUNT_MODIFICATION)
         {
-            return ParseMultisigAccountModificationTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMultisigAccountModificationTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.ADDRESS_ALIAS)
         {
-            return ParseAddressAliasTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseAddressAliasTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MOSAIC_ALIAS)
         {
-            return ParseMosaicAliasTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicAliasTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.NAMESPACE_REGISTRATION)
         {
-            return ParseNamespaceRegistrationTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseNamespaceRegistrationTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.ACCOUNT_ADDRESS_RESTRICTION)
         {
-            return ParseAccountAddressRestrictionTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseAccountAddressRestrictionTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.ACCOUNT_MOSAIC_RESTRICTION)
         {
-            return ParseAccountMosaicRestrictionTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseAccountMosaicRestrictionTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.ACCOUNT_OPERATION_RESTRICTION)
         {
-            return ParseAccountOperationRestrictionTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseAccountOperationRestrictionTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MOSAIC_ADDRESS_RESTRICTION)
         {
-            return ParseMosaicAddressRestrictionTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicAddressRestrictionTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.MOSAIC_GLOBAL_RESTRICTION)
         {
-            return ParseMosaicGlobalRestrictionTransaction(transaction, embedded);
+            return ((ITransaction)transaction, ParseMosaicGlobalRestrictionTransaction(transaction, embedded));
         }
         if(transaction.Type == TransactionType.AGGREGATE_COMPLETE)
         {
-            return ParseAggregateCompleteTransaction(transaction);
+            return ((ITransaction)transaction, ParseAggregateCompleteTransaction(transaction));
         }
         if(transaction.Type == TransactionType.AGGREGATE_BONDED)
         {
-            return ParseAggregateBondedTransaction(transaction);
+            return ((ITransaction)transaction, ParseAggregateBondedTransaction(transaction));
         }
         throw new Exception("Unknown transaction type");
     }
@@ -133,7 +130,7 @@ public static class SymbolTransaction
         result += $"TransactionsHash: {transaction.TransactionsHash}\n";
         result += $"Transactions:\n";
         result = transaction.Transactions.Aggregate(result, (current, innerTransaction) => 
-            current + $"{ParseTransaction(Converter.BytesToHex(innerTransaction.Serialize()), true)}\n");
+            current + $"{ParseTransaction(Converter.BytesToHex(innerTransaction.Serialize()), true).parsedTransaction}\n");
         result += $"Cosignatures:\n";
         result = transaction.Cosignatures.Aggregate(result, (current, cosignature) => 
             current + $"{ParseCosignature(cosignature)}\n");
@@ -149,7 +146,7 @@ public static class SymbolTransaction
         result += $"TransactionsHash: {transaction.TransactionsHash}\n";
         result += $"Transactions:\n";
         result = transaction.Transactions.Aggregate(result, (current, innerTransaction) => 
-            current + $"{ParseTransaction(Converter.BytesToHex(innerTransaction.Serialize()), true)}\n");
+            current + $"{ParseTransaction(Converter.BytesToHex(innerTransaction.Serialize()), true).parsedTransaction}\n");
         result += $"Cosignatures:\n";
         result = transaction.Cosignatures.Aggregate(result, (current, cosignature) => 
             current + $"{ParseCosignature(cosignature)}\n");

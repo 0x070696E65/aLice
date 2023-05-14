@@ -12,6 +12,7 @@ public partial class RequestSign : ContentPage
     private RequestType type;
     private byte[] bytesData;
     private SavedAccount mainAccount;
+    private (ITransaction transaction, string parsedTransaction) parsedTransaction;
 
     public RequestSign(string _data, string _callbackUrl, RequestType _type)
     {
@@ -49,9 +50,10 @@ public partial class RequestSign : ContentPage
             }
             else if (type == RequestType.SignTransaction)
             {
-                bytesData = Converter.HexToBytes(data);
+                parsedTransaction = SymbolTransaction.ParseTransaction(data);
+                parsedTransaction.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(mainAccount.publicKey));
                 Type.Text = "Symbolのトランザクションです";
-                Data.Text = SymbolTransaction.ParseTransaction(data, false, mainAccount.publicKey);
+                Data.Text = parsedTransaction.parsedTransaction;
             }
             Ask.Text = $"{mainAccount.accountName}で署名しますか？";
         }
@@ -78,11 +80,23 @@ public partial class RequestSign : ContentPage
             }
 
             var keyPair = new KeyPair(new PrivateKey(privateKey));
-            var signature = keyPair.Sign(bytesData);
-            var systemKeyPair = new KeyPair(new PrivateKey(Env.PRIVATE_KEY));
-            var hash = systemKeyPair.Sign(signature.bytes);
-            
-            await Launcher.OpenAsync(new Uri($"{callbackUrl}?sig={Converter.BytesToHex(signature.bytes)}&hash={Converter.BytesToHex(hash.bytes)}&pubkey={mainAccount.publicKey}"));
+            if (type == RequestType.SignTransaction)
+            {
+                var network = parsedTransaction.transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet;
+                var facade = new CatSdk.Facade.SymbolFacade(network);
+                var signature = facade.SignTransaction(keyPair, parsedTransaction.transaction);
+                var signedTransaction = CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction(parsedTransaction.transaction, signature);
+                var signedPayload = Converter.BytesToHex(signedTransaction.Serialize());
+                var url = $"{callbackUrl}?signed_payload={signedPayload}&pubkey={mainAccount.publicKey}&original_data={data}";
+                await Launcher.OpenAsync(new Uri(url));
+            }
+            else
+            {
+                var signature = keyPair.Sign(bytesData);
+                var url = $"{callbackUrl}?signature={Converter.BytesToHex(signature.bytes)}&pubkey={mainAccount.publicKey}&original_data={data}";
+                await Launcher.OpenAsync(new Uri(url));
+            }
+
             Reset();
             await Navigation.PopModalAsync();
         } 
