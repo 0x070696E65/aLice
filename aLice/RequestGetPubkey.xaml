@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="aLice.RequestSign">
+    <ScrollView>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+            <StackLayout>
+                <Label
+                    x:Name="Data"
+                    FontSize="12"
+                    Margin="0, 10, 0, 0"/>
+                <Label
+                    x:Name="Transaction"
+                    FontSize="12"
+                    Margin="0, 10, 0, 20"/>
+                <Label
+                    x:Name="Ask"
+                    FontSize="22"
+                    HorizontalOptions="Center"/>
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Text="Input password"
+                            Clicked="AcceptRequestSign"
+                            BackgroundColor="Black"
+                            Grid.Column="0" 
+                            Margin="0,0,10,0"/>
+
+                    <Button Text="Close"
+                            Clicked="RejectedRequestSign"
+                            BackgroundColor="Gray"
+                            TextColor="White"
+                            Grid.Column="1" 
+                            Margin="10,0,0,0"/>
+                </Grid>
+                <Label
+                    x:Name="Error"
+                    TextColor="DarkRed"
+                    HorizontalTextAlignment="Center"
+                    Margin="0,20,0,0"
+                    FontSize="14"/>
+            </StackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
