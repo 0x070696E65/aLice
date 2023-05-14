@@ -14,14 +14,14 @@ public class AppDelegate : MauiUIApplicationDelegate
         if (userActivity.WebPageUrl == null) return true;
         var url = userActivity.WebPageUrl.AbsoluteString;
         _cts = new CancellationTokenSource();
-        App.RequestSignatureForNotification(url, _cts.Token);
+        App.RequestNotification(url, _cts.Token);
         return true;
     }
     
     public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
     {
         _cts = new CancellationTokenSource();
-        App.RequestSignatureForNotification(url.ToString(), _cts.Token);
+        App.RequestNotification(url.ToString(), _cts.Token);
         return true;
     }
 }

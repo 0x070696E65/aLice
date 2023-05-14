@@ -8,9 +8,12 @@ namespace aLice;
 
 public static class SymbolTransaction
 {
-    public static string ParseTransaction(string hex, bool embedded = false)
+    public static string ParseTransaction(string hex, bool embedded = false, string pubkey = "")
     {
         var transaction = embedded ? EmbeddedTransactionFactory.Deserialize(hex) : TransactionFactory.Deserialize(hex);
+        if (!embedded) {
+            ((ITransaction) transaction).SignerPublicKey = new PublicKey(Converter.HexToBytes(pubkey));
+        }
         if (transaction.Type == TransactionType.TRANSFER)
         {
             return ParseTransferTransaction(transaction, embedded);

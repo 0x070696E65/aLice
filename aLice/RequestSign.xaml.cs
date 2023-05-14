@@ -7,21 +7,18 @@ namespace aLice;
 
 public partial class RequestSign : ContentPage
 {
-    private readonly string data;
-    private readonly string callbackUrl;
-    private readonly string type;
+    private string data;
+    private string callbackUrl;
+    private RequestType type;
+    private byte[] bytesData;
     private SavedAccount mainAccount;
-    public RequestSign(string _uri)
+
+    public RequestSign(string _data, string _callbackUrl, RequestType _type)
     {
         InitializeComponent();
-        var queryString = _uri.Split('?').LastOrDefault();
-        if (queryString == null) return;
-        var dict = queryString.Split('&')
-            .Select(s => s.Split('='))
-            .ToDictionary(a => a[0], a => a[1]);
-        data = dict["data"];
-        callbackUrl = dict["callback"];
-        type = dict.TryGetValue("type", out var value) ? value : "hex";
+        data = _data;
+        callbackUrl = _callbackUrl;
+        type = _type;
     }
     
     protected override async void OnAppearing()
@@ -39,15 +36,22 @@ public partial class RequestSign : ContentPage
             var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
             if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
             mainAccount = savedAccounts.accounts.Find((acc) => acc.isMain);
-            try
+            if(type == RequestType.SignUtf8)
             {
-                Transaction.Text = SymbolTransaction.ParseTransaction(data);
-            }
-            catch(Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.Message);
-                Transaction.Text = "これはSymbolのトランザクションではありません";
+                bytesData = System.Text.Encoding.UTF8.GetBytes(data);
+                Type.Text = "UTF8文字列です";
                 Data.Text = data;
+            } else if(type == RequestType.SignBinaryHex)
+            {
+                bytesData = Converter.HexToBytes(data);
+                Type.Text = "バイナリデータの16進数文字列です";
+                Data.Text = data;
+            }
+            else if (type == RequestType.SignTransaction)
+            {
+                bytesData = Converter.HexToBytes(data);
+                Type.Text = "Symbolのトランザクションです";
+                Data.Text = SymbolTransaction.ParseTransaction(data, false, mainAccount.publicKey);
             }
             Ask.Text = $"{mainAccount.accountName}で署名しますか？";
         }
@@ -74,20 +78,15 @@ public partial class RequestSign : ContentPage
             }
 
             var keyPair = new KeyPair(new PrivateKey(privateKey));
-            var b = type switch
-            {
-                "hex" => Converter.HexToBytes(data),
-                "utf8" => System.Text.Encoding.UTF8.GetBytes(data),
-                _ => throw new Exception("typeが不正です")
-            };
-            var signature = keyPair.Sign(b);
-
+            var signature = keyPair.Sign(bytesData);
             var systemKeyPair = new KeyPair(new PrivateKey(Env.PRIVATE_KEY));
             var hash = systemKeyPair.Sign(signature.bytes);
             
-            await Launcher.OpenAsync(new Uri($"{callbackUrl}?sig={Converter.BytesToHex(signature.bytes)}&hash={Converter.BytesToHex(hash.bytes)}"));
+            await Launcher.OpenAsync(new Uri($"{callbackUrl}?sig={Converter.BytesToHex(signature.bytes)}&hash={Converter.BytesToHex(hash.bytes)}&pubkey={mainAccount.publicKey}"));
+            Reset();
             await Navigation.PopModalAsync();
-        } catch (Exception exception)
+        } 
+        catch (Exception exception)
         {
             Error.Text = exception.Message;
         }
@@ -96,7 +95,16 @@ public partial class RequestSign : ContentPage
     // 署名を拒否したときに呼び出される
     private async void RejectedRequestSign(object sender, EventArgs e)
     {
-        await Navigation.PopModalAsync();
         await Launcher.OpenAsync(new Uri($"{callbackUrl}?error=sign_rejected"));
+        Reset();
+        await Navigation.PopModalAsync();
+    }
+
+    private void Reset()
+    {
+        callbackUrl = null;
+        data = null;
+        bytesData = null;
+        mainAccount = null;
     }
 }

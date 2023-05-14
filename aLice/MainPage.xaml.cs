@@ -163,6 +163,6 @@ public partial class MainPage : ContentPage
     private async void OnButtonClicked(object sender, EventArgs e)
     {
         // データ登録用のボップアップを開く
-        await Navigation.PushModalAsync(new InputAccount());
+        await Navigation.PushModalAsync(new InputAccount(this));
     }
 }

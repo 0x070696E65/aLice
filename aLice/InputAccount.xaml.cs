@@ -9,10 +9,12 @@ namespace aLice;
 public partial class InputAccount : ContentPage
 {
     private string NetworkType = "MainNet";
-    public InputAccount()
+    private MainPage mainPage;
+    public InputAccount(MainPage _mainPage)
     {
         InitializeComponent();
         ShowPasswordButton.Text = "\uf06e";
+        mainPage = _mainPage;
     }
 
     // 登録ボタンが押されたときに呼び出される
@@ -86,7 +88,9 @@ public partial class InputAccount : ContentPage
         
         // 保存完了のメッセージを表示
         await DisplayAlert("Saved", "アカウントが登録されました", "OK");
-        
+
+        await mainPage.ShowAccounts();
+
         // 画面を閉じる
         await Navigation.PopModalAsync();
     }

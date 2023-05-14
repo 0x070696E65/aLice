@@ -5,29 +5,26 @@ using CatSdk.Utils;
 
 namespace aLice;
 
-public partial class RequestSign : ContentPage
+public partial class RequestGetPubkey : ContentPage
 {
-    private readonly string data;
-    private readonly string callbackUrl;
-    private readonly string type;
     private SavedAccount mainAccount;
+    private readonly string callbackUrl;
+    private string pubkey;
 
-    public RequestSign(string _data, string _callbackUrl, string _type)
+    public RequestGetPubkey(string _callbackUrl)
     {
         InitializeComponent();
-        data = _data;
         callbackUrl = _callbackUrl;
-        type = _type;
     }
     
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await ShowRequestSign();
+        await ShowRequestGetPubkey();
     }
 
-    // 署名を要求されたときに呼び出される
-    private async Task ShowRequestSign()
+    // 公開鍵を要求されたときに呼び出される
+    private async Task ShowRequestGetPubkey()
     {
         try
         {
@@ -35,17 +32,8 @@ public partial class RequestSign : ContentPage
             var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
             if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
             mainAccount = savedAccounts.accounts.Find((acc) => acc.isMain);
-            try
-            {
-                Transaction.Text = SymbolTransaction.ParseTransaction(data);
-            }
-            catch(Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.Message);
-                Transaction.Text = "これはSymbolのトランザクションではありません";
-                Data.Text = data;
-            }
-            Ask.Text = $"{mainAccount.accountName}で署名しますか？";
+            pubkey = mainAccount.publicKey;
+            Ask.Text = $"{mainAccount.accountName}の公開鍵を渡しても良いですか？";
         }
         catch (Exception exception)
         {
@@ -54,45 +42,16 @@ public partial class RequestSign : ContentPage
     }
     
     // 署名を受け入れたときに呼び出される
-    private async void AcceptRequestSign(object sender, EventArgs e)
-    {
-        Error.Text = "";
-        try
-        {
-            var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
-            if (password == null) return;
-            string privateKey;
-            try {
-                privateKey = CatSdk.Crypto.Crypto.DecryptString(mainAccount.encryptedPrivateKey, password, mainAccount.address);
-            }
-            catch {
-                throw new Exception("パスワードが正しくありません");
-            }
-
-            var keyPair = new KeyPair(new PrivateKey(privateKey));
-            var b = type switch
-            {
-                "hex" => Converter.HexToBytes(data),
-                "utf8" => System.Text.Encoding.UTF8.GetBytes(data),
-                _ => throw new Exception("typeが不正です")
-            };
-            var signature = keyPair.Sign(b);
-
-            var systemKeyPair = new KeyPair(new PrivateKey(Env.PRIVATE_KEY));
-            var hash = systemKeyPair.Sign(signature.bytes);
-            
-            await Launcher.OpenAsync(new Uri($"{callbackUrl}?sig={Converter.BytesToHex(signature.bytes)}&hash={Converter.BytesToHex(hash.bytes)}"));
-            await Navigation.PopModalAsync();
-        } catch (Exception exception)
-        {
-            Error.Text = exception.Message;
-        }
-    }
-    
-    // 署名を拒否したときに呼び出される
-    private async void RejectedRequestSign(object sender, EventArgs e)
+    private async void AcceptRequestGetPubkey(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();
-        await Launcher.OpenAsync(new Uri($"{callbackUrl}?error=sign_rejected"));
+        await Launcher.OpenAsync(new Uri($"{callbackUrl}?pubkey={pubkey}"));
+    }
+    
+    // 公開鍵要求を拒否したときに呼び出される
+    private async void RejectedRequestGetPubkey(object sender, EventArgs e)
+    {
+        await Navigation.PopModalAsync();
+        await Launcher.OpenAsync(new Uri($"{callbackUrl}?error=get_pubkey_rejected"));
     }
 }

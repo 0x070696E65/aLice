@@ -8,12 +8,47 @@ public partial class App : Application
         MainPage = new MainPage();
     }
     
-    public static async void RequestSignatureForNotification(string uri, CancellationToken token)
+    public static async void RequestNotification(string _uri, CancellationToken token)
     {
         try
         {
-            if (Current?.MainPage != null)
-                await Current.MainPage.Navigation.PushModalAsync(new RequestSign(uri));
+            var queryString = _uri.Split('?').LastOrDefault();
+            if (queryString == null) return;
+            var dict = queryString.Split('&')
+                .Select(s => s.Split('='))
+                .ToDictionary(a => a[0], a => a[1]);
+            var hasType = dict.TryGetValue("type", out var type);
+            RequestType requestType;
+            switch (type)
+            {
+                case "request_sign_utf8":
+                    requestType = RequestType.SignUtf8;
+                    break;
+                case "request_sign_transaction":
+                    requestType = RequestType.SignTransaction;
+                    break;
+                case "request_sign_binary_hex":
+                    requestType = RequestType.SignBinaryHex;
+                    break;
+                case "request_pubkey":
+                    requestType = RequestType.Pugkey;
+                    break;
+                default:
+                    throw new Exception("type is invalid");
+            }
+            var hasData = dict.TryGetValue("data", out var data);
+            var hasCallbackUrl = dict.TryGetValue("callback", out var callbackUrl);
+            if (!hasType) throw new NullReferenceException("type is null");
+            if (!hasCallbackUrl) throw new NullReferenceException("callback url is null");
+
+            if (Current?.MainPage != null && requestType == RequestType.Pugkey)
+            {
+                await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));
+                return;
+            }
+
+            if (Current?.MainPage != null && hasData && hasCallbackUrl)
+                await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType));
         }
         catch (OperationCanceledException)
         {

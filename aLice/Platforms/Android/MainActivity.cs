@@ -35,7 +35,7 @@ public class MainActivity : MauiAppCompatActivity
         var uri = Intent?.Data;
         if (uri == null) return;
         _cts = new CancellationTokenSource();
-        App.RequestSignatureForNotification(uri.ToString(), _cts.Token);
+        App.RequestNotification(uri.ToString(), _cts.Token);
     }
 
     protected override void OnNewIntent(Intent intent)
@@ -45,7 +45,7 @@ public class MainActivity : MauiAppCompatActivity
         if (strLink == null) return;
         
         _cts = new CancellationTokenSource();
-        App.RequestSignatureForNotification(strLink, _cts.Token);
+        App.RequestNotification(strLink, _cts.Token);
     }
     
     protected override void OnDestroy()
