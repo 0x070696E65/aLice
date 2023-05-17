@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using CatSdk.CryptoTypes;
 using CatSdk.Symbol;
@@ -9,15 +10,19 @@ public partial class RequestSign : ContentPage
 {
     private string data;
     private string callbackUrl;
-    private RequestType type;
+    private readonly string method;
+    private readonly string redirectUrl;
+    private readonly RequestType type;
     private byte[] bytesData;
     private SavedAccount mainAccount;
     private (ITransaction transaction, string parsedTransaction) parsedTransaction;
 
-    public RequestSign(string _data, string _callbackUrl, RequestType _type)
+    public RequestSign(string _data, string _callbackUrl, RequestType _type, string _method, string _redirectUrl = null)
     {
         InitializeComponent();
         data = _data;
+        method = _method;
+        redirectUrl = _redirectUrl;
         callbackUrl = _callbackUrl;
         type = _type;
     }
@@ -87,8 +92,32 @@ public partial class RequestSign : ContentPage
                 var signature = facade.SignTransaction(keyPair, parsedTransaction.transaction);
                 var signedTransaction = CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction(parsedTransaction.transaction, signature);
                 var signedPayload = Converter.BytesToHex(signedTransaction.Serialize());
-                var url = $"{callbackUrl}?signed_payload={signedPayload}&pubkey={mainAccount.publicKey}&original_data={data}";
-                await Launcher.OpenAsync(new Uri(url));
+                switch (method)
+                {
+                    case "post":
+                    {
+                        var dic = new Dictionary<string, string>
+                        {
+                            {"pubkey", mainAccount.publicKey},
+                            {"original_data", data},
+                            {"signed_payload", signedPayload},
+                        };
+                        using var client = new HttpClient();
+                        var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
+                        var response =  client.PostAsync(callbackUrl, content).Result;
+                        await response.Content.ReadAsStringAsync();
+                        if (redirectUrl != null) await Launcher.OpenAsync(new Uri(redirectUrl));
+                        break;
+                    }
+                    case "get":
+                    {
+                        var url = $"{callbackUrl}?signed_payload={signedPayload}&pubkey={mainAccount.publicKey}&original_data={data}";
+                        await Launcher.OpenAsync(new Uri(url));
+                        break;
+                    }
+                    default:
+                        throw new Exception("不正なリクエストです");
+                }
             }
             else
             {

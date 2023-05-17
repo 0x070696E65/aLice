@@ -16,7 +16,7 @@ namespace aLice;
             Intent.CategoryDefault,
             Intent.CategoryBrowsable
         },
-        DataScheme = "alice", DataPathPrefix = "sign"
+        DataScheme = "alice", DataPathPrefix = "/sign"
     )
 ]
 

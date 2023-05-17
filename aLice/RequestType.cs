@@ -7,6 +7,7 @@ namespace aLice
 		SignTransaction,
 		SignBinaryHex,
 		Pugkey,
+		Metal,
 	}
 }
 

@@ -5,6 +5,10 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        
+        // 強制的にライトモードを適用
+        if (Application.Current != null) Application.Current.UserAppTheme = AppTheme.Light;
+
         MainPage = new MainPage();
     }
     
@@ -18,37 +22,67 @@ public partial class App : Application
                 .Select(s => s.Split('='))
                 .ToDictionary(a => a[0], a => a[1]);
             var hasType = dict.TryGetValue("type", out var type);
-            RequestType requestType;
-            switch (type)
+            var requestType = type switch
             {
-                case "request_sign_utf8":
-                    requestType = RequestType.SignUtf8;
-                    break;
-                case "request_sign_transaction":
-                    requestType = RequestType.SignTransaction;
-                    break;
-                case "request_sign_binary_hex":
-                    requestType = RequestType.SignBinaryHex;
-                    break;
-                case "request_pubkey":
-                    requestType = RequestType.Pugkey;
-                    break;
-                default:
-                    throw new Exception("type is invalid");
-            }
+                "request_sign_utf8" => RequestType.SignUtf8,
+                "request_sign_transaction" => RequestType.SignTransaction,
+                "request_sign_binary_hex" => RequestType.SignBinaryHex,
+                "request_pubkey" => RequestType.Pugkey,
+                "request_sign_metal" => RequestType.Metal,
+                _ => throw new Exception("type is invalid")
+            };
             var hasData = dict.TryGetValue("data", out var data);
             var hasCallbackUrl = dict.TryGetValue("callback", out var callbackUrl);
+            var hasMethod = dict.TryGetValue("method", out var method);
+            
             if (!hasType) throw new NullReferenceException("type is null");
             if (!hasCallbackUrl) throw new NullReferenceException("callback url is null");
-
+            
+            if(!hasMethod) method = "get";
+            var hasRedirectUrl = dict.TryGetValue("redirect_url", out var redirectUrl);
+            
             if (Current?.MainPage != null && requestType == RequestType.Pugkey)
             {
                 await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));
                 return;
             }
+            if (Current?.MainPage != null && requestType == RequestType.Metal)
+            {
+                var count = 0;
+                var metalList = new List<string>();
+                while (true)
+                {
+                    var hasMetal = dict.TryGetValue("metal" + count, out var metal);
+                    if (!hasMetal)
+                    {
+                        break;
+                    }
+                    metalList.Add(metal);
+                    count++;
+                }
+                
+                if (hasRedirectUrl)
+                {
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignMetal(metalList, callbackUrl, method, redirectUrl));
+                }
+                else
+                {
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignMetal(metalList, callbackUrl, method));
+                }
+                return;
+            }
 
-            if (Current?.MainPage != null && hasData && hasCallbackUrl)
-                await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType));
+            if (Current?.MainPage != null && hasData)
+            {
+                if (hasRedirectUrl)
+                {
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, redirectUrl));
+                }
+                else
+                {
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method));
+                }
+            }
         }
         catch (OperationCanceledException)
         {
