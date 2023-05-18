@@ -28,7 +28,7 @@ public partial class App : Application
                 "request_sign_transaction" => RequestType.SignTransaction,
                 "request_sign_binary_hex" => RequestType.SignBinaryHex,
                 "request_pubkey" => RequestType.Pugkey,
-                "request_sign_metal" => RequestType.Metal,
+                "request_sign_batches" => RequestType.Batches,
                 _ => throw new Exception("type is invalid")
             };
             var hasData = dict.TryGetValue("data", out var data);
@@ -46,13 +46,13 @@ public partial class App : Application
                 await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));
                 return;
             }
-            if (Current?.MainPage != null && requestType == RequestType.Metal)
+            if (Current?.MainPage != null && requestType == RequestType.Batches)
             {
                 var count = 0;
                 var metalList = new List<string>();
                 while (true)
                 {
-                    var hasMetal = dict.TryGetValue("metal" + count, out var metal);
+                    var hasMetal = dict.TryGetValue("batch" + count, out var metal);
                     if (!hasMetal)
                     {
                         break;
@@ -63,11 +63,11 @@ public partial class App : Application
                 
                 if (hasRedirectUrl)
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignMetal(metalList, callbackUrl, method, redirectUrl));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(metalList, callbackUrl, method, redirectUrl));
                 }
                 else
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignMetal(metalList, callbackUrl, method));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(metalList, callbackUrl, method));
                 }
                 return;
             }

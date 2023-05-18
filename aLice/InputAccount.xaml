@@ -2,6 +2,7 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              x:Class="aLice.InputAccount">
     <ContentPage.Content>
         <ScrollView>
@@ -9,7 +10,7 @@
                 Spacing="25"
                 Padding="30,0"
                 VerticalOptions="Center">
-            
+                
                 <Label
                     Text="New Account"
                     SemanticProperties.HeadingLevel="Level1"
@@ -75,6 +76,18 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"/>
                 </Grid>
+                
+                <StackLayout>
+                    <ImageButton 
+                        VerticalOptions="CenterAndExpand" 
+                        HorizontalOptions="EndAndExpand" 
+                        Source="qr_code_icon"
+                        Clicked="OnQRButtonClicked"
+                        Aspect="AspectFit"
+                        HeightRequest="80"
+                        WidthRequest="80"
+                        BackgroundColor="White"/>
+                </StackLayout>
             </VerticalStackLayout>
         </ScrollView>
     </ContentPage.Content>

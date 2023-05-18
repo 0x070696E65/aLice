@@ -6,7 +6,7 @@ using CatSdk.Utils;
 
 namespace aLice;
 
-public partial class RequestSignMetal : ContentPage
+public partial class RequestSignBatches : ContentPage
 {
     private List<string> data;
     private string callbackUrl;
@@ -15,7 +15,7 @@ public partial class RequestSignMetal : ContentPage
     private SavedAccount mainAccount;
     private readonly List<(IBaseTransaction transaction, string parsedTransaction)> parsedTransaction;
     
-    public RequestSignMetal(List<string> _data, string _callbackUrl, string _method, string _redirectUrl = null)
+    public RequestSignBatches(List<string> _data, string _callbackUrl, string _method, string _redirectUrl = null)
     {
         InitializeComponent();
         data = _data;
@@ -47,7 +47,7 @@ public partial class RequestSignMetal : ContentPage
                 Data.Text += tx.parsedTransaction;
                 parsedTransaction.Add(tx);
             }
-            Type.Text = "Metalです";
+            Type.Text = "複数のトランザクションです";
             Ask.Text = $"{mainAccount.accountName}で署名しますか？";
         }
         catch (Exception exception)
@@ -82,8 +82,7 @@ public partial class RequestSignMetal : ContentPage
             {
                 case "post":
                 {
-                    var dic = new Dictionary<string, string>();
-                    dic.Add("pubkey" , mainAccount.publicKey);
+                    var dic = new Dictionary<string, string> {{"pubkey", mainAccount.publicKey}};
                     for (var i = 0; i < aggs.Count; i++)
                     {
                         dic.Add("metal" + i, Converter.BytesToHex(aggs[i].Serialize()));   

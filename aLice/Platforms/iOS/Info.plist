@@ -41,5 +41,7 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses barcode scanning to...</string>
 </dict>
 </plist>

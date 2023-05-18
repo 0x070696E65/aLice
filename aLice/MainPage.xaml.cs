@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using ZXing.Net.Maui;
 
 namespace aLice;
 

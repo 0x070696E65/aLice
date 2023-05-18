@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Unloaded="OnContentPageUnloaded"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="aLice.BarcodeReader">
+    <ContentPage.Content>
+        <AbsoluteLayout>
+            <zxing:CameraBarcodeReaderView
+                IsTorchOn="False"
+                x:Name="cameraBarcodeReaderView"
+                HeightRequest="300"
+                WidthRequest="300"
+                BarcodesDetected="BarcodesDetected"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                AbsoluteLayout.LayoutBounds="0.5, 0.5, 300, 300"
+                AbsoluteLayout.LayoutFlags="PositionProportional" />
+
+            <Button
+                x:Name="CameraCloseButton"
+                VerticalOptions="Start"
+                HorizontalOptions="End"
+                Clicked="OnQRCloseClicked"
+                Text="×"
+                TextColor="Black"
+                FontSize="24"
+                BackgroundColor="White"
+                AbsoluteLayout.LayoutBounds="0.9, 0.05, 50, 50"
+                AbsoluteLayout.LayoutFlags="PositionProportional" />
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

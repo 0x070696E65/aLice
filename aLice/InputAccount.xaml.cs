@@ -9,7 +9,7 @@ namespace aLice;
 public partial class InputAccount : ContentPage
 {
     private string NetworkType = "MainNet";
-    private MainPage mainPage;
+    private readonly MainPage mainPage;
     public InputAccount(MainPage _mainPage)
     {
         InitializeComponent();
@@ -202,5 +202,39 @@ public partial class InputAccount : ContentPage
         // パスワードを表示する
         Password.IsPassword = !Password.IsPassword;
         ShowPasswordButton.Text = Password.IsPassword ? "\uf06e" : "\uf070";
+    }
+    
+    private async void OnQRButtonClicked(object sender, EventArgs e)
+    {
+        var barcodeReaderPage = new BarcodeReader();
+        barcodeReaderPage.DataChanged += OnBarcodeReaderDataChanged;
+        await Navigation.PushModalAsync(barcodeReaderPage);
+    }
+    
+    private async void OnBarcodeReaderDataChanged(object sender, DataEventArgs e)
+    {
+        await Dispatcher.DispatchAsync(async () =>
+        {
+            PrivateKey.Text = e.privateKey;
+            Address.Text = e.address;
+            switch (e.network)
+            {
+                case 104:
+                    mainnetRadioButton.IsChecked = true;
+                    testnetRadioButton.IsChecked = false;
+                    NetworkType = "MainNet";
+                    break;
+                case 152:
+                    mainnetRadioButton.IsChecked = false;
+                    testnetRadioButton.IsChecked = true;
+                    NetworkType = "TestNet";
+                    break;
+            }
+
+            if (Navigation.ModalStack.Count > 1)
+            {
+                await Navigation.PopModalAsync();
+            }
+        });
     }
 }
