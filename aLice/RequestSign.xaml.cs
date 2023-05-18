@@ -12,15 +12,17 @@ public partial class RequestSign : ContentPage
     private string callbackUrl;
     private readonly string method;
     private readonly string redirectUrl;
+    private readonly List<string> args;
     private readonly RequestType type;
     private byte[] bytesData;
     private SavedAccount mainAccount;
     private (ITransaction transaction, string parsedTransaction) parsedTransaction;
 
-    public RequestSign(string _data, string _callbackUrl, RequestType _type, string _method, string _redirectUrl = null)
+    public RequestSign(string _data, string _callbackUrl, RequestType _type, string _method, List<string> _args = null, string _redirectUrl = null)
     {
         InitializeComponent();
         data = _data;
+        args = _args;
         method = _method;
         redirectUrl = _redirectUrl;
         callbackUrl = _callbackUrl;
@@ -102,6 +104,10 @@ public partial class RequestSign : ContentPage
                             {"original_data", data},
                             {"signed_payload", signedPayload},
                         };
+                        for (var i = 0; i < args.Count; i++)
+                        {
+                            dic.Add("arg" + i, args[i]);   
+                        }
                         using var client = new HttpClient();
                         var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
                         var response =  client.PostAsync(callbackUrl, content).Result;
@@ -112,6 +118,9 @@ public partial class RequestSign : ContentPage
                     case "get":
                     {
                         var url = $"{callbackUrl}?signed_payload={signedPayload}&pubkey={mainAccount.publicKey}&original_data={data}";
+                        for (var i = 0; i < args.Count; i++) {
+                            url += $"&args{i}={args[i]}";
+                        }
                         await Launcher.OpenAsync(new Uri(url));
                         break;
                     }

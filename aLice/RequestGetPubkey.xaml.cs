@@ -10,11 +10,13 @@ public partial class RequestGetPubkey : ContentPage
     private SavedAccount mainAccount;
     private readonly string callbackUrl;
     private string pubkey;
+    private readonly List<string> args;
 
-    public RequestGetPubkey(string _callbackUrl)
+    public RequestGetPubkey(string _callbackUrl, List<string> _args = null)
     {
         InitializeComponent();
         callbackUrl = _callbackUrl;
+        args = _args;
     }
     
     protected override async void OnAppearing()
@@ -45,6 +47,10 @@ public partial class RequestGetPubkey : ContentPage
     private async void AcceptRequestGetPubkey(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();
+        var url = $"{callbackUrl}?pubkey={pubkey}";
+        for (var i = 0; i < args.Count; i++) {
+            url += $"&args{i}={args[i]}";
+        }
         await Launcher.OpenAsync(new Uri($"{callbackUrl}?pubkey={pubkey}"));
     }
     

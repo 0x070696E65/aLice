@@ -41,9 +41,22 @@ public partial class App : Application
             if(!hasMethod) method = "get";
             var hasRedirectUrl = dict.TryGetValue("redirect_url", out var redirectUrl);
             
+            var argsCount = 0;
+            var args = new List<string>();
+            while (true)
+            {
+                var hasArgs = dict.TryGetValue("arg" + argsCount, out var metal);
+                if (!hasArgs)
+                {
+                    break;
+                }
+                args.Add(metal);
+                argsCount++;
+            }
+            
             if (Current?.MainPage != null && requestType == RequestType.Pugkey)
             {
-                await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));
+                await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl, args));
                 return;
             }
             if (Current?.MainPage != null && requestType == RequestType.Batches)
@@ -52,8 +65,8 @@ public partial class App : Application
                 var batches = new List<string>();
                 while (true)
                 {
-                    var hasMetal = dict.TryGetValue("batch" + count, out var metal);
-                    if (!hasMetal)
+                    var hasBatches = dict.TryGetValue("batch" + count, out var metal);
+                    if (!hasBatches)
                     {
                         break;
                     }
@@ -63,11 +76,11 @@ public partial class App : Application
                 
                 if (hasRedirectUrl)
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, redirectUrl));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, args, redirectUrl));
                 }
                 else
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, args));
                 }
                 return;
             }
@@ -76,11 +89,11 @@ public partial class App : Application
             {
                 if (hasRedirectUrl)
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, redirectUrl));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, args, redirectUrl));
                 }
                 else
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, args));
                 }
             }
         }
