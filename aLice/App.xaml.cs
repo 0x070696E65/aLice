@@ -49,7 +49,7 @@ public partial class App : Application
             if (Current?.MainPage != null && requestType == RequestType.Batches)
             {
                 var count = 0;
-                var metalList = new List<string>();
+                var batches = new List<string>();
                 while (true)
                 {
                     var hasMetal = dict.TryGetValue("batch" + count, out var metal);
@@ -57,17 +57,17 @@ public partial class App : Application
                     {
                         break;
                     }
-                    metalList.Add(metal);
+                    batches.Add(metal);
                     count++;
                 }
                 
                 if (hasRedirectUrl)
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(metalList, callbackUrl, method, redirectUrl));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, redirectUrl));
                 }
                 else
                 {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(metalList, callbackUrl, method));
+                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method));
                 }
                 return;
             }
