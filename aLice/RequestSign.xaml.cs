@@ -131,8 +131,38 @@ public partial class RequestSign : ContentPage
             else
             {
                 var signature = keyPair.Sign(bytesData);
-                var url = $"{callbackUrl}?signature={Converter.BytesToHex(signature.bytes)}&pubkey={mainAccount.publicKey}&original_data={data}";
-                await Launcher.OpenAsync(new Uri(url));
+                switch (method)
+                {
+                    case "post":
+                    {
+                        var dic = new Dictionary<string, string>
+                        {
+                            {"pubkey", mainAccount.publicKey},
+                            {"original_data", data},
+                            {"signature", Converter.BytesToHex(signature.bytes)},
+                        };
+                        for (var i = 0; i < args.Count; i++)
+                        {
+                            dic.Add("arg" + i, args[i]);   
+                        }
+                        using var client = new HttpClient();
+                        var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
+                        var response =  client.PostAsync(callbackUrl, content).Result;
+                        await response.Content.ReadAsStringAsync();
+                        if (redirectUrl != null) await Launcher.OpenAsync(new Uri(redirectUrl));
+                        break;
+                    }
+                    case "get":
+                    {
+                        var url =
+                            $"{callbackUrl}?signature={Converter.BytesToHex(signature.bytes)}&pubkey={mainAccount.publicKey}&original_data={data}";
+                        for (var i = 0; i < args.Count; i++) {
+                            url += $"&args{i}={args[i]}";
+                        }
+                        await Launcher.OpenAsync(new Uri(url));
+                        break;   
+                    }
+                }
             }
 
             Reset();
