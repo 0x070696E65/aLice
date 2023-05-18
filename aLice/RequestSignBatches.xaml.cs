@@ -11,16 +11,14 @@ public partial class RequestSignBatches : ContentPage
     private List<string> data;
     private string callbackUrl;
     private readonly string method;
-    private readonly List<string> args;
     private readonly string redirectUrl;
     private SavedAccount mainAccount;
     private readonly List<(IBaseTransaction transaction, string parsedTransaction)> parsedTransaction;
     
-    public RequestSignBatches(List<string> _data, string _callbackUrl, string _method, List<string> _args = null, string _redirectUrl = null)
+    public RequestSignBatches(List<string> _data, string _callbackUrl, string _method, string _redirectUrl = null)
     {
         InitializeComponent();
         data = _data;
-        args = _args;
         redirectUrl = _redirectUrl;
         callbackUrl = _callbackUrl;
         method = _method;
@@ -89,10 +87,6 @@ public partial class RequestSignBatches : ContentPage
                     {
                         dic.Add("metal" + i, Converter.BytesToHex(aggs[i].Serialize()));   
                     }
-                    for (var i = 0; i < args.Count; i++)
-                    {
-                        dic.Add("arg" + i, args[i]);   
-                    }
                     using var client = new HttpClient();
                     var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
                     var response =  client.PostAsync(callbackUrl, content).Result;
@@ -107,9 +101,6 @@ public partial class RequestSignBatches : ContentPage
                     {
                         var signedPayload = Converter.BytesToHex(aggs[i].Serialize());
                         url += $"&signed_{i}={signedPayload}";
-                    }
-                    for (var i = 0; i < args.Count; i++) {
-                        url += $"&args{i}={args[i]}";
                     }
                     await Launcher.OpenAsync(new Uri(url));
                     break;
