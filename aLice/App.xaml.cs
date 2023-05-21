@@ -1,4 +1,6 @@
-﻿namespace aLice;
+﻿using CatSdk.Utils;
+
+namespace aLice;
 
 public partial class App : Application
 {
@@ -37,10 +39,14 @@ public partial class App : Application
             
             if (!hasType) throw new NullReferenceException("type is null");
             if (!hasCallbackUrl) throw new NullReferenceException("callback url is null");
-            
+            callbackUrl = Converter.HexToUtf8(callbackUrl);
+
             if(!hasMethod) method = "get";
             var hasRedirectUrl = dict.TryGetValue("redirect_url", out var redirectUrl);
-            
+            if (hasRedirectUrl) {
+                redirectUrl = Converter.HexToUtf8(redirectUrl);   
+            }
+
             if (Current?.MainPage != null && requestType == RequestType.Pugkey)
             {
                 await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));

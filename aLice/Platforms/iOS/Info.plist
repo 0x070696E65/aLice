@@ -43,5 +43,7 @@
 	<string>Light</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses barcode scanning to...</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>このアプリは直接的にBluetoothを使用しませんが、一部の内部コンポーネントがBluetoothを必要とする可能性があります。</string>
 </dict>
 </plist>

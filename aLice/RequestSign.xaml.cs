@@ -111,8 +111,15 @@ public partial class RequestSign : ContentPage
                     }
                     case "get":
                     {
-                        var url = $"{callbackUrl}?signed_payload={signedPayload}&pubkey={mainAccount.publicKey}&original_data={data}";
-                        await Launcher.OpenAsync(new Uri(url));
+                        var additionalParam =
+                            $"signed_payload={signedPayload}&pubkey={mainAccount.publicKey}&original_data={data}";
+                        if (callbackUrl.Contains('?')) {
+                            callbackUrl += "&" + additionalParam;
+                        }
+                        else {
+                            callbackUrl += "?" + additionalParam;
+                        }
+                        await Launcher.OpenAsync(new Uri(callbackUrl));
                         break;
                     }
                     default:
@@ -141,9 +148,15 @@ public partial class RequestSign : ContentPage
                     }
                     case "get":
                     {
-                        var url =
-                            $"{callbackUrl}?signature={Converter.BytesToHex(signature.bytes)}&pubkey={mainAccount.publicKey}&original_data={data}";
-                        await Launcher.OpenAsync(new Uri(url));
+                        var additionalParam =
+                            $"signature={Converter.BytesToHex(signature.bytes)}&pubkey={mainAccount.publicKey}&original_data={data}";
+                        if (callbackUrl.Contains('?')) {
+                            callbackUrl += "&" + additionalParam;
+                        }
+                        else {
+                            callbackUrl += "?" + additionalParam;
+                        }
+                        await Launcher.OpenAsync(new Uri(callbackUrl));
                         break;   
                     }
                 }
@@ -161,7 +174,14 @@ public partial class RequestSign : ContentPage
     // 署名を拒否したときに呼び出される
     private async void RejectedRequestSign(object sender, EventArgs e)
     {
-        await Launcher.OpenAsync(new Uri($"{callbackUrl}?error=sign_rejected"));
+        const string additionalParam = "error=sign_rejected";
+        if (callbackUrl.Contains('?')) {
+            callbackUrl += "&" + additionalParam;
+        }
+        else {
+            callbackUrl += "?" + additionalParam;
+        }
+        await Launcher.OpenAsync(new Uri(callbackUrl));
         Reset();
         await Navigation.PopModalAsync();
     }

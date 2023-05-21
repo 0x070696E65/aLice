@@ -1,14 +1,11 @@
 using System.Text.Json;
-using CatSdk.CryptoTypes;
-using CatSdk.Symbol;
-using CatSdk.Utils;
 
 namespace aLice;
 
 public partial class RequestGetPubkey : ContentPage
 {
     private SavedAccount mainAccount;
-    private readonly string callbackUrl;
+    private string callbackUrl;
     private string pubkey;
 
     public RequestGetPubkey(string _callbackUrl)
@@ -45,13 +42,27 @@ public partial class RequestGetPubkey : ContentPage
     private async void AcceptRequestGetPubkey(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();
-        await Launcher.OpenAsync(new Uri($"{callbackUrl}?pubkey={pubkey}"));
+        var additionalParam = $"pubkey={pubkey}";
+        if (callbackUrl.Contains('?')) {
+            callbackUrl += "&" + additionalParam;
+        }
+        else {
+            callbackUrl += "?" + additionalParam;
+        }
+        await Launcher.OpenAsync(new Uri(callbackUrl));
     }
     
     // 公開鍵要求を拒否したときに呼び出される
     private async void RejectedRequestGetPubkey(object sender, EventArgs e)
     {
+        const string additionalParam = "error=sign_rejected";
+        if (callbackUrl.Contains('?')) {
+            callbackUrl += "&" + additionalParam;
+        }
+        else {
+            callbackUrl += "?" + additionalParam;
+        }
+        await Launcher.OpenAsync(new Uri(callbackUrl));
         await Navigation.PopModalAsync();
-        await Launcher.OpenAsync(new Uri($"{callbackUrl}?error=get_pubkey_rejected"));
     }
 }

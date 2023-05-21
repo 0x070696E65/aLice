@@ -1,5 +1,4 @@
-﻿using ObjCRuntime;
-using UIKit;
+﻿using UIKit;
 
 namespace aLice;
 
@@ -13,4 +12,3 @@ public class Program
 		UIApplication.Main(args, null, typeof(AppDelegate));
 	}
 }
-
