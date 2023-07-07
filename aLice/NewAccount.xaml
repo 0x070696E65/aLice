@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="aLice.NewAccount">
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout
+                Spacing="25"
+                Padding="30,50, 30, 0"
+                VerticalOptions="Start">
+                <Label
+                    Text="New Account"
+                    SemanticProperties.HeadingLevel="Level1"
+                    FontSize="32"
+                    HorizontalOptions="Center" />
+                
+                <StackLayout Orientation="Horizontal">
+                    <RadioButton IsChecked="True" x:Name="mainnetRadioButton" GroupName="NetworkType" CheckedChanged="OnRadioButtonCheckedChanged" VerticalOptions="Center" />
+                    <Label Text="MainNet" VerticalOptions="Center" />
+                    <RadioButton x:Name="testnetRadioButton" GroupName="NetworkType" CheckedChanged="OnRadioButtonCheckedChanged" VerticalOptions="Center" />
+                    <Label Text="TestNet" VerticalOptions="Center" />
+                </StackLayout>
+                
+                <Entry
+                    Placeholder="AccountName"
+                    PlaceholderColor="#BFBFBF"
+                    x:Name="Name"/>
+                
+                <StackLayout Orientation="Horizontal">
+                    <Entry
+                        Placeholder="Password"
+                        PlaceholderColor="#BFBFBF"
+                        x:Name="Password"
+                        Keyboard="Numeric"
+                        IsPassword="True"
+                        HorizontalOptions="FillAndExpand"/>
+                    
+                    <Button BackgroundColor="White" FontSize="30" TextColor="Gray" Text="\uf06e" Clicked="ShowPasswordButtonClicked" FontFamily="FontAwesome" x:Name="ShowPasswordButton" HorizontalOptions="End" />
+                </StackLayout>
+                
+                <Label
+                    FontSize="14"
+                    x:Name="Error"
+                    TextColor="DarkRed"
+                    HorizontalOptions="Center" />
+                
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Text="Submit"
+                            Clicked="OnClickSubmitAccount"
+                            BackgroundColor="Black"
+                            Grid.Column="0"
+                            Margin="0,0,10,0"/>
+
+                    <Button Text="Close"
+                            Clicked="OnClickCloseAccount"
+                            BackgroundColor="Gray"
+                            TextColor="White"
+                            Grid.Column="1"
+                            Margin="10,0,0,0"/>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

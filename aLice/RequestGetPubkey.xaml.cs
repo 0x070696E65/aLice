@@ -6,6 +6,7 @@ public partial class RequestGetPubkey : ContentPage
 {
     private SavedAccount mainAccount;
     private string callbackUrl;
+    private SavedAccounts savedAccounts;
     private string pubkey;
 
     public RequestGetPubkey(string _callbackUrl)
@@ -26,7 +27,7 @@ public partial class RequestGetPubkey : ContentPage
         try
         {
             var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
+            savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
             if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
             mainAccount = savedAccounts.accounts.Find((acc) => acc.isMain);
             pubkey = mainAccount.publicKey;
@@ -36,6 +37,18 @@ public partial class RequestGetPubkey : ContentPage
         {
             Error.Text = exception.Message;
         }
+    }
+    
+    private async void ChangeAccount(object sender, EventArgs e)
+    {
+        var accountNames = new string[savedAccounts.accounts.Count];
+        for (var i = 0; i < savedAccounts.accounts.Count; i++)
+        {
+            accountNames[i] = savedAccounts.accounts[i].accountName;
+        }
+        var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, accountNames);
+        mainAccount = savedAccounts.accounts.Find(acc => acc.accountName == accName);
+        Ask.Text = $"{mainAccount.accountName}で署名しますか？";
     }
     
     // 署名を受け入れたときに呼び出される

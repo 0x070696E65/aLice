@@ -19,8 +19,8 @@
         <ApplicationIdGuid>1E47EC8D-2DC8-4A49-8AF0-BBCFCA12D518</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.1.1</ApplicationDisplayVersion>
-        <ApplicationVersion>13</ApplicationVersion>
+        <ApplicationDisplayVersion>1.2.1</ApplicationDisplayVersion>
+        <ApplicationVersion>15</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
@@ -81,6 +81,19 @@
         <Reference Include="MetalOnSymbol">
           <HintPath>Plugins\MetalOnSymbol.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="NewAccount.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="NewAccount.xaml.cs">
+        <DependentUpon>NewAccount.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 
 </Project>

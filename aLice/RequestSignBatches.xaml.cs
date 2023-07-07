@@ -10,6 +10,7 @@ public partial class RequestSignBatches : ContentPage
 {
     private List<string> data;
     private string callbackUrl;
+    private SavedAccounts savedAccounts;
     private readonly string method;
     private readonly string redirectUrl;
     private SavedAccount mainAccount;
@@ -36,8 +37,12 @@ public partial class RequestSignBatches : ContentPage
     {
         try
         {
+            var uri = new Uri(callbackUrl);
+            var baseUrl = $"{uri.Scheme}://{uri.Authority}";
+            Domain.Text = $"{baseUrl}からの署名要求です";
+            
             var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
+            savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
             if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
             mainAccount = savedAccounts.accounts.Find((acc) => acc.isMain);
             foreach (var s in data)
@@ -123,6 +128,18 @@ public partial class RequestSignBatches : ContentPage
         {
             Error.Text = exception.Message;
         }
+    }
+    
+    private async void ChangeAccount(object sender, EventArgs e)
+    {
+        var accountNames = new string[savedAccounts.accounts.Count];
+        for (var i = 0; i < savedAccounts.accounts.Count; i++)
+        {
+            accountNames[i] = savedAccounts.accounts[i].accountName;
+        }
+        var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, accountNames);
+        mainAccount = savedAccounts.accounts.Find(acc => acc.accountName == accName);
+        Ask.Text = $"{mainAccount.accountName}で署名しますか？";
     }
     
     // 署名を拒否したときに呼び出される

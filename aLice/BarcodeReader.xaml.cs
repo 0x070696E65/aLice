@@ -38,7 +38,6 @@ public partial class BarcodeReader : ContentPage
     
     private async void OnQRCloseClicked(object sender, EventArgs e)
     {
-        
         await Navigation.PopModalAsync();
     }
     

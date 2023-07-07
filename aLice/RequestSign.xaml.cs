@@ -12,6 +12,7 @@ public partial class RequestSign : ContentPage
     private string callbackUrl;
     private readonly string method;
     private readonly string redirectUrl;
+    private SavedAccounts savedAccounts;
     private readonly RequestType type;
     private byte[] bytesData;
     private SavedAccount mainAccount;
@@ -38,15 +39,18 @@ public partial class RequestSign : ContentPage
     {
         try
         {
+            var uri = new Uri(callbackUrl);
+            var baseUrl = $"{uri.Scheme}://{uri.Authority}";
+            Domain.Text = $"{baseUrl}からの署名要求です";
             var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
+            savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
             if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
             mainAccount = savedAccounts.accounts.Find((acc) => acc.isMain);
             if(type == RequestType.SignUtf8)
             {
-                bytesData = System.Text.Encoding.UTF8.GetBytes(data);
+                bytesData = Converter.HexToBytes(data);
                 Type.Text = "UTF8文字列です";
-                Data.Text = data;
+                Data.Text = Converter.HexToUtf8(data);
             } else if(type == RequestType.SignBinaryHex)
             {
                 bytesData = Converter.HexToBytes(data);
@@ -66,6 +70,18 @@ public partial class RequestSign : ContentPage
         {
             Error.Text = exception.Message;
         }
+    }
+
+    private async void ChangeAccount(object sender, EventArgs e)
+    {
+        var accountNames = new string[savedAccounts.accounts.Count];
+        for (var i = 0; i < savedAccounts.accounts.Count; i++)
+        {
+            accountNames[i] = savedAccounts.accounts[i].accountName;
+        }
+        var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, accountNames);
+        mainAccount = savedAccounts.accounts.Find(acc => acc.accountName == accName);
+        Ask.Text = $"{mainAccount.accountName}で署名しますか？";
     }
     
     // 署名を受け入れたときに呼び出される

@@ -1,5 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
+using System.Text.Json;
 using ZXing.Net.Maui;
+using CatSdk.Symbol;
+using CatSdk.CryptoTypes;
 
 namespace aLice;
 
@@ -37,9 +40,11 @@ public partial class MainPage : ContentPage
                 {
                     ColumnDefinitions =
                     {
+                        new ColumnDefinition { Width = new GridLength(5, GridUnitType.Star) },
                         new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                        new ColumnDefinition { Width = GridLength.Auto },
-                        new ColumnDefinition { Width = GridLength.Auto }
+                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
                     }
                 };
                 var nameLabel = new Label
@@ -52,43 +57,76 @@ public partial class MainPage : ContentPage
                 Grid.SetColumn(nameLabel, 0);
                 grid.Children.Add(nameLabel);
                 
-                var keyButton = new Button()
+                var starButton = new Button()
                 {
                     BackgroundColor = Color.FromRgba(255, 255, 255, 0),
                     HorizontalOptions = LayoutOptions.End,
                 };
+                var addressButton = new Button
+                {
+                    BackgroundColor = Color.FromRgba(255, 255, 255, 0),
+                    HorizontalOptions = LayoutOptions.End,
+                    ImageSource = "book.png",
+                };
+                addressButton.Clicked += async (sender, args) =>
+                {
+                    await Clipboard.SetTextAsync(acc.address);
+                    // ダイアログを表示
+                    if(Application.Current != null 
+                       && Application.Current.MainPage != null 
+                       && Application.Current != null )
+                        await Application.Current.MainPage.DisplayAlert("Copied", "クリップボードにアドレスをコピーしました", "閉じる");
+                };
+                var exportButton = new Button
+                {
+                    BackgroundColor = Color.FromRgba(255, 255, 255, 0),
+                    HorizontalOptions = LayoutOptions.End,
+                    ImageSource = "key.png",
+                };
+                exportButton.Clicked += async (sender, e) =>
+                {
+                    await ExportAccount(acc.address);
+                };
+                var deleteButton = new Button
+                {
+                    BackgroundColor = Color.FromRgba(255, 255, 255, 0),
+                    HorizontalOptions = LayoutOptions.End,
+                    ImageSource = "trash_can_regular.png",
+                };
+                deleteButton.Clicked += async (sender, e) =>
+                {
+                    await ConfirmDeleteAccount(acc.address);
+                };
                 if (acc.isMain)
                 {
-                    keyButton.ImageSource = "star_solid.png";
-                    keyButton.Clicked += async (sender, e) =>
+                    starButton.ImageSource = "star_solid.png";
+                    starButton.Clicked += async (sender, e) =>
                     {
                         await DisplayAlert("Info", "メインアカウントです", "OK");
                     };
-                    Grid.SetColumn(keyButton, 1);
-                    grid.Children.Add(keyButton);
+                    Grid.SetColumn(starButton, 2);
+                    grid.Children.Add(starButton);
+                    Grid.SetColumn(addressButton, 3);
+                    grid.Children.Add(addressButton);
+                    Grid.SetColumn(exportButton, 4);
+                    grid.Children.Add(exportButton);
                 }
                 else
                 {
-                    keyButton.ImageSource = "star_regular.png";
-                    keyButton.Clicked += async (sender, e) =>
+                    starButton.ImageSource = "star_regular.png";
+                    starButton.Clicked += async (sender, e) =>
                     {
                         await SetMainAccount(acc.address);
                         await DisplayAlert("Success", "メインアカウントが変更されました", "OK");
                     };
                     
-                    var deleteButton = new Button
-                    {
-                        BackgroundColor = Color.FromRgba(255, 255, 255, 0),
-                        HorizontalOptions = LayoutOptions.End,
-                        ImageSource = "trash_can_regular.png",
-                    };
-                    deleteButton.Clicked += async (sender, e) =>
-                    {
-                        　await ConfirmDeleteAccount(acc.address);
-                    };
-                    Grid.SetColumn(keyButton, 1);
-                    Grid.SetColumn(deleteButton, 2);
-                    grid.Children.Add(keyButton);
+                    Grid.SetColumn(starButton, 1);
+                    Grid.SetColumn(addressButton, 2);
+                    Grid.SetColumn(exportButton, 3);
+                    Grid.SetColumn(deleteButton, 4);
+                    grid.Children.Add(starButton);
+                    grid.Children.Add(addressButton);
+                    grid.Children.Add(exportButton);
                     grid.Children.Add(deleteButton);
                 }
                 
@@ -124,6 +162,30 @@ public partial class MainPage : ContentPage
         {
             Console.WriteLine("No accounts found: " + e.Message);
         }
+    }
+
+    private async Task ExportAccount(string address)
+    {
+        var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+        if (password == null) return;
+        string privateKey;
+        try {
+            var accounts = await SecureStorage.GetAsync("accounts");
+            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
+            if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
+            var acc = savedAccounts.accounts.Find(acc => acc.address == address);
+            privateKey = CatSdk.Crypto.Crypto.DecryptString(acc.encryptedPrivateKey, password, acc.address);
+        }
+        catch {
+            throw new Exception("パスワードが正しくありません");
+        }
+        var keyPair = new KeyPair(new PrivateKey(privateKey));
+        await Clipboard.SetTextAsync(keyPair.PrivateKey.ToString());
+        // ダイアログを表示
+        if(Application.Current != null 
+           && Application.Current.MainPage != null 
+           && Application.Current != null )
+        await Application.Current.MainPage.DisplayAlert("クリップボードに秘密鍵をコピーしました", "秘密鍵の取り扱いには十分に注意してください", "はい");
     }
 
     private async Task SetMainAccount(string mainAddress)
@@ -163,7 +225,15 @@ public partial class MainPage : ContentPage
     
     private async void OnButtonClicked(object sender, EventArgs e)
     {
-        // データ登録用のボップアップを開く
-        await Navigation.PushModalAsync(new InputAccount(this));
+        var action = await DisplayActionSheet("Select", "cancel", null, "New Account", "Import Account");
+        switch (action)
+        {
+            case "New Account":
+                await Navigation.PushModalAsync(new NewAccount(this));
+                break;
+            case "Import Account":
+                await Navigation.PushModalAsync(new ImportAccount(this));
+                break;
+        }
     }
 }
