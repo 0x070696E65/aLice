@@ -51,7 +51,7 @@ public partial class App : Application
             var hasCallbackUrl = dict.TryGetValue("callback", out var callbackUrl);
             var hasMethod = dict.TryGetValue("method", out var method);
             
-            if (!hasData)
+            if (!hasData && requestType != RequestType.Pugkey)
             {
                 await NotificationError("data is null");
                 return;

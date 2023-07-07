@@ -7,7 +7,6 @@ public partial class RequestGetPubkey : ContentPage
     private SavedAccount mainAccount;
     private string callbackUrl;
     private SavedAccounts savedAccounts;
-    private string pubkey;
 
     public RequestGetPubkey(string _callbackUrl)
     {
@@ -30,7 +29,6 @@ public partial class RequestGetPubkey : ContentPage
             savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
             if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
             mainAccount = savedAccounts.accounts.Find((acc) => acc.isMain);
-            pubkey = mainAccount.publicKey;
             Ask.Text = $"{mainAccount.accountName}の公開鍵を渡しても良いですか？";
         }
         catch (Exception exception)
@@ -48,14 +46,14 @@ public partial class RequestGetPubkey : ContentPage
         }
         var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, accountNames);
         mainAccount = savedAccounts.accounts.Find(acc => acc.accountName == accName);
-        Ask.Text = $"{mainAccount.accountName}で署名しますか？";
+        Ask.Text = $"{mainAccount.accountName}の公開鍵を渡しても良いですか？";
     }
     
     // 署名を受け入れたときに呼び出される
     private async void AcceptRequestGetPubkey(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();
-        var additionalParam = $"pubkey={pubkey}";
+        var additionalParam = $"pubkey={mainAccount.publicKey}";
         if (callbackUrl.Contains('?')) {
             callbackUrl += "&" + additionalParam;
         }
