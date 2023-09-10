@@ -52,28 +52,42 @@ public partial class RequestGetPubkey : ContentPage
     // 署名を受け入れたときに呼び出される
     private async void AcceptRequestGetPubkey(object sender, EventArgs e)
     {
-        await Navigation.PopModalAsync();
-        var additionalParam = $"pubkey={mainAccount.publicKey}";
-        if (callbackUrl.Contains('?')) {
-            callbackUrl += "&" + additionalParam;
+        var additionalParam = $"pubkey={mainAccount.publicKey}&network={mainAccount.networkType}";
+        
+        if (callbackUrl != null)
+        {
+            await Navigation.PopModalAsync();
+            if (callbackUrl.Contains('?')) {
+                callbackUrl += "&" + additionalParam;
+            }
+            else {
+                callbackUrl += "?" + additionalParam;
+            }
+            await Launcher.OpenAsync(new Uri(callbackUrl));
         }
-        else {
-            callbackUrl += "?" + additionalParam;
+        else
+        {
+            await Application.Current.MainPage.Navigation.PopModalAsync();
+            await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("公開鍵", mainAccount.publicKey));
         }
-        await Launcher.OpenAsync(new Uri(callbackUrl));
     }
     
     // 公開鍵要求を拒否したときに呼び出される
     private async void RejectedRequestGetPubkey(object sender, EventArgs e)
     {
         const string additionalParam = "error=sign_rejected";
-        if (callbackUrl.Contains('?')) {
-            callbackUrl += "&" + additionalParam;
+        
+        if (callbackUrl != null)
+        {
+            if (callbackUrl.Contains('?')) {
+                callbackUrl += "&" + additionalParam;
+            }
+            else {
+                callbackUrl += "?" + additionalParam;
+            }
+            await Launcher.OpenAsync(new Uri(callbackUrl));
+            
         }
-        else {
-            callbackUrl += "?" + additionalParam;
-        }
-        await Launcher.OpenAsync(new Uri(callbackUrl));
         await Navigation.PopModalAsync();
     }
 }

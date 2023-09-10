@@ -104,12 +104,6 @@ public partial class MainPage : ContentPage
                     {
                         await DisplayAlert("Info", "メインアカウントです", "OK");
                     };
-                    Grid.SetColumn(starButton, 2);
-                    grid.Children.Add(starButton);
-                    Grid.SetColumn(addressButton, 3);
-                    grid.Children.Add(addressButton);
-                    Grid.SetColumn(exportButton, 4);
-                    grid.Children.Add(exportButton);
                 }
                 else
                 {
@@ -119,16 +113,16 @@ public partial class MainPage : ContentPage
                         await SetMainAccount(acc.address);
                         await DisplayAlert("Success", "メインアカウントが変更されました", "OK");
                     };
-                    
-                    Grid.SetColumn(starButton, 1);
-                    Grid.SetColumn(addressButton, 2);
-                    Grid.SetColumn(exportButton, 3);
-                    Grid.SetColumn(deleteButton, 4);
-                    grid.Children.Add(starButton);
-                    grid.Children.Add(addressButton);
-                    grid.Children.Add(exportButton);
-                    grid.Children.Add(deleteButton);
                 }
+                
+                Grid.SetColumn(starButton, 1);
+                Grid.SetColumn(addressButton, 2);
+                Grid.SetColumn(exportButton, 3);
+                Grid.SetColumn(deleteButton, 4);
+                grid.Children.Add(starButton);
+                grid.Children.Add(addressButton);
+                grid.Children.Add(exportButton);
+                grid.Children.Add(deleteButton);
                 
                 var addressLabel = new Label
                 {
@@ -212,8 +206,11 @@ public partial class MainPage : ContentPage
         {
             var accounts = await SecureStorage.GetAsync("accounts");
             var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
-            var elementsToRemove = savedAccounts.accounts.Where(acc => acc.address == addressToRemove).ToList();
-            savedAccounts.accounts.RemoveAll(x => elementsToRemove.Contains(x));
+            var elementsToRemove = savedAccounts.accounts.Find(acc => acc.address == addressToRemove);
+            savedAccounts.accounts.Remove(elementsToRemove);
+            if (elementsToRemove.isMain && savedAccounts.accounts.Count > 0)
+                savedAccounts.accounts[0].isMain = true;
+            
             var updatedAccounts = JsonSerializer.Serialize(savedAccounts);
             await SecureStorage.SetAsync("accounts", updatedAccounts);
         }

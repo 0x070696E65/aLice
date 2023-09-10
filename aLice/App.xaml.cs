@@ -9,7 +9,7 @@ public partial class App : Application
         InitializeComponent();
         
         // 強制的にライトモードを適用
-        if (Application.Current != null) Application.Current.UserAppTheme = AppTheme.Light;
+        if (Current != null) Current.UserAppTheme = AppTheme.Light;
 
         MainPage = new MainPage();
     }
@@ -19,12 +19,6 @@ public partial class App : Application
         
         try
         {
-            /*
-            var uri_a = new Uri(_uri);
-            var baseUrl_a = $"{uri_a.Scheme}://{uri_a.Authority}";
-            Console.WriteLine(baseUrl_a);
-            */
-            
             var queryString = _uri.Split('?').LastOrDefault();
             if (queryString == null) return;
             var dict = queryString.Split('&')
@@ -56,14 +50,9 @@ public partial class App : Application
                 await NotificationError("data is null");
                 return;
             }
-
-            if (!hasCallbackUrl)
-            {
-                await NotificationError("callback url is null");
-                return;
-            }
             
-            callbackUrl = Converter.HexToUtf8(callbackUrl);
+            dict.TryGetValue("recipient_publicKey_for_encrypt_message", out var recipientPublicKeyForEncryptMessage);
+            dict.TryGetValue("fee_multiplier", out var feeMultiplier);
             
             if(!hasMethod) method = "get";
             var hasRedirectUrl = dict.TryGetValue("redirect_url", out var redirectUrl);
@@ -71,38 +60,43 @@ public partial class App : Application
                 redirectUrl = Converter.HexToUtf8(redirectUrl);   
             }
             
-            var uri = new Uri(callbackUrl);
-            var baseUrl = $"{uri.Scheme}://{uri.Authority}";
-
-            var domains = Array.Empty<string>();
-            try
+            if (hasCallbackUrl)
             {
-                domains = (await SecureStorage.GetAsync("domains")).Split(',');
-            }
-            catch
-            {
-                // ignored
-            }
+                callbackUrl = Converter.HexToUtf8(callbackUrl);
             
-            if (!domains.Contains(baseUrl))
-            {
-                if (Current?.MainPage != null)
+                var uri = new Uri(callbackUrl);
+                var baseUrl = $"{uri.Scheme}://{uri.Authority}";
+
+                var domains = Array.Empty<string>();
+                try
                 {
-                    var isRegistDomain =
-                        await Current.MainPage.DisplayAlert("確認", baseUrl + "は未登録です。\n使用可能として登録しますか？", "はい", "いいえ");
-                    if (isRegistDomain)
+                    domains = (await SecureStorage.GetAsync("domains")).Split(',');
+                }
+                catch
+                {
+                    // ignored
+                }
+            
+                if (!domains.Contains(baseUrl))
+                {
+                    if (Current?.MainPage != null)
                     {
-                        var addedDomains = domains.Append(baseUrl);
-                        await SecureStorage.SetAsync("domains", string.Join(",", addedDomains));
-                    }
-                    else
-                    {
-                        RejectedRequestSign(callbackUrl);
-                        return;
+                        var isRegistDomain =
+                            await Current.MainPage.DisplayAlert("確認", baseUrl + "は未登録です。\n使用可能として登録しますか？", "はい", "いいえ");
+                        if (isRegistDomain)
+                        {
+                            var addedDomains = domains.Append(baseUrl);
+                            await SecureStorage.SetAsync("domains", string.Join(",", addedDomains));
+                        }
+                        else
+                        {
+                            RejectedRequestSign(callbackUrl);
+                            return;
+                        }
                     }
                 }
             }
-
+            
             if (Current?.MainPage != null && requestType == RequestType.Pugkey)
             {
                 await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));
@@ -123,27 +117,14 @@ public partial class App : Application
                     count++;
                 }
                 
-                if (hasRedirectUrl)
-                {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, redirectUrl));
-                }
-                else
-                {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method));
-                }
+                await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, redirectUrl));
                 return;
             }
-
+            
+            dict.TryGetValue("set_public_key", out var setPublicKey);
             if (Current?.MainPage != null && hasData)
             {
-                if (hasRedirectUrl)
-                {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, redirectUrl));
-                }
-                else
-                {
-                    await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method));
-                }
+                await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, redirectUrl, setPublicKey, recipientPublicKeyForEncryptMessage, feeMultiplier));
             }
         }
         catch (OperationCanceledException)
@@ -151,7 +132,7 @@ public partial class App : Application
             // 非同期操作がキャンセルされたときの処理（必要に応じて）
         }
     }
-
+    
     static private async Task NotificationError(string message)
     {
         if (Current?.MainPage != null)

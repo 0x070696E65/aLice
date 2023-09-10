@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text;
 using CatSdk;
+using CatSdk.Crypto;
+using CatSdk.CryptoTypes;
 using CatSdk.Symbol;
 using CatSdk.Utils;
 
@@ -8,11 +10,24 @@ namespace aLice;
 
 public static class SymbolTransaction
 {
-    public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex)
+    public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex, string recipientPublicKeyForEncryptMessage, string feeMultiplier)
     {
         var transaction = TransactionFactory.Deserialize(hex);
         if (transaction.Type == TransactionType.TRANSFER)
         {
+            if (recipientPublicKeyForEncryptMessage != null)
+            {
+                if (transaction is TransferTransactionV1 transferTransaction)
+                {
+                    var saveMessage = transferTransaction.Message;
+                    var dammyKeyPair = new KeyPair(PrivateKey.Random());
+                    var message = Encoding.UTF8.GetString(transferTransaction.Message);
+                    var encrypted = "01" + Crypto.Encode(dammyKeyPair.PrivateKey.ToString(), dammyKeyPair.PublicKey.ToString(), message);
+                    transferTransaction.Message = Converter.HexToBytes(encrypted);
+                    TransactionHelper.SetMaxFee(transferTransaction, feeMultiplier != null ? int.Parse(feeMultiplier) : 100);
+                    transferTransaction.Message = saveMessage;
+                }
+            }
             return (transaction, ParseTransferTransaction(transaction));
         }
         if(transaction.Type == TransactionType.MOSAIC_DEFINITION)
@@ -535,7 +550,7 @@ public static class SymbolTransaction
         if (embedded)
         {
             var transaction = (EmbeddedMultisigAccountModificationTransactionV1) _transaction;
-            result += "NamespaceMetadataTransaction\n";
+            result += "MultisigAccountModificationTransaction\n";
             result += $"MinApprovalDelta: {transaction.MinApprovalDelta}\n";
             result += $"MinRemovalDelta: {transaction.MinRemovalDelta}\n";
             result += $"AddressAdditions:\n";
@@ -548,7 +563,7 @@ public static class SymbolTransaction
         else
         {
             var transaction = (MultisigAccountModificationTransactionV1) _transaction;
-            result += "NamespaceMetadataTransaction\n";
+            result += "MultisigAccountModificationTransaction\n";
             result += $"MinApprovalDelta: {transaction.MinApprovalDelta}\n";
             result += $"MinRemovalDelta: {transaction.MinRemovalDelta}\n";
             result += $"AddressAdditions:\n";
@@ -849,7 +864,7 @@ public static class SymbolTransaction
         if (embedded)
         {
             var transaction = (EmbeddedMosaicSupplyChangeTransactionV1) _transaction;
-            result += "MosaicDefinitionTransaction\n";
+            result += "MosaicSupplyChangeTransaction\n";
             result += $"MosaicID: {transaction.MosaicId.Value:X16}\n";
             result += $"Action: {transaction.Action}\n";
             result += $"Delta: {transaction.Delta.Value}\n";
@@ -857,7 +872,7 @@ public static class SymbolTransaction
         else
         {
             var transaction = (MosaicSupplyChangeTransactionV1) _transaction;
-            result += "MosaicDefinitionTransaction\n";
+            result += "MosaicSupplyChangeTransaction\n";
             result += $"MosaicID: {transaction.MosaicId.Value:X16}\n";
             result += $"Action: {transaction.Action}\n";
             result += $"Delta: {transaction.Delta.Value}\n";
@@ -973,17 +988,13 @@ public static class SymbolTransaction
     static string ParseMessage(byte[] bytes)
     {
         if(bytes.Length == 0) return "";
-        switch (bytes[0])
+        try
         {
-            case 0:
-            {
-                var message = Encoding.UTF8.GetString(bytes);
-                return message;
-            }
-            case 1:
-                return "暗号化されたメッセージです";
-            default:
-                return Converter.BytesToHex(bytes);
+            return Encoding.UTF8.GetString(bytes);
+        }
+        catch
+        {
+            return Converter.BytesToHex(bytes);
         }
     }
 }
