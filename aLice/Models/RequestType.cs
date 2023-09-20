@@ -6,7 +6,7 @@ namespace aLice
 		SignUtf8,
 		SignTransaction,
 		SignBinaryHex,
-		Pugkey,
+		Pubkey,
 		Batches,
 	}
 }

@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
+        <!--<TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>-->
+        <TargetFrameworks>net7.0-ios</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
         <!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
@@ -37,19 +38,20 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
+        <CreatePackage>false</CreatePackage>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit</MtouchExtraArgs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
       <CreatePackage>false</CreatePackage>
       <CodesignProvision>alice_product</CodesignProvision>
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit</MtouchExtraArgs>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
       <CreatePackage>false</CreatePackage>
-      <CodesignKey></CodesignKey>
       <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     </PropertyGroup>
     <ItemGroup>
@@ -89,16 +91,76 @@
     </ItemGroup>
 
     <ItemGroup>
-      <MauiXaml Update="NewAccount.xaml">
+      <MauiXaml Update="Views\MainPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\ImportAccount.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\NewAccount.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\RequestGetPubkey.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\RequestSign.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\RequestSignBatches.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\ShowPage.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+      <MauiXaml Update="Views\BarcodeReader.xaml">
         <SubType>Designer</SubType>
       </MauiXaml>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="NewAccount.xaml.cs">
+      <Compile Update="Views\MainPage.xaml.cs">
+        <DependentUpon>MainPage.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\ImportAccount.xaml.cs">
+        <DependentUpon>ImportAccount.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\NewAccount.xaml.cs">
         <DependentUpon>NewAccount.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Views\RequestGetPubkey.xaml.cs">
+        <DependentUpon>RequestGetPubkey.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\RequestSign.xaml.cs">
+        <DependentUpon>RequestSign.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\RequestSignBatches.xaml.cs">
+        <DependentUpon>RequestSignBatches.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\ShowPage.xaml.cs">
+        <DependentUpon>ShowPage.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\BarcodeReader.xaml.cs">
+        <DependentUpon>BarcodeReader.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\BarcodeReader.xaml" />
+      <AdditionalFiles Include="Views\ImportAccount.xaml" />
+      <AdditionalFiles Include="Views\MainPage.xaml" />
+      <AdditionalFiles Include="Views\NewAccount.xaml" />
+      <AdditionalFiles Include="Views\RequestGetPubkey.xaml" />
+      <AdditionalFiles Include="Views\RequestSign.xaml" />
+      <AdditionalFiles Include="Views\RequestSignBatches.xaml" />
+      <AdditionalFiles Include="Views\ShowPage.xaml" />
     </ItemGroup>
 
 </Project>

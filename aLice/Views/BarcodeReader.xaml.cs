@@ -4,7 +4,7 @@ using CatSdk.Facade;
 using CatSdk.Symbol;
 using ZXing.Net.Maui;
 
-namespace aLice;
+namespace aLice.Views;
 
 public partial class BarcodeReader : ContentPage
 {

@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Text.Json;
+using aLice.ViewModels;
 using ZXing.Net.Maui;
 using CatSdk.Symbol;
 using CatSdk.CryptoTypes;
 
-namespace aLice;
+namespace aLice.Views;
 
 public partial class MainPage : ContentPage
 {
@@ -22,11 +23,12 @@ public partial class MainPage : ContentPage
     public async Task ShowAccounts()
     {
         AccountList.Children.Clear();
+        await AccountViewModel.SetAccounts();
+        
         try
         {
             // 保存されているアカウントを取得
-            var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
+            var savedAccounts = AccountViewModel.Accounts;
 
             foreach (var acc in savedAccounts.accounts)
             {

@@ -1,12 +1,16 @@
-﻿using CatSdk.Utils;
+﻿using aLice.ViewModels;
+using aLice.Views;
 
 namespace aLice;
 
 public partial class App : Application
 {
+    public static IServiceProvider ServiceProvider { get; private set; }
+    
     public App()
     {
         InitializeComponent();
+        ServiceProvider = ConfigureServices();
         
         // 強制的にライトモードを適用
         if (Current != null) Current.UserAppTheme = AppTheme.Light;
@@ -16,120 +20,48 @@ public partial class App : Application
     
     public static async void RequestNotification(string _uri, CancellationToken token)
     {
-        
         try
         {
-            var queryString = _uri.Split('?').LastOrDefault();
-            if (queryString == null) return;
-            var dict = queryString.Split('&')
-                .Select(s => s.Split('='))
-                .ToDictionary(a => a[0], a => a[1]);
-            var hasType = dict.TryGetValue("type", out var type);
+            await AccountViewModel.SetAccounts();
+            if (AccountViewModel.Accounts.accounts.Count == 0)
+            {
+                throw new NullReferenceException("アカウントが登録されていません");
+            }
+            
+            var notification = new NotificationModel(_uri);
+            RequestViewModel.SetNotification(notification);
 
-            if (!hasType)
+            if (notification.BaseUrl != null)
             {
-                await NotificationError("type is null");
-                return;
+                await ApproveDomain(notification.BaseUrl, notification.CallbackUrl);
             }
-            
-            var requestType = type switch
-            {
-                "request_sign_utf8" => RequestType.SignUtf8,
-                "request_sign_transaction" => RequestType.SignTransaction,
-                "request_sign_binary_hex" => RequestType.SignBinaryHex,
-                "request_pubkey" => RequestType.Pugkey,
-                "request_sign_batches" => RequestType.Batches,
-                _ => throw new Exception("type is invalid")
-            };
-            var hasData = dict.TryGetValue("data", out var data);
-            var hasCallbackUrl = dict.TryGetValue("callback", out var callbackUrl);
-            var hasMethod = dict.TryGetValue("method", out var method);
-            
-            if (!hasData && requestType != RequestType.Pugkey)
-            {
-                await NotificationError("data is null");
-                return;
-            }
-            
-            dict.TryGetValue("recipient_publicKey_for_encrypt_message", out var recipientPublicKeyForEncryptMessage);
-            dict.TryGetValue("fee_multiplier", out var feeMultiplier);
-            
-            if(!hasMethod) method = "get";
-            var hasRedirectUrl = dict.TryGetValue("redirect_url", out var redirectUrl);
-            if (hasRedirectUrl) {
-                redirectUrl = Converter.HexToUtf8(redirectUrl);   
-            }
-            
-            if (hasCallbackUrl)
-            {
-                callbackUrl = Converter.HexToUtf8(callbackUrl);
-            
-                var uri = new Uri(callbackUrl);
-                var baseUrl = $"{uri.Scheme}://{uri.Authority}";
 
-                var domains = Array.Empty<string>();
-                try
-                {
-                    domains = (await SecureStorage.GetAsync("domains")).Split(',');
-                }
-                catch
-                {
-                    // ignored
-                }
+            if (Current?.MainPage == null) return;
             
-                if (!domains.Contains(baseUrl))
-                {
-                    if (Current?.MainPage != null)
-                    {
-                        var isRegistDomain =
-                            await Current.MainPage.DisplayAlert("確認", baseUrl + "は未登録です。\n使用可能として登録しますか？", "はい", "いいえ");
-                        if (isRegistDomain)
-                        {
-                            var addedDomains = domains.Append(baseUrl);
-                            await SecureStorage.SetAsync("domains", string.Join(",", addedDomains));
-                        }
-                        else
-                        {
-                            RejectedRequestSign(callbackUrl);
-                            return;
-                        }
-                    }
-                }
-            }
-            
-            if (Current?.MainPage != null && requestType == RequestType.Pugkey)
+            if(notification.RequestType == RequestType.Pubkey)
             {
-                await Current.MainPage.Navigation.PushModalAsync(new RequestGetPubkey(callbackUrl));
+                await Current.MainPage.Navigation.PushModalAsync(
+                    new RequestGetPubkey());
                 return;
             }
-            if (Current?.MainPage != null && requestType == RequestType.Batches)
+
+            if (notification.RequestType == RequestType.Batches)
             {
-                var count = 0;
-                var batches = new List<string>();
-                while (true)
-                {
-                    var hasBatches = dict.TryGetValue("batch" + count, out var metal);
-                    if (!hasBatches)
-                    {
-                        break;
-                    }
-                    batches.Add(metal);
-                    count++;
-                }
-                
-                await Current.MainPage.Navigation.PushModalAsync(new RequestSignBatches(batches, callbackUrl, method, redirectUrl));
+                await Current.MainPage.Navigation.PushModalAsync(
+                    new RequestSignBatches());
                 return;
             }
             
-            dict.TryGetValue("set_public_key", out var setPublicKey);
-            if (Current?.MainPage != null && hasData)
+            if (notification.Data != null)
             {
-                await Current.MainPage.Navigation.PushModalAsync(new RequestSign(data, callbackUrl, requestType, method, redirectUrl, setPublicKey, recipientPublicKeyForEncryptMessage, feeMultiplier));
+                await Current.MainPage.Navigation.PushModalAsync(
+                    new RequestSign()
+                    );
             }
         }
-        catch (OperationCanceledException)
+        catch (Exception e)
         {
-            // 非同期操作がキャンセルされたときの処理（必要に応じて）
+            await NotificationError(e.Message);
         }
     }
     
@@ -137,6 +69,37 @@ public partial class App : Application
     {
         if (Current?.MainPage != null)
             await Current.MainPage.DisplayAlert("Error", $"必要な情報が不足しています、遷移元開発者にお問い合わせください\n{message}", "閉じる");
+    }
+
+    static private async Task ApproveDomain(string baseUrl, string callbackUrl)
+    {
+        var domains = Array.Empty<string>();
+        try
+        {
+            domains = (await SecureStorage.GetAsync("domains")).Split(',');
+        }
+        catch
+        {
+            // ignored
+        }
+            
+        if (!domains.Contains(baseUrl))
+        {
+            if (Current?.MainPage != null)
+            {
+                var isRegistDomain =
+                    await Current.MainPage.DisplayAlert("確認", baseUrl + "は未登録です。\n使用可能として登録しますか？", "はい", "いいえ");
+                if (isRegistDomain)
+                {
+                    var addedDomains = domains.Append(baseUrl);
+                    await SecureStorage.SetAsync("domains", string.Join(",", addedDomains));
+                }
+                else
+                {
+                    RejectedRequestSign(callbackUrl);
+                }
+            }
+        }
     }
     
     static private async void RejectedRequestSign(string callbackUrl)
@@ -149,5 +112,12 @@ public partial class App : Application
             callbackUrl += "?" + additionalParam;
         }
         await Launcher.OpenAsync(new Uri(callbackUrl));
+    }
+    
+    private static IServiceProvider ConfigureServices()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<AccountViewModel>();
+        return services.BuildServiceProvider();
     }
 }

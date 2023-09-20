@@ -2,7 +2,7 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="aLice.RequestSign">
+             x:Class="aLice.Views.RequestSign">
     <ScrollView>
         <VerticalStackLayout
             Spacing="25"
@@ -46,16 +46,10 @@
                 </Grid>
                 <Button ImageSource="account_convert.png"
                         BorderColor="Gray"
-                        Clicked="ChangeAccount"
+                        Clicked="OnChangeAccount"
                         BackgroundColor="White"
                         HorizontalOptions="End"
                         Margin="0,0,0,0"/>
-                <Label
-                    x:Name="Error"
-                    TextColor="DarkRed"
-                    HorizontalTextAlignment="Center"
-                    Margin="0,20,0,0"
-                    FontSize="14"/>
             </StackLayout>
         </VerticalStackLayout>
     </ScrollView>

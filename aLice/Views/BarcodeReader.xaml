@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Unloaded="OnContentPageUnloaded"
              xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
-             x:Class="aLice.BarcodeReader">
+             x:Class="aLice.Views.BarcodeReader">
     <ContentPage.Content>
         <AbsoluteLayout>
             <zxing:CameraBarcodeReaderView

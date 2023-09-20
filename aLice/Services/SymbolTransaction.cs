@@ -6,7 +6,7 @@ using CatSdk.CryptoTypes;
 using CatSdk.Symbol;
 using CatSdk.Utils;
 
-namespace aLice;
+namespace aLice.Services;
 
 public static class SymbolTransaction
 {
