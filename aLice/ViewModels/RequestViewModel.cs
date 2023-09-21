@@ -119,7 +119,7 @@ public abstract class RequestViewModel
 
     private static async Task<(bool isCallBack, string result)> AcceptRequestSign(string password)
     {
-        var privateKey = GetPassword(password);
+        var privateKey = GetPrivateKey(password);
         if (privateKey == "")
         {
             throw new Exception("パスワードが間違っています");
@@ -194,7 +194,7 @@ public abstract class RequestViewModel
 
     private static async Task<(bool isCallBack, string result)> AcceptRequestBatches(string password)
     {
-        var privateKey = GetPassword(password);
+        var privateKey = GetPrivateKey(password);
         if (privateKey == "")
         {
             throw new Exception("パスワードが間違っています");
@@ -267,7 +267,7 @@ public abstract class RequestViewModel
         return AccountViewModel.Accounts.accounts.ToList().Find(acc => acc.publicKey == Notification.SetPublicKey);
     }
     
-    private static string GetPassword(string password)
+    private static string GetPrivateKey(string password)
     {
         return CatSdk.Crypto.Crypto.DecryptString(AccountViewModel.MainAccount.encryptedPrivateKey, password, AccountViewModel.MainAccount.address);
     }
