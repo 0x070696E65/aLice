@@ -18,7 +18,7 @@ public partial class RequestSignBatches : ContentPage
             var isChangeMainAccount = await DisplayAlert("確認", requestAccount.accountName + "をメインアカウントに変更しますか？\nいいえを選択するとこのページを閉じます", "はい", "いいえ");
             if (isChangeMainAccount)
             {
-                AccountViewModel.ChangeMainAccount(requestAccount.accountName);
+                AccountViewModel.SetMainAccount(requestAccount.address);
             }
             else
             {
@@ -75,7 +75,8 @@ public partial class RequestSignBatches : ContentPage
         try
         {
             var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
-            AccountViewModel.ChangeMainAccount(accName);
+            var address = AccountViewModel.Accounts.accounts.ToList().Find(a=>a.accountName == accName).address;
+            AccountViewModel.SetMainAccount(address);
             Ask.Text = $"{AccountViewModel.MainAccount.accountName}の公開鍵を渡しても良いですか？";   
         }
         catch (Exception exception)

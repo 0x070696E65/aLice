@@ -8,12 +8,10 @@ namespace aLice.Views;
 public partial class NewAccount : ContentPage
 {
     private string NetworkType = "MainNet";
-    private readonly MainPage mainPage;
-    public NewAccount(MainPage _mainPage)
+    public NewAccount()
     {
         InitializeComponent();
         ShowPasswordButton.Text = "\uf06e";
-        mainPage = _mainPage;
     }
 
     // 登録ボタンが押されたときに呼び出される
@@ -24,7 +22,7 @@ public partial class NewAccount : ContentPage
             var keyPair = KeyPair.GenerateNewKeyPair();
             
             // バリデーション
-            var validate = await AccountViewModel.ValidationAccount(
+            var validate = AccountViewModel.ValidationAccount(
                 Name.Text, 
                 null, 
                 false, 
@@ -68,7 +66,6 @@ public partial class NewAccount : ContentPage
             
             // 保存完了のメッセージを表示
             await DisplayAlert("Saved", "アカウントが登録されました", "OK");
-            await mainPage.ShowAccounts();
             
             // 画面を閉じる
             await Navigation.PopModalAsync();

@@ -1,6 +1,6 @@
 using CatSdk.Symbol;
 
-namespace aLice;
+namespace aLice.Services;
 
 public class Metal
 {

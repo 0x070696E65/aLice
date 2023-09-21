@@ -1,8 +1,5 @@
-using System.Text.Json;
 using aLice.ViewModels;
-using aLice.Views;
 using CatSdk.CryptoTypes;
-using CatSdk.Facade;
 using CatSdk.Symbol;
 using CatSdk.Utils;
 
@@ -11,12 +8,10 @@ namespace aLice.Views;
 public partial class ImportAccount : ContentPage
 {
     private string NetworkType = "MainNet";
-    private readonly MainPage mainPage;
-    public ImportAccount(MainPage _mainPage)
+    public ImportAccount()
     {
         InitializeComponent();
         ShowPasswordButton.Text = "\uf06e";
-        mainPage = _mainPage;
     }
 
     // 登録ボタンが押されたときに呼び出される
@@ -27,7 +22,7 @@ public partial class ImportAccount : ContentPage
             var keyPair = new KeyPair(new PrivateKey(PrivateKey.Text));
             
             // バリデーション
-            var validate = await AccountViewModel.ValidationAccount(
+            var validate = AccountViewModel.ValidationAccount(
                 Name.Text, 
                 Address.Text, 
                 PrivateKey.Text != null,
@@ -63,7 +58,6 @@ public partial class ImportAccount : ContentPage
             
             // 保存完了のメッセージを表示
             await DisplayAlert("Saved", "アカウントが登録されました", "OK");
-            await mainPage.ShowAccounts();
             
             // 画面を閉じる
             await Navigation.PopModalAsync();
@@ -92,13 +86,11 @@ public partial class ImportAccount : ContentPage
     
     private async void OnClickCloseAccount(object sender, EventArgs e)
     {
-        // 画面を閉じる
         await Navigation.PopModalAsync();
     }
     
     private void ShowPasswordButtonClicked(object sender, EventArgs e)
     {
-        // パスワードを表示する
         Password.IsPassword = !Password.IsPassword;
         ShowPasswordButton.Text = Password.IsPassword ? "\uf06e" : "\uf070";
     }

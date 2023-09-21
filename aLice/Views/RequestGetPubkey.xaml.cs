@@ -16,7 +16,8 @@ public partial class RequestGetPubkey : ContentPage
         try
         {
             var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
-            AccountViewModel.ChangeMainAccount(accName);
+            var address = AccountViewModel.Accounts.accounts.ToList().Find(a=>a.accountName == accName).address;
+            AccountViewModel.SetMainAccount(address);
             Ask.Text = $"{AccountViewModel.MainAccount.accountName}の公開鍵を渡しても良いですか？";   
         }
         catch (Exception exception)

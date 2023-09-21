@@ -1,17 +1,38 @@
-namespace aLice;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+
+namespace aLice.Models;
 
 public class SavedAccounts
 {
-    public List<SavedAccount> accounts { get; set; }
+    public ObservableCollection<SavedAccount> accounts { get; set; }
 }
 
-public class SavedAccount
+public sealed class SavedAccount: INotifyPropertyChanged
 {
-    public bool isMain { get; set; }
+    public event PropertyChangedEventHandler PropertyChanged;
+    
     public string accountName { get; set; }
     public string address { get; set; }
     public string publicKey { get; set; }
     public string encryptedPrivateKey { get; set; }
     public string networkType { get; set; }
+
+    private bool _isMain { get; set; }
     
+    public bool isMain
+    {
+        get => _isMain;
+        set
+        {
+            if (_isMain == value) return;
+            _isMain = value;
+            OnPropertyChanged(nameof(isMain));
+        }
+    }
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

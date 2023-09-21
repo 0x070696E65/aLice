@@ -1,11 +1,12 @@
 using System.Text.Json;
+using aLice.Models;
 using CatSdk.Facade;
 
 namespace aLice.ViewModels;
 
 public abstract class AccountViewModel
 {
-    public static SavedAccounts Accounts { get; private set; }
+    public static SavedAccounts Accounts = new SavedAccounts();
     public static SavedAccount MainAccount;
     public static string[] AccountNames;
     public static async Task SetAccounts()
@@ -19,17 +20,52 @@ public abstract class AccountViewModel
             {
                 AccountNames[i] = Accounts.accounts[i].accountName;
             }
-            MainAccount = Accounts.accounts.Find((acc) => acc.isMain);
+            MainAccount = Accounts.accounts.ToList().Find((acc) => acc.isMain);
         }
         catch
         {
             Accounts = new SavedAccounts();
         }
     }
-    
-    public static void ChangeMainAccount(string name)
+
+    public static string ExportAccount(string address, string password)
     {
-        MainAccount = Accounts.accounts.Find(acc => acc.accountName == name);
+        try {
+            var acc = Accounts.accounts.ToList().Find(acc => acc.address == address);
+            return CatSdk.Crypto.Crypto.DecryptString(acc.encryptedPrivateKey, password, acc.address);
+        }
+        catch {
+            throw new Exception("パスワードが正しくありません");
+        }
+    }
+    
+    public static async Task DeleteAccount(string address)
+    {
+        try {
+            var elementsToRemove = Accounts.accounts.ToList().Find(acc => acc.address == address);
+            Accounts.accounts.Remove(elementsToRemove);
+            if (elementsToRemove.isMain && Accounts.accounts.Count > 0)
+                Accounts.accounts[0].isMain = true;
+            
+            var updatedAccounts = JsonSerializer.Serialize(Accounts);
+            await SecureStorage.SetAsync("accounts", updatedAccounts);
+        }
+        catch {
+            throw new Exception("パスワードが正しくありません");
+        }
+    }
+    
+    public static void SetMainAccount(string address)
+    {
+        MainAccount = Accounts.accounts.ToList().Find(acc => acc.address == address);
+    }
+    
+    public static async Task ChangeMainAccount(string address)
+    {
+        Accounts.accounts.ToList().ForEach(acc => acc.isMain = acc.address == address);
+        Accounts.accounts = Accounts.accounts;
+        var updatedAccounts = JsonSerializer.Serialize(Accounts);
+        await SecureStorage.SetAsync("accounts", updatedAccounts);
     }
     
     // アカウントを保存する
@@ -56,7 +92,7 @@ public abstract class AccountViewModel
         await SecureStorage.SetAsync("accounts", JsonSerializer.Serialize(Accounts));
     }
 
-    public static async Task<(bool isValid, string message)> ValidationAccount(
+    public static (bool isValid, string message) ValidationAccount(
         string Name, string Address, bool hasPrivateKey, byte[] publicKey, string Password, string NetworkType, bool isNewAccount = false
     )
     {
@@ -117,10 +153,7 @@ public abstract class AccountViewModel
 
         try
         {
-            // 保存されているアドレスを取得
-            var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
-            foreach (var savedAccount in savedAccounts.accounts)
+            foreach (var savedAccount in Accounts.accounts)
             {
                 if (savedAccount.accountName == Name)
                 {

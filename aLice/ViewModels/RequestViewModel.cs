@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using aLice.Models;
 using aLice.Services;
 using CatSdk.Crypto;
 using CatSdk.CryptoTypes;
@@ -202,7 +203,7 @@ public abstract class RequestViewModel
         var keyPair = new KeyPair(new PrivateKey(privateKey));
         
         var network = ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet;
-        var metal = new Metal(network);
+        var metal = new Services.Metal(network);
         var txs = ParseTransaction.Select(valueTuple => valueTuple.transaction).ToList();
             
         var aggs = metal.SignedAggregateCompleteTxBatches(txs, keyPair, network);
@@ -263,7 +264,7 @@ public abstract class RequestViewModel
 
     public static SavedAccount GetRequestAccount()
     {
-        return AccountViewModel.Accounts.accounts.Find(acc => acc.publicKey == Notification.SetPublicKey);
+        return AccountViewModel.Accounts.accounts.ToList().Find(acc => acc.publicKey == Notification.SetPublicKey);
     }
     
     private static string GetPassword(string password)

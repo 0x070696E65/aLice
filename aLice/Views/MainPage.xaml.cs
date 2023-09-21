@@ -1,9 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Text.Json;
+using aLice.Models;
 using aLice.ViewModels;
-using ZXing.Net.Maui;
-using CatSdk.Symbol;
-using CatSdk.CryptoTypes;
 
 namespace aLice.Views;
 
@@ -17,14 +14,33 @@ public partial class MainPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await ShowAccounts();
+        await AccountViewModel.SetAccounts();
+        ShowAccounts();
+
+        // isMainが変更された際のイベントを各アカウントに登録
+        foreach (var accountsAccount in AccountViewModel.Accounts.accounts)
+        {
+            accountsAccount.PropertyChanged += PropertyChangedHandler;
+        }
+        
+        // アカウント群に追加や削除があった際に…
+        AccountViewModel.Accounts.accounts.CollectionChanged += (sender, e) =>
+        {
+            // ShowAccountsを呼び出す
+            ShowAccounts();
+            
+            // 追加されたアカウントにイベントを登録
+            if (e.NewItems?[0] != null)
+            {
+                ((SavedAccount) e.NewItems[0]).PropertyChanged += PropertyChangedHandler;                    
+            }
+        };
     }
     
-    public async Task ShowAccounts()
+    // 保存されているアカウントを表示するための関数
+    private void ShowAccounts()
     {
         AccountList.Children.Clear();
-        await AccountViewModel.SetAccounts();
-        
         try
         {
             // 保存されているアカウントを取得
@@ -70,15 +86,11 @@ public partial class MainPage : ContentPage
                     HorizontalOptions = LayoutOptions.End,
                     ImageSource = "book.png",
                 };
-                addressButton.Clicked += async (sender, args) =>
+                addressButton.Clicked += async (sender, e) =>
                 {
-                    await Clipboard.SetTextAsync(acc.address);
-                    // ダイアログを表示
-                    if(Application.Current != null 
-                       && Application.Current.MainPage != null 
-                       && Application.Current != null )
-                        await Application.Current.MainPage.DisplayAlert("Copied", "クリップボードにアドレスをコピーしました", "閉じる");
+                    await OnAddressCopyButtonClicked(acc.address);
                 };
+                
                 var exportButton = new Button
                 {
                     BackgroundColor = Color.FromRgba(255, 255, 255, 0),
@@ -87,8 +99,9 @@ public partial class MainPage : ContentPage
                 };
                 exportButton.Clicked += async (sender, e) =>
                 {
-                    await ExportAccount(acc.address);
+                    await OnExportButtonClicked(acc.address);
                 };
+                
                 var deleteButton = new Button
                 {
                     BackgroundColor = Color.FromRgba(255, 255, 255, 0),
@@ -97,8 +110,9 @@ public partial class MainPage : ContentPage
                 };
                 deleteButton.Clicked += async (sender, e) =>
                 {
-                    await ConfirmDeleteAccount(acc.address);
+                    await OnDeleteButtonClicked(acc.address, acc.accountName);
                 };
+                
                 if (acc.isMain)
                 {
                     starButton.ImageSource = "star_solid.png";
@@ -112,8 +126,7 @@ public partial class MainPage : ContentPage
                     starButton.ImageSource = "star_regular.png";
                     starButton.Clicked += async (sender, e) =>
                     {
-                        await SetMainAccount(acc.address);
-                        await DisplayAlert("Success", "メインアカウントが変更されました", "OK");
+                        await OnChangeMainAccount(acc.address, acc.accountName);
                     };
                 }
                 
@@ -159,68 +172,6 @@ public partial class MainPage : ContentPage
             Console.WriteLine("No accounts found: " + e.Message);
         }
     }
-
-    private async Task ExportAccount(string address)
-    {
-        var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
-        if (password == null) return;
-        string privateKey;
-        try {
-            var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
-            if (savedAccounts.accounts[0] == null) throw new NullReferenceException("アカウントが登録されていません");
-            var acc = savedAccounts.accounts.Find(acc => acc.address == address);
-            privateKey = CatSdk.Crypto.Crypto.DecryptString(acc.encryptedPrivateKey, password, acc.address);
-        }
-        catch {
-            throw new Exception("パスワードが正しくありません");
-        }
-        var keyPair = new KeyPair(new PrivateKey(privateKey));
-        await Clipboard.SetTextAsync(keyPair.PrivateKey.ToString());
-        // ダイアログを表示
-        if(Application.Current != null 
-           && Application.Current.MainPage != null 
-           && Application.Current != null )
-        await Application.Current.MainPage.DisplayAlert("クリップボードに秘密鍵をコピーしました", "秘密鍵の取り扱いには十分に注意してください", "はい");
-    }
-
-    private async Task SetMainAccount(string mainAddress)
-    {
-        var accounts = await SecureStorage.GetAsync("accounts");
-        var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
-        savedAccounts.accounts.ForEach(acc => acc.isMain = acc.address == mainAddress);
-        var updatedAccounts = JsonSerializer.Serialize(savedAccounts);
-        await SecureStorage.SetAsync("accounts", updatedAccounts);
-        await ShowAccounts();
-    }
-
-    private async Task ConfirmDeleteAccount(string addressToRemove)
-    {
-        var isOK = await DisplayAlert("Confirm", "本当に削除しますか？", "OK", "Cancel");
-        if (!isOK) return;
-        await DeleteAccount(addressToRemove);
-        await ShowAccounts();
-    }
-
-    private async Task DeleteAccount(string addressToRemove)
-    {
-        try
-        {
-            var accounts = await SecureStorage.GetAsync("accounts");
-            var savedAccounts = JsonSerializer.Deserialize<SavedAccounts>(accounts);
-            var elementsToRemove = savedAccounts.accounts.Find(acc => acc.address == addressToRemove);
-            savedAccounts.accounts.Remove(elementsToRemove);
-            if (elementsToRemove.isMain && savedAccounts.accounts.Count > 0)
-                savedAccounts.accounts[0].isMain = true;
-            
-            var updatedAccounts = JsonSerializer.Serialize(savedAccounts);
-            await SecureStorage.SetAsync("accounts", updatedAccounts);
-        }
-        catch (Exception e)
-        {
-            await DisplayAlert("ERROR", e.Message, "OK");
-        }
-    }
     
     private async void OnButtonClicked(object sender, EventArgs e)
     {
@@ -228,11 +179,77 @@ public partial class MainPage : ContentPage
         switch (action)
         {
             case "New Account":
-                await Navigation.PushModalAsync(new NewAccount(this));
+                await Navigation.PushModalAsync(new NewAccount());
                 break;
             case "Import Account":
-                await Navigation.PushModalAsync(new ImportAccount(this));
+                await Navigation.PushModalAsync(new ImportAccount());
                 break;
+        }
+    }
+    
+    private async Task OnChangeMainAccount(string address, string name)
+    {
+        try
+        {
+            await AccountViewModel.ChangeMainAccount(address);
+            await DisplayAlert("Success", $"Mainアカウントを{name}に変更しました", "閉じる");
+        }
+        catch (Exception error)
+        {
+            await DisplayAlert("Error", error.Message, "閉じる");
+        }
+    }
+
+    private async Task OnAddressCopyButtonClicked(string address)
+    {
+        try
+        {
+            await Clipboard.SetTextAsync(address);
+            await DisplayAlert("Copied", "クリップボードにアドレスをコピーしました", "閉じる");
+        }
+        catch (Exception error)
+        {
+            await DisplayAlert("Error", error.Message, "閉じる");
+        }
+    }
+
+    private async Task OnExportButtonClicked(string address)
+    {
+        try
+        {
+            var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            if (password == null) return;
+
+            var privateKey = AccountViewModel.ExportAccount(address, password);
+            await Clipboard.SetTextAsync(privateKey);
+            await DisplayAlert("クリップボードに秘密鍵をコピーしました", "秘密鍵の取り扱いには十分に注意してください", "はい");    
+        }
+        catch (Exception error)
+        {
+            await DisplayAlert("Error", error.Message, "閉じる");
+        }
+    }
+    
+    private async Task OnDeleteButtonClicked(string address, string name)
+    {
+        try
+        {
+            await DisplayAlert("Alert", $"本当に{name}を削除していいですか？", "はい", "いいえ");
+            await AccountViewModel.DeleteAccount(address);
+            await DisplayAlert("Deleted", "アカウントを削除しました", "閉じる");
+        }
+        catch (Exception error)
+        {
+            await DisplayAlert("Error", error.Message, "閉じる");
+        }
+    }
+    
+    // 変更されたプロパティがisMainであればShowAccountsを呼び出す（メインアカウントの変更を反映させるため）
+    private void PropertyChangedHandler(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "isMain")
+        {
+            ShowAccounts();
         }
     }
 }

@@ -1,16 +1,14 @@
-﻿using aLice.ViewModels;
+﻿using aLice.Models;
+using aLice.ViewModels;
 using aLice.Views;
 
 namespace aLice;
 
 public partial class App : Application
 {
-    public static IServiceProvider ServiceProvider { get; private set; }
-    
     public App()
     {
         InitializeComponent();
-        ServiceProvider = ConfigureServices();
         
         // 強制的にライトモードを適用
         if (Current != null) Current.UserAppTheme = AppTheme.Light;
@@ -82,7 +80,7 @@ public partial class App : Application
         {
             // ignored
         }
-            
+
         if (!domains.Contains(baseUrl))
         {
             if (Current?.MainPage != null)
@@ -112,12 +110,5 @@ public partial class App : Application
             callbackUrl += "?" + additionalParam;
         }
         await Launcher.OpenAsync(new Uri(callbackUrl));
-    }
-    
-    private static IServiceProvider ConfigureServices()
-    {
-        var services = new ServiceCollection();
-        services.AddSingleton<AccountViewModel>();
-        return services.BuildServiceProvider();
     }
 }

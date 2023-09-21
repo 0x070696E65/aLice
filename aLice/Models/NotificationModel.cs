@@ -1,6 +1,6 @@
 using CatSdk.Utils;
 
-namespace aLice;
+namespace aLice.Models;
 
 public class NotificationModel
 {
@@ -12,7 +12,7 @@ public class NotificationModel
     public readonly string BaseUrl;
     public readonly string RecipientPublicKeyForEncryptMessage;
     public readonly string FeeMultiplier;
-    public readonly List<string> Batches = new List<string>();
+    public readonly List<string> Batches = new();
     public readonly string SetPublicKey;
     public NotificationModel(string _uri)
     {
