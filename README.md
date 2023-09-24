@@ -29,12 +29,12 @@
 | set_public_key | 公開鍵を渡してアカウントを指定する                                                                                          |
 <br>
 ex)
-`alice://sign?data={data}&type={request_type}&callback={callbackURL}`
+`alice://sign?data=${data}&type=${request_type}&callback=${callbackURL}`
 
 ### POST通信
 `&method=post`を与えてやるとPOSTにて送信します。
 その際は、aLiceの画面に留まるため
-`&redirect_url={redirect_url}`を追加してやると画面が遷移します。`redirect_url`にパラメータを追加するとそのまま遷移するので`token`などの受け渡しに使えるかと思います。
+`&redirect_url=${redirect_url}`を追加してやると画面が遷移します。`redirect_url`にパラメータを追加するとそのまま遷移するので`token`などの受け渡しに使えるかと思います。
 ※redirect_urlもutf8をhexにして渡してください
 
 postの場合は以下のようなJSONをBodyに含め送信します
@@ -95,7 +95,7 @@ signedPayloadは以下のように扱います
 // v2 v2系では一度再構築しなおす必要があります
 const hash = Transaction.createTransactionHash(payload, [... Convert.hexToUint8(generationHash)])
 const signed = TransactionMapping.createFromPayload(payload);
-const signedTx = new SignedTransaction(payload, hash, signed.signer?.publicKey!, signed.type, signed.type)
+const signedTx = new SignedTransaction(payload, hash, signed.signer?.publicKey!, signed.type, signed.networkType);
 
 // v3 v3系ではそのままpayloadとして扱えますがput送信する時には以下のように扱う
 const jsonObject = {
