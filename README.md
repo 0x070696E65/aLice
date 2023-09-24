@@ -27,6 +27,7 @@
 | method | get, post                                                                                                  |
 | redirect_url | これらをhexにする (https://google.com)                                                                            |
 | set_public_key | 公開鍵を渡してアカウントを指定する                                                                                          |
+<br>
 ex)
 `alice://sign?data={data}&type={request_type}&callback={callbackURL}`
 
