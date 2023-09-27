@@ -119,7 +119,7 @@ const tx = TransferTransaction.create(
   NetworkType.TEST_NET
 );
 // URL例
-`alice://sign?data=${tx.serialize()}&type=request_sign_transaction&recipient_publicKey_for_encrypt_message=${bob.address.plain()}&sdk_version=v2`;
+`alice://sign?data=${tx.serialize()}&type=request_sign_transaction&recipient_publicKey_for_encrypt_message=${bob.publicKey}&sdk_version=v2`;
 ```
 
 v3の場合はMessage領域にUTF8をbyte[]に変換し冒頭に[0x01]を追加してください
