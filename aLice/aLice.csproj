@@ -73,6 +73,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
+        <PackageReference Include="CatSdk" Version="1.0.5" />
+        <PackageReference Include="MetalOnSymbol" Version="1.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="ZXing.Net.Maui" Version="0.3.0-preview.1" />
         <PackageReference Include="ZXing.Net.Maui.Controls" Version="0.3.0-preview.1" />
@@ -81,9 +84,6 @@
     <ItemGroup>
         <Reference Include="BouncyCastle.Crypto">
             <HintPath>Plugins\BouncyCastle.Crypto.dll</HintPath>
-        </Reference>
-        <Reference Include="CatSdk">
-            <HintPath>Plugins\CatSdk.dll</HintPath>
         </Reference>
         <Reference Include="MetalOnSymbol">
           <HintPath>Plugins\MetalOnSymbol.dll</HintPath>
