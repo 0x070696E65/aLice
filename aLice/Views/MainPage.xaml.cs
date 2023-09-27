@@ -13,28 +13,35 @@ public partial class MainPage : ContentPage
     
     protected override async void OnAppearing()
     {
-        base.OnAppearing();
-        await AccountViewModel.SetAccounts();
-        ShowAccounts();
-
-        // isMainが変更された際のイベントを各アカウントに登録
-        foreach (var accountsAccount in AccountViewModel.Accounts.accounts)
+        try
         {
-            accountsAccount.PropertyChanged += PropertyChangedHandler;
-        }
-        
-        // アカウント群に追加や削除があった際に…
-        AccountViewModel.Accounts.accounts.CollectionChanged += (sender, e) =>
-        {
-            // ShowAccountsを呼び出す
+            base.OnAppearing();
+            await AccountViewModel.SetAccounts();
             ShowAccounts();
-            
-            // 追加されたアカウントにイベントを登録
-            if (e.NewItems?[0] != null)
+
+            // isMainが変更された際のイベントを各アカウントに登録
+            foreach (var accountsAccount in AccountViewModel.Accounts.accounts)
             {
-                ((SavedAccount) e.NewItems[0]).PropertyChanged += PropertyChangedHandler;                    
+                accountsAccount.PropertyChanged += PropertyChangedHandler;
             }
-        };
+        
+            // アカウント群に追加や削除があった際に…
+            AccountViewModel.Accounts.accounts.CollectionChanged += (sender, e) =>
+            {
+                // ShowAccountsを呼び出す
+                ShowAccounts();
+            
+                // 追加されたアカウントにイベントを登録
+                if (e.NewItems?[0] != null)
+                {
+                    ((SavedAccount) e.NewItems[0]).PropertyChanged += PropertyChangedHandler;                    
+                }
+            };   
+        }
+        catch(Exception e)
+        {
+            await DisplayAlert("Error", e.Message, "閉じる");
+        }
     }
     
     // 保存されているアカウントを表示するための関数

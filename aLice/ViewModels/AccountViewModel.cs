@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text.Json;
 using aLice.Models;
 using CatSdk.Facade;
@@ -20,11 +21,15 @@ public abstract class AccountViewModel
             {
                 AccountNames[i] = Accounts.accounts[i].accountName;
             }
+
             MainAccount = Accounts.accounts.ToList().Find((acc) => acc.isMain);
         }
         catch
         {
-            Accounts = new SavedAccounts();
+            Accounts = new SavedAccounts
+            {
+                accounts = new ObservableCollection<SavedAccount>()
+            };   
         }
     }
 
