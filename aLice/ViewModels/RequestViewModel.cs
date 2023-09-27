@@ -143,7 +143,7 @@ public abstract class RequestViewModel
                         var encrypted = Crypto.Encode(privateKey, Notification.RecipientPublicKeyForEncryptMessage, message);
                         var m = Encoding.UTF8.GetBytes(encrypted);
                         var zero = new byte[] { 1 };
-                        var newArr = new byte[message.Length + 1];
+                        var newArr = new byte[m.Length + 1];
                         zero.CopyTo(newArr, 0);
                         m.CopyTo(newArr, 1);
                         Console.WriteLine(Converter.BytesToHex(newArr));
