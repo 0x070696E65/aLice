@@ -26,6 +26,7 @@ public static class SymbolTransaction
                     transferTransaction.Message = Converter.HexToBytes(encrypted);
                     TransactionHelper.SetMaxFee(transferTransaction, feeMultiplier != null ? int.Parse(feeMultiplier) : 100);
                     transferTransaction.Message = saveMessage;
+                    return (transferTransaction, ParseTransferTransaction(transferTransaction));
                 }
             }
             return (transaction, ParseTransferTransaction(transaction));

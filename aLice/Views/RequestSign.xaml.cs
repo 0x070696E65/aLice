@@ -12,7 +12,7 @@ public partial class RequestSign : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        
+
         if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
         {
             var requestAccount = RequestViewModel.GetRequestAccount();
@@ -64,7 +64,7 @@ public partial class RequestSign : ContentPage
             {
                 await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
             }
-        } 
+        }
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, "閉じる");
@@ -78,7 +78,7 @@ public partial class RequestSign : ContentPage
             var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
             var address = AccountViewModel.Accounts.accounts.ToList().Find(a=>a.accountName == accName).address;
             AccountViewModel.SetMainAccount(address);
-            Ask.Text = $"{AccountViewModel.MainAccount.accountName}の公開鍵を渡しても良いですか？";   
+            Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";   
         }
         catch (Exception exception)
         {

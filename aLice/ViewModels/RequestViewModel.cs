@@ -46,6 +46,7 @@ public abstract class RequestViewModel
         }
         else if (Notification.RequestType == RequestType.SignTransaction)
         {
+            ParseTransaction.Clear();
             ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier));
             ParseTransaction[0].transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
             typeText = "Symbolのトランザクションです";
@@ -90,7 +91,7 @@ public abstract class RequestViewModel
             return (false, "");
         }
         
-        var callbackUrl = "";
+        var callbackUrl = Notification.CallbackUrl;
         if (Notification.CallbackUrl.Contains('?')) {
             callbackUrl += "&" + RejectParam;
         }
@@ -134,11 +135,12 @@ public abstract class RequestViewModel
             {
                 var transferTransaction = ParseTransaction[0].transaction as TransferTransactionV1;
                 var bytes = transferTransaction?.Message;
-                if (bytes != null && bytes[0] == 1 && bytes.Length >= 2)
+                if (bytes is {Length: >= 2})
                 {
                     var message = Encoding.UTF8.GetString(bytes.ToList().GetRange(1, bytes.Length - 1).ToArray());
                     var encrypted = "01" + Crypto.Encode(privateKey, Notification.RecipientPublicKeyForEncryptMessage,
                         message);
+                    Console.WriteLine(encrypted);
                     ((TransferTransactionV1) ParseTransaction[0].transaction).Message = Converter.HexToBytes(encrypted);
                     TransactionHelper.SetMaxFee(transferTransaction,
                         Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100);
