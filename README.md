@@ -109,6 +109,29 @@ const d = JSON.stringify(jsonObject);
 暗号化メッセージはTransferTransactionのみで使えます。
 パラメータにに`&recipient_publicKey_for_encrypt_message=${RecipientPublicKey}`を追加で渡してください。なお、暗号化することでトランザクションのサイズは大きくなり手数料が変わります。追加で`&fee_multiplier=100`とすることで手数料乗数を設定できます。このパラメータがない場合は100に設定されます・
 
+v2の場合はPlainMessageで送信してください
+```js
+const tx = TransferTransaction.create(
+  Deadline.create(1667250467),
+  bob.address,
+  [],
+  PlainMessage.create('test'),
+  NetworkType.TEST_NET
+);
+// URL例
+`alice://sign?data=${tx.serialize()}&type=request_sign_transaction&recipient_publicKey_for_encrypt_message=${bob.address.plain()}`;
+```
+
+v2でv3形式の暗号化メッセージを復号するにはコツがあります。
+txを取得するとMessageはEncryptedMessageクラスになっています。
+EncryptedMessage.message.toDTO()でHexを取り出し冒頭の1byteが不要なので取り除きます。
+
+
+
+v3の場合はMessage領域にUTF8をbyte[]に変換してください。
+冒頭のbyteに[0x01]は不要です。
+
+
 #### request_sign_utf8
 UTF8文字列に署名します
 文字列はそのままではなく16進数文字列にしてから送信してください

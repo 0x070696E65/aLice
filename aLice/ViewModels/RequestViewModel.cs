@@ -137,13 +137,27 @@ public abstract class RequestViewModel
                 var bytes = transferTransaction?.Message;
                 if (bytes is {Length: >= 2})
                 {
-                    var message = Encoding.UTF8.GetString(bytes.ToList().GetRange(1, bytes.Length - 1).ToArray());
-                    var encrypted = "01" + Crypto.Encode(privateKey, Notification.RecipientPublicKeyForEncryptMessage,
-                        message);
-                    Console.WriteLine(encrypted);
-                    ((TransferTransactionV1) ParseTransaction[0].transaction).Message = Converter.HexToBytes(encrypted);
-                    TransactionHelper.SetMaxFee(transferTransaction,
-                        Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100);
+                    if (Notification.SdkVersion == SdkVersion.V2)
+                    {
+                        var message = Encoding.UTF8.GetString(bytes.ToList().GetRange(1, bytes.Length - 1).ToArray());
+                        var encrypted = Crypto.Encode(privateKey, Notification.RecipientPublicKeyForEncryptMessage, message);
+                        var m = Encoding.UTF8.GetBytes(encrypted);
+                        var zero = new byte[] { 1 };
+                        var newArr = new byte[message.Length + 1];
+                        zero.CopyTo(newArr, 0);
+                        m.CopyTo(newArr, 1);
+                        Console.WriteLine(Converter.BytesToHex(newArr));
+                        ((TransferTransactionV1) ParseTransaction[0].transaction).Message = newArr;
+                        TransactionHelper.SetMaxFee(transferTransaction, Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100);
+                    }
+                    else
+                    {
+                        var message = Encoding.UTF8.GetString(bytes.ToList().GetRange(1, bytes.Length - 1).ToArray());
+                        var encrypted = "01" + Crypto.Encode(privateKey, Notification.RecipientPublicKeyForEncryptMessage, message);
+                        Console.WriteLine(encrypted);
+                        ((TransferTransactionV1) ParseTransaction[0].transaction).Message = Converter.HexToBytes(encrypted);
+                        TransactionHelper.SetMaxFee(transferTransaction, Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100);
+                    }
                 }
             }
 

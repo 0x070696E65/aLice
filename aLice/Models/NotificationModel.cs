@@ -14,6 +14,7 @@ public class NotificationModel
     public readonly string FeeMultiplier;
     public readonly List<string> Batches = new();
     public readonly string SetPublicKey;
+    public readonly SdkVersion SdkVersion = SdkVersion.V3;
     public NotificationModel(string _uri)
     {
         var queryString = _uri.Split('?').LastOrDefault();
@@ -95,6 +96,15 @@ public class NotificationModel
         if (hasSetPublicKey)
         {
             SetPublicKey = _setPublicKey;
+        }
+        
+        var hasSdkVersion = dict.TryGetValue("sdk_version", out var sdkVersion);
+        if (hasSdkVersion)
+        {
+            if (sdkVersion == "v2")
+            {
+                SdkVersion = SdkVersion.V2;
+            }
         }
     }
 }
