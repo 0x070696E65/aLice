@@ -120,8 +120,11 @@ public abstract class RequestViewModel
 
     private static async Task<(bool isCallBack, string result)> AcceptRequestSign(string password)
     {
-        var privateKey = GetPrivateKey(password);
-        if (privateKey == "")
+        string privateKey;
+        try
+        {
+            privateKey = GetPrivateKey(password);
+        } catch
         {
             throw new Exception("パスワードが間違っています");
         }
@@ -210,8 +213,12 @@ public abstract class RequestViewModel
 
     private static async Task<(bool isCallBack, string result)> AcceptRequestBatches(string password)
     {
-        var privateKey = GetPrivateKey(password);
-        if (privateKey == "")
+        string privateKey;
+        try
+        {
+            privateKey = GetPrivateKey(password);
+        }
+        catch
         {
             throw new Exception("パスワードが間違っています");
         }

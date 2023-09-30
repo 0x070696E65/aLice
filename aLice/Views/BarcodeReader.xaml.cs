@@ -2,7 +2,6 @@ using System.Text.Json;
 using CatSdk.CryptoTypes;
 using CatSdk.Facade;
 using CatSdk.Symbol;
-using ZXing.Net.Maui;
 
 namespace aLice.Views;
 
@@ -13,14 +12,29 @@ public partial class BarcodeReader : ContentPage
     public BarcodeReader()
     {
         InitializeComponent();
+        cameraView.CamerasLoaded += CameraViewCamerasLoaded;
+        cameraView.BarcodeDetected += CameraViewBarcodeDetected;
     }
     
-    private void BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
+    private void CameraViewCamerasLoaded(object sender, EventArgs e)
     {
-        foreach (var barcode in e.Results)
+        if (cameraView.Cameras.Count > 0)
         {
-            var (isCorrectFormat, networkId, privateKey) = ParseQrForPrivateKey(barcode.Value);
-            if (!isCorrectFormat) continue;
+            cameraView.Camera = cameraView.Cameras.First();
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await cameraView.StopCameraAsync();
+                await cameraView.StartCameraAsync();
+            });
+        }
+    }
+
+    private void CameraViewBarcodeDetected(object sender, Camera.MAUI.ZXingHelper.BarcodeEventArgs args)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            var (isCorrectFormat, networkId, privateKey) = ParseQrForPrivateKey(args.Result[0].Text);
+            if (!isCorrectFormat) return;
             var network = networkId switch
             {
                 152 => CatSdk.Symbol.Network.TestNet,
@@ -32,15 +46,14 @@ public partial class BarcodeReader : ContentPage
             var address = facade.Network.PublicKeyToAddress(keyPair.PublicKey);
             
             DataChanged?.Invoke(this, new DataEventArgs(privateKey, address.ToString(), networkId));
-            return;
-        }
+            DataChanged = null;
+            if (Navigation.ModalStack.Count > 1)
+            {
+                await Navigation.PopModalAsync();
+            }
+        });
     }
-    
-    private async void OnQRCloseClicked(object sender, EventArgs e)
-    {
-        await Navigation.PopModalAsync();
-    }
-    
+
     private (bool isCorrectFormat, int networkId, string privateKey) ParseQrForPrivateKey(string value)
     {
         try
@@ -54,11 +67,19 @@ public partial class BarcodeReader : ContentPage
         }
     }
     
+
     void OnContentPageUnloaded(object sender, EventArgs e)
     {
-        cameraBarcodeReaderView.Handler?.DisconnectHandler();
+        cameraView.StopCameraAsync();
+        cameraView.CamerasLoaded -= CameraViewCamerasLoaded;
+        cameraView.BarcodeDetected -= CameraViewBarcodeDetected;
     }
-    
+
+    private async void OnQRCloseClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopModalAsync();
+    }
+
     private class QrFormat
     {
         public int v { get; set; }

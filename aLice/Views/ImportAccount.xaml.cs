@@ -8,6 +8,7 @@ namespace aLice.Views;
 public partial class ImportAccount : ContentPage
 {
     private string NetworkType = "MainNet";
+    private BarcodeReader barcodeReaderPage;
     public ImportAccount()
     {
         InitializeComponent();
@@ -97,7 +98,7 @@ public partial class ImportAccount : ContentPage
     
     private async void OnQRButtonClicked(object sender, EventArgs e)
     {
-        var barcodeReaderPage = new BarcodeReader();
+        barcodeReaderPage = new BarcodeReader();
         barcodeReaderPage.DataChanged += OnBarcodeReaderDataChanged;
         await Navigation.PushModalAsync(barcodeReaderPage);
     }
@@ -120,11 +121,6 @@ public partial class ImportAccount : ContentPage
                     testnetRadioButton.IsChecked = true;
                     NetworkType = "TestNet";
                     break;
-            }
-
-            if (Navigation.ModalStack.Count > 1)
-            {
-                await Navigation.PopModalAsync();
             }
         });
     }

@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using ZXing.Net.Maui.Controls;
+﻿using Camera.MAUI;
+using Microsoft.Extensions.Logging;
 
 namespace aLice;
 
@@ -10,11 +10,11 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseBarcodeReader()
+            .UseMauiCameraView()
             .ConfigureFonts(fonts =>
             {
-                fonts.AddFont("OpenSans_regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans_Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("opensans_regular.ttf", "OpenSansRegular");
+                fonts.AddFont("opensans_semibold.ttf", "OpenSansSemibold");
                 fonts.AddFont("fontawesome_webfont.ttf", "FontAwesome");
                 fonts.AddFont("times_new_roman.ttf", "TimesNewRoman");
             });
