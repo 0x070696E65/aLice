@@ -19,8 +19,8 @@
         <ApplicationIdGuid>1E47EC8D-2DC8-4A49-8AF0-BBCFCA12D518</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.5.1</ApplicationDisplayVersion>
-        <ApplicationVersion>24</ApplicationVersion>
+        <ApplicationDisplayVersion>1.5.2</ApplicationDisplayVersion>
+        <ApplicationVersion>25</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
@@ -38,7 +38,7 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
         <CreatePackage>false</CreatePackage>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
         <CodesignProvision>alice</CodesignProvision>
         <CodesignKey>iPhone Developer</CodesignKey>
     </PropertyGroup>
@@ -46,7 +46,7 @@
       <CreatePackage>false</CreatePackage>
       <CodesignProvision>alice_product</CodesignProvision>
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit</MtouchExtraArgs>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>

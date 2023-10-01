@@ -14,7 +14,6 @@ public abstract class RequestViewModel
     public static NotificationModel Notification { get; private set; }
     private static readonly List<(IBaseTransaction transaction, string parsedTransaction)> ParseTransaction = new ();
     private static byte[] BytesData;
-    private static readonly string AdditionalParam = $"pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
     private static readonly string RejectParam = "error=sign_rejected";
     
     public static void SetNotification(NotificationModel notification)
@@ -110,10 +109,10 @@ public abstract class RequestViewModel
         
         var callbackUrl = "";
         if (Notification.CallbackUrl.Contains('?')) {
-            callbackUrl += $"{Notification.CallbackUrl}&{AdditionalParam}";
+            callbackUrl += $"{Notification.CallbackUrl}&pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
         }
         else {
-            callbackUrl += $"{Notification.CallbackUrl}?{AdditionalParam}";
+            callbackUrl += $"{Notification.CallbackUrl}?pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
         }
         return (true, callbackUrl);
     }
@@ -272,7 +271,7 @@ public abstract class RequestViewModel
         if (Notification.CallbackUrl == null) return (false, signedContent);
         var callbackUrl = "";
         var additionalParam =
-            $"{contentKey}={signedContent}&original_data={Notification.Data}&{AdditionalParam}";
+            $"{contentKey}={signedContent}&original_data={Notification.Data}&pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
         if (Notification.CallbackUrl.Contains('?'))
         {
             callbackUrl += $"{Notification.CallbackUrl}&{additionalParam}";

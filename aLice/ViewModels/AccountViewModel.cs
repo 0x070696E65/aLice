@@ -60,15 +60,10 @@ public abstract class AccountViewModel
         }
     }
     
-    public static void SetMainAccount(string address)
-    {
-        MainAccount = Accounts.accounts.ToList().Find(acc => acc.address == address);
-    }
-    
     public static async Task ChangeMainAccount(string address)
     {
         Accounts.accounts.ToList().ForEach(acc => acc.isMain = acc.address == address);
-        Accounts.accounts = Accounts.accounts;
+        MainAccount = Accounts.accounts.ToList().Find(acc => acc.address == address);
         var updatedAccounts = JsonSerializer.Serialize(Accounts);
         await SecureStorage.SetAsync("accounts", updatedAccounts);
     }
