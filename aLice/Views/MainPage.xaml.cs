@@ -241,9 +241,12 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            await DisplayAlert("Alert", $"本当に{name}を削除していいですか？", "はい", "いいえ");
-            await AccountViewModel.DeleteAccount(address);
-            await DisplayAlert("Deleted", "アカウントを削除しました", "閉じる");
+            bool result = await DisplayAlert("Alert", $"本当に{name}を削除していいですか？", "はい", "いいえ");
+            if (result)
+            {
+                await AccountViewModel.DeleteAccount(address);
+                await DisplayAlert("Deleted", "アカウントを削除しました", "閉じる");
+            }
         }
         catch (Exception error)
         {
