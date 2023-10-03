@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="aLice.Views.Settings">
+    <ContentPage.Content>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,50, 30, 0"
+            VerticalOptions="Start">
+            <Label
+                Text="Settings"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center" />
+            
+            <VerticalStackLayout>
+                <Label
+                    Text="パスワードの保存時間(秒)"
+                    SemanticProperties.HeadingLevel="Level1"
+                    FontSize="20"
+                    HorizontalOptions="Start" />
+                <Label
+                    Text="※ 0の場合は保存しません"
+                    SemanticProperties.HeadingLevel="Level1"
+                    FontSize="12"
+                    HorizontalOptions="Start" />
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Slider
+                        Grid.Column="0"
+                        Minimum="0"
+                        Maximum="300"
+                        x:Name="MemoryTimeSlider"
+                        ThumbColor="Gray"
+                        MaximumTrackColor="Black"
+                        ValueChanged="MemoryTimeSliderChanged">
+                    </Slider>
+                    <Label
+                        Grid.Column="1"
+                        Text="0"
+                        x:Name="MemoryTimeValue"
+                        FontSize="20"
+                        Margin="20, 0, 0, 0"/>
+                </Grid>
+            </VerticalStackLayout>
+            <Grid Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Text="Save"
+                        Clicked="OnSaveMemoryTime"
+                        BackgroundColor="Black"
+                        Grid.Column="0"
+                        Margin="0,0,10,0"/>
+
+                <Button Text="Close"
+                        Clicked="OnClickedCliseButton"
+                        BackgroundColor="Gray"
+                        TextColor="White"
+                        Grid.Column="1"
+                        Margin="10,0,0,0"/>
+            </Grid>
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>

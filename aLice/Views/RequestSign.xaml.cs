@@ -51,11 +51,24 @@ public partial class RequestSign : ContentPage
     {
         try
         {
-            var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            string password;
+            if (AccountViewModel.MemoryPasswordMilliseconds != 0)
+            {
+                password = await SecureStorage.GetAsync("CurrentPassword");
+                if (password == null)
+                {
+                    password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+                }
+                await SecureStorage.SetAsync("CurrentPassword", password);
+            }
+            else
+            {
+                password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            }
+            
             var (isCallBack, result) = await RequestViewModel.Accept(password);
-            
             await Application.Current.MainPage.Navigation.PopModalAsync();
-            
+        
             if (isCallBack)
             {
                 await Launcher.OpenAsync(new Uri(result));
@@ -64,6 +77,8 @@ public partial class RequestSign : ContentPage
             {
                 await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
             }
+
+            await AccountViewModel.DeletePassword();
         }
         catch (Exception exception)
         {

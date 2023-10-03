@@ -31,7 +31,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Text="Input password"
+                    <Button Text="Sign"
                             Clicked="AcceptRequestSign"
                             BackgroundColor="Black"
                             Grid.Column="0" 

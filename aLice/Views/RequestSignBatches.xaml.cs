@@ -50,11 +50,24 @@ public partial class RequestSignBatches : ContentPage
     {
         try
         {
-            var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            string password;
+            if (AccountViewModel.MemoryPasswordMilliseconds != 0)
+            {
+                password = await SecureStorage.GetAsync("CurrentPassword");
+                if (password == null)
+                {
+                    password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+                }
+                await SecureStorage.SetAsync("CurrentPassword", password);
+            }
+            else
+            {
+                password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            }
+            
             var (isCallBack, result) = await RequestViewModel.Accept(password);
-            
             await Application.Current.MainPage.Navigation.PopModalAsync();
-            
+        
             if (isCallBack)
             {
                 await Launcher.OpenAsync(new Uri(result));
@@ -63,7 +76,9 @@ public partial class RequestSignBatches : ContentPage
             {
                 await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
             }
-        } 
+
+            await AccountViewModel.DeletePassword();
+        }
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, "閉じる");
@@ -77,7 +92,7 @@ public partial class RequestSignBatches : ContentPage
             var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
             var address = AccountViewModel.Accounts.accounts.ToList().Find(a=>a.accountName == accName).address;
             await AccountViewModel.ChangeMainAccount(address);
-            Ask.Text = $"{AccountViewModel.MainAccount.accountName}の公開鍵を渡しても良いですか？";   
+            Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
         }
         catch (Exception exception)
         {

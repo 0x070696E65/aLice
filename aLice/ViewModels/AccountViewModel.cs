@@ -10,6 +10,8 @@ public abstract class AccountViewModel
     public static SavedAccounts Accounts = new SavedAccounts();
     public static SavedAccount MainAccount;
     public static string[] AccountNames;
+    public static int MemoryPasswordMilliseconds = 0;
+    
     public static async Task SetAccounts()
     {
         try
@@ -23,6 +25,7 @@ public abstract class AccountViewModel
             }
 
             MainAccount = Accounts.accounts.ToList().Find((acc) => acc.isMain);
+            MemoryPasswordMilliseconds = await SecureStorage.GetAsync("MemoryPasswordMilliseconds") == null ? 0 : int.Parse(await SecureStorage.GetAsync("MemoryPasswordMilliseconds"));
         }
         catch
         {
@@ -65,6 +68,7 @@ public abstract class AccountViewModel
         Accounts.accounts.ToList().ForEach(acc => acc.isMain = acc.address == address);
         MainAccount = Accounts.accounts.ToList().Find(acc => acc.address == address);
         var updatedAccounts = JsonSerializer.Serialize(Accounts);
+        SecureStorage.Remove("CurrentPassword");
         await SecureStorage.SetAsync("accounts", updatedAccounts);
     }
     
@@ -174,5 +178,28 @@ public abstract class AccountViewModel
         }
 
         return (isValid, message);
+    }
+
+    private readonly static List<CancellationTokenSource> cancellationTokenSources = new List<CancellationTokenSource>();
+    public static async ValueTask DeletePassword()
+    {
+        if (cancellationTokenSources.Count > 0)
+        {
+            foreach (var c in cancellationTokenSources)
+            {
+                c.Cancel();   
+            }
+        }
+        cancellationTokenSources.Clear();
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSources.Add(cancellationTokenSource);
+        await ActionDeletePassword(cancellationTokenSource.Token);
+    }
+    
+    private static async Task ActionDeletePassword(CancellationToken token)
+    {
+        await Task.Delay(MemoryPasswordMilliseconds, token);
+        token.ThrowIfCancellationRequested();
+        SecureStorage.Remove("CurrentPassword");
     }
 }

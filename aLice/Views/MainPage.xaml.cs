@@ -193,6 +193,11 @@ public partial class MainPage : ContentPage
                 break;
         }
     }
+
+    private async void OnOpenSettingsClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushModalAsync(new Settings());
+    }
     
     private async Task OnChangeMainAccount(string address, string name)
     {
@@ -241,7 +246,7 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            bool result = await DisplayAlert("Alert", $"本当に{name}を削除していいですか？", "はい", "いいえ");
+            var result = await DisplayAlert("Alert", $"本当に{name}を削除していいですか？", "はい", "いいえ");
             if (result)
             {
                 await AccountViewModel.DeleteAccount(address);

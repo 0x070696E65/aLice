@@ -100,6 +100,19 @@ public partial class App : Application
         }
     }
     
+    protected override Window CreateWindow(IActivationState activationState)
+    {
+        var window = base.CreateWindow(activationState);
+
+        window.Destroying += (s, e) =>
+        {
+            // パスワードの削除
+            SecureStorage.Remove("CurrentPassword");
+        };
+
+        return window;
+    }
+    
     static private async void RejectedRequestSign(string callbackUrl)
     {
         const string additionalParam = "error=sign_rejected";

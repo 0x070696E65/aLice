@@ -7,17 +7,30 @@
         <VerticalStackLayout
             Spacing="25"
             Padding="30,0">
-            
-            <StackLayout>
-                <Button 
-                    VerticalOptions="CenterAndExpand" 
-                    HorizontalOptions="EndAndExpand" 
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" 
+                    Clicked="OnOpenSettingsClicked" 
+                    Text="≡"
+                    TextColor="Black"
+                    FontSize="34"
+                    BackgroundColor="White"/>
+                <Button
+                    Grid.Column="1"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="End" 
                     Clicked="OnButtonClicked" 
                     Text="︙"
                     TextColor="Black"
                     FontSize="24"
                     BackgroundColor="White"/>
-            </StackLayout>
+            </Grid>
             
             <Label
                 Text="- aLice -"
