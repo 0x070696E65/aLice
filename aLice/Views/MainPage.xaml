@@ -47,11 +47,9 @@
             HorizontalOptions="Center" />
         
         <ScrollView 
-            VerticalOptions="FillAndExpand"
-            HorizontalOptions="Fill">
-            <StackLayout 
-                x:Name="AccountList"
-                VerticalOptions="Fill" />
+            Orientation="Vertical"
+            VerticalOptions="FillAndExpand">
+            <StackLayout x:Name="AccountList"/>
         </ScrollView>
 
         <ImageButton 

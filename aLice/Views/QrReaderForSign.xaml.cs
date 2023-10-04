@@ -8,6 +8,8 @@ namespace aLice.Views;
 
 public partial class QrReaderForSign : ContentPage
 {
+    private HashSet<string> scannedQRCodes = new HashSet<string>();
+
     public QrReaderForSign()
     {
         InitializeComponent();
@@ -34,25 +36,28 @@ public partial class QrReaderForSign : ContentPage
         {
             try
             {
+                var qrCodeText = args.Result[0].Text;
+                if (scannedQRCodes.Contains(qrCodeText)) return;
+                scannedQRCodes.Add(qrCodeText);
+                
                 var url = "aLice://sign?";
                 var jsonDocument = JsonDocument.Parse(args.Result[0].Text);
-                if (jsonDocument.RootElement.TryGetProperty("alice", out var aliceObject))
+                if (!jsonDocument.RootElement.TryGetProperty("alice", out var aliceObject)) return;
+                    
+                var d = aliceObject.EnumerateObject().ToArray();
+                for (var i = 0; i < d.Count(); i++)
                 {
-                    var d = aliceObject.EnumerateObject().ToArray();
-                    for (var i = 0; i < d.Count(); i++)
-                    {
-                        var propertyName = d[i].Name;
-                        var propertyValue = d[i].Value;
-                        url += i == 0 ? $"{propertyName}={propertyValue}" : $"&{propertyName}={propertyValue}";
-                    }
-
-                    if (Navigation.ModalStack.Count > 0)
-                    {
-                        await Navigation.PopModalAsync();
-                    }
-
-                    App.RequestNotification(url, new CancellationToken());
+                    var propertyName = d[i].Name;
+                    var propertyValue = d[i].Value;
+                    url += i == 0 ? $"{propertyName}={propertyValue}" : $"&{propertyName}={propertyValue}";
                 }
+
+                if (Navigation.ModalStack.Count > 0)
+                {
+                    await Navigation.PopModalAsync();
+                }
+
+                App.RequestNotification(url, new CancellationToken());
             }
             catch (Exception e)
             {
