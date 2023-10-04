@@ -267,4 +267,9 @@ public partial class MainPage : ContentPage
             ShowAccounts();
         }
     }
+    
+    private async void OnQRButtonClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushModalAsync(new QrReaderForSign());
+    }
 }
