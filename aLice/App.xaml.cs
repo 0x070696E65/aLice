@@ -102,8 +102,8 @@ public partial class App : Application
     
     protected override Window CreateWindow(IActivationState activationState)
     {
+        SecureStorage.Remove("CurrentPassword");
         var window = base.CreateWindow(activationState);
-
         window.Destroying += (s, e) =>
         {
             // パスワードの削除

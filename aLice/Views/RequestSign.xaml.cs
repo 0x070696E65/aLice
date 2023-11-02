@@ -59,7 +59,6 @@ public partial class RequestSign : ContentPage
                 {
                     password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
                 }
-                await SecureStorage.SetAsync("CurrentPassword", password);
             }
             else
             {

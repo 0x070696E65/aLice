@@ -123,6 +123,7 @@ public abstract class RequestViewModel
         try
         {
             privateKey = GetPrivateKey(password);
+            await SecureStorage.SetAsync("CurrentPassword", password);
         } catch
         {
             throw new Exception("パスワードが間違っています");
