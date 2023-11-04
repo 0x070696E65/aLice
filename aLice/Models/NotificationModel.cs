@@ -14,6 +14,8 @@ public class NotificationModel
     public readonly string FeeMultiplier;
     public readonly List<string> Batches = new();
     public readonly string SetPublicKey;
+    public readonly string Node;
+    public readonly string Deadline;
     public readonly SdkVersion SdkVersion = SdkVersion.V3;
     public NotificationModel(string _uri)
     {
@@ -96,6 +98,18 @@ public class NotificationModel
         if (hasSetPublicKey)
         {
             SetPublicKey = _setPublicKey;
+        }
+        
+        var hasDeadline = dict.TryGetValue("deadline", out var _deadline);
+        if (hasDeadline)
+        {
+            Deadline = _deadline;
+        }
+        
+        var hasNode = dict.TryGetValue("node", out var _node);
+        if (hasNode)
+        {
+            Node = Converter.HexToUtf8(_node);
         }
         
         var hasSdkVersion = dict.TryGetValue("sdk_version", out var sdkVersion);

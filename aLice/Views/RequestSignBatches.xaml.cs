@@ -1,3 +1,4 @@
+using aLice.Models;
 using aLice.ViewModels;
 
 namespace aLice.Views;
@@ -64,10 +65,10 @@ public partial class RequestSignBatches : ContentPage
                 password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
             }
             
-            var (isCallBack, result) = await RequestViewModel.Accept(password);
+            var (resultType, result) = await RequestViewModel.Accept(password);
             await Application.Current.MainPage.Navigation.PopModalAsync();
         
-            if (isCallBack)
+            if (resultType == ResultType.Callback)
             {
                 await Launcher.OpenAsync(new Uri(result));
             }

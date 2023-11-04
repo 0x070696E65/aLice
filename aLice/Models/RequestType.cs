@@ -1,5 +1,4 @@
-﻿using System;
-namespace aLice
+﻿namespace aLice.Models
 {
 	public enum RequestType
 	{

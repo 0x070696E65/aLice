@@ -1,3 +1,4 @@
+using aLice.Models;
 using aLice.ViewModels;
 
 namespace aLice.Views;
@@ -65,16 +66,22 @@ public partial class RequestSign : ContentPage
                 password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
             }
             
-            var (isCallBack, result) = await RequestViewModel.Accept(password);
+            var (resultType, result) = await RequestViewModel.Accept(password);
             await Application.Current.MainPage.Navigation.PopModalAsync();
         
-            if (isCallBack)
+            switch (resultType)
             {
-                await Launcher.OpenAsync(new Uri(result));
-            }
-            else
-            {
-                await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
+                case ResultType.Callback:
+                    await Launcher.OpenAsync(new Uri(result));
+                    break;
+                case ResultType.Announce:
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result));
+                    break;
+                case ResultType.ShowData:
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
+                    break;
+                default:
+                    throw new Exception("指定されたタイプは存在しません");
             }
 
             await AccountViewModel.DeletePassword();

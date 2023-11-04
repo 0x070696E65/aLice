@@ -1,5 +1,7 @@
+using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using aLice.Models;
 using aLice.Services;
 using CatSdk.Crypto;
@@ -12,7 +14,7 @@ namespace aLice.ViewModels;
 public abstract class RequestViewModel
 {
     public static NotificationModel Notification { get; private set; }
-    private static readonly List<(IBaseTransaction transaction, string parsedTransaction)> ParseTransaction = new ();
+    public static readonly List<(IBaseTransaction transaction, string parsedTransaction)> ParseTransaction = new ();
     private static byte[] BytesData;
     private static readonly string RejectParam = "error=sign_rejected";
     
@@ -46,7 +48,7 @@ public abstract class RequestViewModel
         else if (Notification.RequestType == RequestType.SignTransaction)
         {
             ParseTransaction.Clear();
-            ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier));
+            ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline));
             ParseTransaction[0].transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
             typeText = "Symbolのトランザクションです";
             dataText = ParseTransaction[0].parsedTransaction;
@@ -71,7 +73,7 @@ public abstract class RequestViewModel
         return (domainText, typeText, dataText, askText);
     }
 
-    public static async Task<(bool isCallBack, string result)> Accept(string password = "")
+    public static async Task<(ResultType resultType, string result)> Accept(string password = "")
     {
         return Notification.RequestType switch
         {
@@ -100,11 +102,11 @@ public abstract class RequestViewModel
         return (true, callbackUrl);
     }
     
-    private static (bool isCallBack, string result) AcceptRequestPublicKey()
+    private static (ResultType resultType, string result) AcceptRequestPublicKey()
     {
         if (Notification.CallbackUrl == null)
         {
-            return (false, AccountViewModel.MainAccount.publicKey);
+            return (ResultType.ShowData, AccountViewModel.MainAccount.publicKey);
         }
         
         var callbackUrl = "";
@@ -114,10 +116,10 @@ public abstract class RequestViewModel
         else {
             callbackUrl += $"{Notification.CallbackUrl}?pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
         }
-        return (true, callbackUrl);
+        return (ResultType.Callback, callbackUrl);
     }
 
-    private static async Task<(bool isCallBack, string result)> AcceptRequestSign(string password)
+    private static async Task<(ResultType resultType, string result)> AcceptRequestSign(string password)
     {
         string privateKey;
         try
@@ -186,6 +188,8 @@ public abstract class RequestViewModel
                     return await Post(dic);
                 case "get":
                     return Get(signedPayload, "signed_payload");
+                case "announce":
+                    return await Announce(signedPayload);
                 default:
                     throw new Exception("不正なリクエストです");
             }
@@ -211,7 +215,7 @@ public abstract class RequestViewModel
         }
     }
 
-    private static async Task<(bool isCallBack, string result)> AcceptRequestBatches(string password)
+    private static async Task<(ResultType resultType, string result)> AcceptRequestBatches(string password)
     {
         string privateKey;
         try
@@ -251,25 +255,25 @@ public abstract class RequestViewModel
                     var signedPayload = Converter.BytesToHex(aggs[i].Serialize());
                     callbackUrl += $"&signed{i}={signedPayload}";
                 }
-                return (true, callbackUrl);
+                return (ResultType.Callback, callbackUrl);
             }
             default:
                 throw new Exception("不正なリクエストです");
         }
     }
 
-    private static async Task<(bool isCallBack, string result)> Post(Dictionary<string, string> dic)
+    private static async Task<(ResultType resultType, string result)> Post(Dictionary<string, string> dic)
     {
         using var client = new HttpClient();
         var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
         var response = client.PostAsync(Notification.CallbackUrl, content).Result;
         await response.Content.ReadAsStringAsync();
-        return Notification.RedirectUrl != null ? (true, Notification.RedirectUrl) : (false, "");
+        return Notification.RedirectUrl != null ? (ResultType.Callback, Notification.RedirectUrl) : (ResultType.ShowData, "");
     }
 
-    private static (bool isCallBack, string result) Get(string signedContent, string contentKey)
+    private static (ResultType resultType, string result) Get(string signedContent, string contentKey)
     {
-        if (Notification.CallbackUrl == null) return (false, signedContent);
+        if (Notification.CallbackUrl == null) return (ResultType.ShowData, signedContent);
         var callbackUrl = "";
         var additionalParam =
             $"{contentKey}={signedContent}&original_data={Notification.Data}&pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
@@ -282,9 +286,26 @@ public abstract class RequestViewModel
             callbackUrl += $"{Notification.CallbackUrl}?{additionalParam}";
         }
 
-        return (true, callbackUrl);
+        return (ResultType.Callback, callbackUrl);
     }
 
+    private static async Task<(ResultType resultType, string result)> Announce(string signedPayload)
+    {
+        var symbolService = new Symbol(Notification.Node);
+        if (!await symbolService.CheckNodeHealth())
+        {
+            throw new Exception("指定されたノードがダウンしているか、正しいノードURLではありません");
+        };
+        try
+        {
+            return (ResultType.Announce, signedPayload);
+        }
+        catch
+        {
+            throw new Exception("アナウンスに失敗しました");
+        }
+    }
+    
     public static SavedAccount GetRequestAccount()
     {
         return AccountViewModel.Accounts.accounts.ToList().Find(acc => acc.publicKey == Notification.SetPublicKey);

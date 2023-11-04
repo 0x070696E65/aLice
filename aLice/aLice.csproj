@@ -19,8 +19,8 @@
         <ApplicationIdGuid>1E47EC8D-2DC8-4A49-8AF0-BBCFCA12D518</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.7.3</ApplicationDisplayVersion>
-        <ApplicationVersion>32</ApplicationVersion>
+        <ApplicationDisplayVersion>1.8.0</ApplicationDisplayVersion>
+        <ApplicationVersion>33</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
@@ -77,7 +77,7 @@
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
         <PackageReference Include="Camera.MAUI" Version="1.4.4" />
-        <PackageReference Include="CatSdk" Version="1.0.5" />
+        <PackageReference Include="CatSdk" Version="1.0.7" />
         <PackageReference Include="MetalOnSymbol" Version="1.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
     </ItemGroup>
@@ -124,6 +124,9 @@
       <MauiXaml Update="Views\QrReaderForSign.xaml">
         <SubType>Designer</SubType>
       </MauiXaml>
+      <MauiXaml Update="Views\WaitConfirmed.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
     </ItemGroup>
 
     <ItemGroup>
@@ -161,6 +164,10 @@
       </Compile>
       <Compile Update="Views\QrReaderForSign.xaml.cs">
         <DependentUpon>QrReaderForSign.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\WaitConfirmed.xaml.cs">
+        <DependentUpon>WaitConfirmed.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

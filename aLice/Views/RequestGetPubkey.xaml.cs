@@ -1,4 +1,5 @@
 using System.Text.Json;
+using aLice.Models;
 using aLice.ViewModels;
 
 namespace aLice.Views;
@@ -31,8 +32,8 @@ public partial class RequestGetPubkey : ContentPage
     {
         try
         {
-            var (isCallBack, result) = await RequestViewModel.Accept();
-            if (isCallBack)
+            var (resultType, result) = await RequestViewModel.Accept();
+            if (resultType == ResultType.Callback)
             {
                 await Application.Current.MainPage.Navigation.PopModalAsync();
                 await Launcher.OpenAsync(new Uri(result));

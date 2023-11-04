@@ -3,6 +3,7 @@ using System.Text;
 using CatSdk;
 using CatSdk.Crypto;
 using CatSdk.CryptoTypes;
+using CatSdk.Facade;
 using CatSdk.Symbol;
 using CatSdk.Utils;
 
@@ -10,9 +11,14 @@ namespace aLice.Services;
 
 public static class SymbolTransaction
 {
-    public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex, string recipientPublicKeyForEncryptMessage, string feeMultiplier)
+    public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex, string recipientPublicKeyForEncryptMessage, string feeMultiplier, string deadline)
     {
         var transaction = TransactionFactory.Deserialize(hex);
+        if (deadline != null)
+        {
+            var facade = new SymbolFacade(transaction.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
+            transaction.Deadline = new Timestamp(facade.Network.FromDatetime<CatSdk.Symbol.NetworkTimestamp>(DateTime.UtcNow).AddSeconds(ulong.Parse(deadline)).Timestamp);   
+        }
         if (transaction.Type == TransactionType.TRANSFER)
         {
             if (recipientPublicKeyForEncryptMessage != null)
