@@ -6,6 +6,7 @@ using aLice.Models;
 using aLice.Services;
 using CatSdk.Crypto;
 using CatSdk.CryptoTypes;
+using CatSdk.Facade;
 using CatSdk.Symbol;
 using CatSdk.Utils;
 
@@ -50,6 +51,46 @@ public abstract class RequestViewModel
             ParseTransaction.Clear();
             ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline));
             ParseTransaction[0].transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+            
+            // もしトランザクションがアグリゲートでかつ公開鍵が空なら内部トランザクションの署名者をメインアカウントに変更する
+            if (ParseTransaction[0].transaction is AggregateCompleteTransactionV2)
+            {
+                var aggregateTx = ParseTransaction[0].transaction as AggregateCompleteTransactionV2;
+                var baseTransactions = aggregateTx?.Transactions;
+                if (baseTransactions != null)
+                {
+                    foreach (var tx in baseTransactions)
+                    {
+                        if (Converter.BytesToHex(tx.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+                        {
+                            tx.SignerPublicKey =  new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                        }
+                    } 
+                    var merkleHash = SymbolFacade.HashEmbeddedTransactions(baseTransactions);
+                    aggregateTx.TransactionsHash = merkleHash;
+                }
+            }
+            Console.WriteLine(Converter.BytesToHex(ParseTransaction[0].transaction.Serialize()));
+            
+            if (ParseTransaction[0].transaction is AggregateBondedTransactionV2)
+            {
+                var aggregateTx = ParseTransaction[0].transaction as AggregateCompleteTransactionV2;
+                var baseTransactions = aggregateTx?.Transactions;
+                if (baseTransactions != null)
+                {
+                    foreach (var tx in baseTransactions)
+                    {
+                        if (tx.SignerPublicKey.bytes ==
+                            Converter.HexToBytes("0000000000000000000000000000000000000000000000000000000000000000"))
+                        {
+                            tx.SignerPublicKey =  new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                        }
+                    }   
+                    var merkleHash = SymbolFacade.HashEmbeddedTransactions(baseTransactions);
+                    aggregateTx.TransactionsHash = merkleHash;
+                }
+            }
+            
             typeText = "Symbolのトランザクションです";
             dataText = ParseTransaction[0].parsedTransaction;
 

@@ -290,6 +290,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicGlobalRestrictionTransactionV1) _transaction;
             result += "MosaicGlobalRestrictionTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"MosaicId: {transaction.MosaicId.Value:X16}\n";
             result += $"RestrictionKey: {transaction.RestrictionKey}\n";
             result += $"PreviousRestrictionValue: {transaction.PreviousRestrictionValue}\n";
@@ -319,6 +323,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicAddressRestrictionTransactionV1) _transaction;
             result += "MosaicAddressRestrictionTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"MosaicId: {transaction.MosaicId.Value:X16}\n";
             result += $"RestrictionKey: {transaction.RestrictionKey}\n";
             result += $"PreviousRestrictionValue: {transaction.PreviousRestrictionValue}\n";
@@ -347,7 +355,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedAccountOperationRestrictionTransactionV1) _transaction;
             result += "AccountOperationRestrictionTransaction\n";
-            result += "AccountMosaicRestrictionTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"RestrictionFlags:\n";
             result += $"{ParseRestrictionFlags(transaction.RestrictionFlags.Value)}";
             result += $"RestrictionAdditions:\n";
@@ -403,6 +414,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedAccountMosaicRestrictionTransactionV1) _transaction;
             result += "AccountMosaicRestrictionTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"RestrictionFlags:\n";
             result += $"{ParseRestrictionFlags(transaction.RestrictionFlags.Value)}";
             result += $"RestrictionAdditions:\n";
@@ -436,6 +451,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedAccountAddressRestrictionTransactionV1) _transaction;
             result += "AccountAddressRestrictionTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"RestrictionFlags:\n";
             result += $"{ParseRestrictionFlags(transaction.RestrictionFlags.Value)}";
             result += $"RestrictionAdditions:\n";
@@ -484,6 +503,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedNamespaceRegistrationTransactionV1) _transaction;
             result += "NamespaceRegistrationTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"ParentId: {transaction.ParentId.Value:X16}\n";
             result += $"Id: {transaction.Id.Value:X16}\n";
             result += $"Duration: {transaction.Duration.Value}\n";
@@ -510,6 +533,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicAliasTransactionV1) _transaction;
             result += "MosaicAliasTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"NamespaceId: {transaction.NamespaceId.Value:X16}\n";
             result += $"MosaicId: {transaction.MosaicId.Value:X16}\n";
             result += $"AliasAction: {transaction.AliasAction}\n";
@@ -534,6 +561,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedAddressAliasTransactionV1) _transaction;
             result += "AddressAliasTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"NamespaceId: {transaction.NamespaceId.Value:X16}\n";
             result += $"Address: {Converter.AddressToString(transaction.Address.bytes)}\n";
             result += $"AliasAction: {transaction.AliasAction}\n";
@@ -558,6 +589,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMultisigAccountModificationTransactionV1) _transaction;
             result += "MultisigAccountModificationTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"MinApprovalDelta: {transaction.MinApprovalDelta}\n";
             result += $"MinRemovalDelta: {transaction.MinRemovalDelta}\n";
             result += $"AddressAdditions:\n";
@@ -592,6 +627,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedNamespaceMetadataTransactionV1) _transaction;
             result += "NamespaceMetadataTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"TargetAddress: {Converter.AddressToString(transaction.TargetAddress.bytes)}\n";
             result += $"TargetNamespaceId: {transaction.TargetNamespaceId.Value:X16}\n";
             result += $"ScopedMetadataKey: {transaction.ScopedMetadataKey:X16}\n";
@@ -620,6 +659,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicMetadataTransactionV1) _transaction;
             result += "MosaicMetadataTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"TargetAddress: {Converter.AddressToString(transaction.TargetAddress.bytes)}\n";
             result += $"TargetMosaicId: {transaction.TargetMosaicId.Value:X16}\n";
             result += $"ScopedMetadataKey: {transaction.ScopedMetadataKey:X16}\n";
@@ -648,6 +691,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedAccountMetadataTransactionV1) _transaction;
             result += "AccountMetadataTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"TargetAddress: {Converter.AddressToString(transaction.TargetAddress.bytes)}\n";
             result += $"ScopedMetadataKey: {transaction.ScopedMetadataKey:X16}\n";
             result += $"ValueSizeDelta: {transaction.ValueSizeDelta}\n";
@@ -674,6 +721,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedSecretProofTransactionV1) _transaction;
             result += "SecretProofTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"RecipientAddress: {Converter.AddressToString(transaction.RecipientAddress.bytes)}\n";
             result += $"Secret: {transaction.Secret}\n";
             result += $"Proof: {Converter.BytesToHex(transaction.Proof)}\n";
@@ -700,6 +751,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedSecretLockTransactionV1) _transaction;
             result += "SecretLockTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"RecipientAddress: {Converter.AddressToString(transaction.RecipientAddress.bytes)}\n";
             result += $"Secret: {transaction.Secret}\n";
             result += $"MosaicID: {transaction.Mosaic.MosaicId}\n";
@@ -730,6 +785,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedHashLockTransactionV1) _transaction;
             result += "HashLockTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"MosaicID: {transaction.Mosaic.MosaicId}\n";
             result += $"Amount: {transaction.Mosaic.Amount.Value}\n";
             result += $"Hash: {transaction.Hash}\n";
@@ -756,6 +815,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedVrfKeyLinkTransactionV1) _transaction;
             result += "VrfKeyLinkTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"LinkedPublicKey: {transaction.LinkedPublicKey}\n";
             result += $"LinkAction: {transaction.LinkAction}\n";
         }
@@ -778,6 +841,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedVotingKeyLinkTransactionV1) _transaction;
             result += "VotingKeyLinkTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"LinkedPublicKey: {transaction.LinkedPublicKey}\n";
             result += $"LinkAction: {transaction.LinkAction}\n";
             result += $"StartEpoch: {transaction.StartEpoch.Value}\n";
@@ -804,6 +871,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedNodeKeyLinkTransactionV1) _transaction;
             result += "NodeKeyLinkTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"LinkedPublicKey: {transaction.LinkedPublicKey}\n";
             result += $"LinkAction: {transaction.LinkAction}\n";
         } 
@@ -826,6 +897,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedAccountKeyLinkTransactionV1) _transaction;
             result += "AccountKeyLinkTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"LinkedPublicKey: {transaction.LinkedPublicKey}\n";
             result += $"LinkAction: {transaction.LinkAction}\n";
         }
@@ -848,6 +923,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicSupplyRevocationTransactionV1) _transaction;
             result += "MosaicSupplyRevocationTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"SourceAddress: {Converter.AddressToString(transaction.SourceAddress.bytes)}\n";
             result += $"MosaicID: {transaction.Mosaic.MosaicId}\n";
             result += $"Amount: {transaction.Mosaic.Amount.Value}\n";
@@ -872,6 +951,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicSupplyChangeTransactionV1) _transaction;
             result += "MosaicSupplyChangeTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"MosaicID: {transaction.MosaicId.Value:X16}\n";
             result += $"Action: {transaction.Action}\n";
             result += $"Delta: {transaction.Delta.Value}\n";
@@ -895,6 +978,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedMosaicDefinitionTransactionV1) _transaction;
             result += "MosaicDefinitionTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"MosaicID: {transaction.Id.Value:X16}\n";
             result += $"Duration: {transaction.Duration.Value}\n";
             result += $"Divisibility: {transaction.Divisibility}\n";
@@ -934,6 +1021,10 @@ public static class SymbolTransaction
         {
             var transaction = (EmbeddedTransferTransactionV1) _transaction;
             result += "TransferTransaction\n";
+            if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+            {
+                result += "※公開鍵が設定されていません、署名するとあなたのメインアカウントによる署名となります\n";
+            }
             result += $"RecipientAddress: {Converter.AddressToString(transaction.RecipientAddress.bytes)}\n";
             result += $"Message: {ParseMessage(transaction.Message)}\n";
             result += "Mosaics:\n";
