@@ -18,15 +18,17 @@
 \- aLice \- のカスタムURLスキームは `alice://` です。prefixには`sign`を使います。
 
 ### クエリパラメータ
-|  クエリパラメータ  | 値                                                                                                          | 
-| ---- |------------------------------------------------------------------------------------------------------------| 
-|  type  | request_sign_transaction, request_sign_utf8, request_sign_binary_hex, request_pubkey, request_sign_batches |
-|  data  | 署名するデータ(string)                                                                                            |
-|  callback  | これらをhexにする（https://hogehoge.com/callback, sampleApp://callback/）                                           |
-| batch | batch0, batch1, batch2 ...                                                                                 |
-| method | get, post                                                                                                  |
-| redirect_url | これらをhexにする (https://google.com)                                                                            |
+| クエリパラメータ       | 値                                                                                                          | 
+|----------------|------------------------------------------------------------------------------------------------------------| 
+| type           | request_sign_transaction, request_sign_utf8, request_sign_binary_hex, request_pubkey, request_sign_batches |
+| data           | 署名するデータ(string)                                                                                            |
+| callback       | これらをhexにする（https://hogehoge.com/callback, sampleApp://callback/）                                           |
+| batch          | batch0, batch1, batch2 ...                                                                                 |
+| method         | get, post, announce                                                                                        |
+| redirect_url   | これらをhexにする (https://google.com)                                                                            |
 | set_public_key | 公開鍵を渡してアカウントを指定する                                                                                          |
+| deadline       | トランザクションのDeadlineをaLiceで設定する                                                                               |
+| node           | request_sign_transactionのみノードを指定することでaLiceがアナウンスします（method=announce)                                       |
 <br>
 ex)
 `alice://sign?data=${data}&type=${request_type}&callback=${callbackURL}`
@@ -104,6 +106,19 @@ const jsonObject = {
 const d = JSON.stringify(jsonObject);
 ```
 > Note: ここでのoriginal_dataは送信時のhex_payloadです。
+
+#### deadline
+`&deadline=3600`を与えてやるとaLiceでDeadlineを設定できます。
+単位は秒です
+
+#### Announce
+request_sign_transactionのみ`&method=announce`を与えてやるとaLiceにてアナウンスします。
+nodeのurlは16進数に変換してください。
+
+```javascript
+const node = `https://samplenode.com:3001`;
+const url = `alice://sign?data=${transferTransaction.serialize()}&type=request_sign_transaction&node=${Convert.uint8ToHex(node)}&method=announce&deadline=3600`;
+```
 
 #### 暗号化メッセージ
 暗号化メッセージはTransferTransactionのみで使えます。
