@@ -15,7 +15,7 @@
                             FontSize="18"
                             HorizontalOptions="Center"
                             Margin="0, 0, 0, 20"/>
-                        <Editor
+                        <Label
                             x:Name="ShowData"
                             HeightRequest="300"
                             />

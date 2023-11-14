@@ -25,6 +25,12 @@
                     x:Name="Ask"
                     FontSize="22"
                     HorizontalOptions="Center"/>
+                <Entry
+                    IsPassword="True"
+                    x:Name="Password"
+                    Keyboard="Numeric"
+                    Placeholder="Input password...">
+                </Entry>
                 <Grid Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

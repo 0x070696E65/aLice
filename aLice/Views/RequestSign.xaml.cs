@@ -14,20 +14,37 @@ public partial class RequestSign : ContentPage
     {
         base.OnAppearing();
 
-        if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
+        try
         {
-            var requestAccount = RequestViewModel.GetRequestAccount();
-            var isChangeMainAccount = await DisplayAlert("確認", requestAccount.accountName + "をメインアカウントに変更しますか？\nいいえを選択するとこのページを閉じます", "はい", "いいえ");
-            if (isChangeMainAccount)
+            if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey !=
+                RequestViewModel.Notification.SetPublicKey)
             {
-                await AccountViewModel.ChangeMainAccount(requestAccount.address);
+                var requestAccount = RequestViewModel.GetRequestAccount();
+                var isChangeMainAccount = await DisplayAlert("確認",
+                    requestAccount.accountName + "をメインアカウントに変更しますか？\nいいえを選択するとこのページを閉じます", "はい", "いいえ");
+                if (isChangeMainAccount)
+                {
+                    await AccountViewModel.ChangeMainAccount(requestAccount.address);
+                }
+                else
+                {
+                    if (Navigation.ModalStack.Count > 0)
+                    {
+                        await Navigation.PopModalAsync();
+                    }
+                }
             }
-            else
+
+            await ShowRequestSign();
+        }
+        catch (Exception exception)
+        {
+            await DisplayAlert("Error", exception.Message, "閉じる");
+            if (Navigation.ModalStack.Count > 0)
             {
                 await Navigation.PopModalAsync();
             }
         }
-        await ShowRequestSign();
     }
 
     // 署名を要求されたときに呼び出される
@@ -40,6 +57,16 @@ public partial class RequestSign : ContentPage
             Type.Text = typeText;
             Data.Text = dataText;
             Ask.Text = askText;
+
+            try
+            {
+                var p = (await SecureStorage.GetAsync("CurrentPassword")).Split("_");
+                Password.Text = p[0];
+            }
+            catch
+            {
+                // 何もしない
+            }
         }
         catch (Exception exception)
         {
@@ -52,20 +79,7 @@ public partial class RequestSign : ContentPage
     {
         try
         {
-            string password;
-            if (AccountViewModel.MemoryPasswordMilliseconds != 0)
-            {
-                password = await SecureStorage.GetAsync("CurrentPassword");
-                if (password == null)
-                {
-                    password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
-                }
-            }
-            else
-            {
-                password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
-            }
-            
+            var password = Password.Text;
             var (resultType, result) = await RequestViewModel.Accept(password);
             await Application.Current.MainPage.Navigation.PopModalAsync();
         

@@ -5,7 +5,7 @@ namespace aLice.Views;
 
 public partial class Settings : ContentPage
 {
-    private int memoryPasswordMilliseconds;
+    private int memoryPasswordSeconds;
     public Settings()
     {
         InitializeComponent();
@@ -14,21 +14,21 @@ public partial class Settings : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        MemoryTimeSlider.Value = AccountViewModel.MemoryPasswordMilliseconds / 1000;
+        MemoryTimeSlider.Value = AccountViewModel.MemoryPasswordSeconds;
     }
 
     private void MemoryTimeSliderChanged(object sender, ValueChangedEventArgs e)
     {
         var slider = (Slider) sender;
-        memoryPasswordMilliseconds = (int) Math.Round(slider.Value / 10) * 10;
-        slider.Value = memoryPasswordMilliseconds;
-        MemoryTimeValue.Text = memoryPasswordMilliseconds.ToString(CultureInfo.InvariantCulture);
+        memoryPasswordSeconds = (int) Math.Round(slider.Value / 10) * 10;
+        slider.Value = memoryPasswordSeconds;
+        MemoryTimeValue.Text = memoryPasswordSeconds.ToString(CultureInfo.InvariantCulture);
     }
 
     private async void OnSaveMemoryTime(object sender, EventArgs e)
     {
-        AccountViewModel.MemoryPasswordMilliseconds = memoryPasswordMilliseconds * 1000;
-        await SecureStorage.SetAsync("MemoryPasswordMilliseconds", AccountViewModel.MemoryPasswordMilliseconds.ToString(CultureInfo.InvariantCulture));
+        AccountViewModel.MemoryPasswordSeconds = memoryPasswordSeconds;
+        await SecureStorage.SetAsync("MemoryPasswordSeconds", AccountViewModel.MemoryPasswordSeconds.ToString(CultureInfo.InvariantCulture));
         await Navigation.PopModalAsync();
     }
 

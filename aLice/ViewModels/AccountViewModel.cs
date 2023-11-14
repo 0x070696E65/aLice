@@ -10,7 +10,7 @@ public abstract class AccountViewModel
     public static SavedAccounts Accounts = new SavedAccounts();
     public static SavedAccount MainAccount;
     public static string[] AccountNames;
-    public static int MemoryPasswordMilliseconds = 0;
+    public static int MemoryPasswordSeconds = 0;
     
     public static async Task SetAccounts()
     {
@@ -25,7 +25,7 @@ public abstract class AccountViewModel
             }
 
             MainAccount = Accounts.accounts.ToList().Find((acc) => acc.isMain);
-            MemoryPasswordMilliseconds = await SecureStorage.GetAsync("MemoryPasswordMilliseconds") == null ? 0 : int.Parse(await SecureStorage.GetAsync("MemoryPasswordMilliseconds"));
+            MemoryPasswordSeconds = await SecureStorage.GetAsync("MemoryPasswordSeconds") == null ? 0 : int.Parse(await SecureStorage.GetAsync("MemoryPasswordSeconds"));
         }
         catch
         {
@@ -198,7 +198,7 @@ public abstract class AccountViewModel
     
     private static async Task ActionDeletePassword(CancellationToken token)
     {
-        await Task.Delay(MemoryPasswordMilliseconds, token);
+        await Task.Delay(MemoryPasswordSeconds * 1000, token);
         token.ThrowIfCancellationRequested();
         SecureStorage.Remove("CurrentPassword");
     }

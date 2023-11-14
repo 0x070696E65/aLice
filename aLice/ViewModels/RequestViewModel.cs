@@ -166,12 +166,14 @@ public abstract class RequestViewModel
         try
         {
             privateKey = GetPrivateKey(password);
-            await SecureStorage.SetAsync("CurrentPassword", password);
+            if (AccountViewModel.MemoryPasswordSeconds != 0)
+            {
+                await SecureStorage.SetAsync("CurrentPassword", $"{password}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
+            }
         } catch
         {
             throw new Exception("パスワードが間違っています");
         }
-
         var keyPair = new KeyPair(new PrivateKey(privateKey));
 
         if (Notification.RequestType == RequestType.SignTransaction)
@@ -349,7 +351,9 @@ public abstract class RequestViewModel
     
     public static SavedAccount GetRequestAccount()
     {
-        return AccountViewModel.Accounts.accounts.ToList().Find(acc => acc.publicKey == Notification.SetPublicKey);
+        var list = AccountViewModel.Accounts.accounts.ToList().Find(acc => acc.publicKey == Notification.SetPublicKey);
+        if(list == null) throw new Exception("指定されたアカウントが存在しません");
+        return list;
     }
     
     private static string GetPrivateKey(string password)
