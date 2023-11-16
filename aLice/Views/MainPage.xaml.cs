@@ -65,9 +65,6 @@ public partial class MainPage : ContentPage
                 {
                     ColumnDefinitions =
                     {
-                        new ColumnDefinition { Width = new GridLength(5, GridUnitType.Star) },
-                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                        new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
                         new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
                         new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
                     }
@@ -76,76 +73,54 @@ public partial class MainPage : ContentPage
                 {
                     Text = acc.accountName,
                     VerticalOptions = LayoutOptions.Center,
+                    HorizontalOptions = LayoutOptions.Start,
                     FontSize = 14,
                     Margin = new Thickness(10, 0, 0, 0)
                 };
                 Grid.SetColumn(nameLabel, 0);
                 grid.Children.Add(nameLabel);
                 
-                var starButton = new Button()
+                var pullDownButton = new Button
                 {
                     BackgroundColor = Color.FromRgba(255, 255, 255, 0),
                     HorizontalOptions = LayoutOptions.End,
+                    Text = "▼",
+                    TextColor = Colors.Black,
+                    FontSize = 20,
                 };
-                var addressButton = new Button
+
+                pullDownButton.Clicked += async (sender, args) =>
                 {
-                    BackgroundColor = Color.FromRgba(255, 255, 255, 0),
-                    HorizontalOptions = LayoutOptions.End,
-                    ImageSource = "book.png",
-                };
-                addressButton.Clicked += async (sender, e) =>
-                {
-                    await OnAddressCopyButtonClicked(acc.address);
-                };
-                
-                var exportButton = new Button
-                {
-                    BackgroundColor = Color.FromRgba(255, 255, 255, 0),
-                    HorizontalOptions = LayoutOptions.End,
-                    ImageSource = "key.png",
-                };
-                exportButton.Clicked += async (sender, e) =>
-                {
-                    await OnExportButtonClicked(acc.address);
-                };
-                
-                var deleteButton = new Button
-                {
-                    BackgroundColor = Color.FromRgba(255, 255, 255, 0),
-                    HorizontalOptions = LayoutOptions.End,
-                    ImageSource = "trash_can_regular.png",
-                };
-                deleteButton.Clicked += async (sender, e) =>
-                {
-                    await OnDeleteButtonClicked(acc.address, acc.accountName);
-                };
-                
-                if (acc.isMain)
-                {
-                    starButton.ImageSource = "star_solid.png";
-                    starButton.Clicked += async (sender, e) =>
+                    string action;
+                    if (acc.isMain)
                     {
-                        await DisplayAlert("Info", "メインアカウントです", "OK");
-                    };
-                }
-                else
-                {
-                    starButton.ImageSource = "star_regular.png";
-                    starButton.Clicked += async (sender, e) =>
+                        action = await DisplayActionSheet("Select", "cancel", null, "アドレスコピー", "秘密鍵コピー");
+                    }
+                    else
                     {
-                        await OnChangeMainAccount(acc.address, acc.accountName);
-                    };
-                }
+                        action = await DisplayActionSheet("Select", "cancel", null, "メインアカウントに設定する", "アドレスコピー", "秘密鍵コピー", "削除");
+                    }
                 
-                Grid.SetColumn(starButton, 1);
-                Grid.SetColumn(addressButton, 2);
-                Grid.SetColumn(exportButton, 3);
-                Grid.SetColumn(deleteButton, 4);
-                grid.Children.Add(starButton);
-                grid.Children.Add(addressButton);
-                grid.Children.Add(exportButton);
-                grid.Children.Add(deleteButton);
+                    switch (action)
+                    {
+                        case "メインアカウントに設定する":
+                            await OnChangeMainAccount(acc.address, acc.accountName);
+                            break;
+                        case "アドレスコピー":
+                            await OnAddressCopyButtonClicked(acc.address);
+                            break;
+                        case "秘密鍵コピー":
+                            await OnExportButtonClicked(acc.address);
+                            break;
+                        case "削除":
+                            await OnDeleteButtonClicked(acc.address, acc.accountName);
+                            break;
+                    }
+                };
                 
+                Grid.SetColumn(pullDownButton, 1);
+                grid.Children.Add(pullDownButton);
+                                
                 var addressLabel = new Label
                 {
                     Text = acc.address,
