@@ -1086,13 +1086,6 @@ public static class SymbolTransaction
     static string ParseMessage(byte[] bytes)
     {
         if(bytes.Length == 0) return "";
-        try
-        {
-            return Encoding.UTF8.GetString(bytes);
-        }
-        catch
-        {
-            return Converter.BytesToHex(bytes);
-        }
+        return bytes[0] == 0 ? Encoding.UTF8.GetString(bytes) : Converter.BytesToHex(bytes);
     }
 }
