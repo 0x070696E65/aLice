@@ -53,7 +53,7 @@ postの場合は以下のようなJSONをBodyに含め送信します
 ただし、これらは16進数にエンコードしてください
 ```javascript
 const callback = `sample://callback/param1=test`;
-const url = `alice://sign?data=${transferTransaction.serialize()}&type=request_sign_transaction&callback=${Convert.uint8ToHex(callback)}`;
+const url = `alice://sign?data=${transferTransaction.serialize()}&type=request_sign_transaction&callback=${Convert.utf8ToHex(callback)}`;
 ```
 
 callbackUrlを渡さない場合は、aLice内で署名データを表示しコピーさせることができます。
@@ -117,7 +117,7 @@ nodeのurlは16進数に変換してください。
 
 ```javascript
 const node = `https://samplenode.com:3001`;
-const url = `alice://sign?data=${transferTransaction.serialize()}&type=request_sign_transaction&node=${Convert.uint8ToHex(node)}&method=announce&deadline=3600`;
+const url = `alice://sign?data=${transferTransaction.serialize()}&type=request_sign_transaction&node=${Convert.utf8ToHex(node)}&method=announce&deadline=3600`;
 ```
 
 #### 暗号化メッセージ
