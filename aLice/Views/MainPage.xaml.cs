@@ -84,7 +84,10 @@ public partial class MainPage : ContentPage
                 {
                     BackgroundColor = Color.FromRgba(255, 255, 255, 0),
                     HorizontalOptions = LayoutOptions.End,
-                    ImageSource = "menu.png",
+                    VerticalOptions = LayoutOptions.Center,
+                    Text = "▽",
+                    TextColor = Colors.Black,
+                    FontSize = 12,
                 };
 
                 pullDownButton.Clicked += async (sender, args) =>
