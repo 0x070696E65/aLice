@@ -2,64 +2,55 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="aLice.Views.MainPage">
-    <StackLayout
-            Spacing="25"
-            Padding="30,0, 30, 10">
-        <Grid 
-            VerticalOptions="Start"
-            HorizontalOptions="Fill">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button
-                Grid.Column="0"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" 
-                Clicked="OnOpenSettingsClicked" 
-                Text="≡"
-                TextColor="Black"
-                FontSize="34"
-                BackgroundColor="White"/>
-            <Button
-                Grid.Column="1"
-                VerticalOptions="Center" 
-                HorizontalOptions="End" 
-                Clicked="OnButtonClicked" 
-                Text="︙"
-                TextColor="Black"
-                FontSize="24"
-                BackgroundColor="White"/>
-        </Grid>
-        
-        <Label
-            Text="- aLice -"
-            SemanticProperties.HeadingLevel="Level1"
-            FontSize="36"
-            FontFamily="TimesNewRoman"
-            HorizontalOptions="Center" />
+    <ScrollView 
+        Orientation="Vertical"
+        VerticalOptions="FillAndExpand">
+        <StackLayout
+                Spacing="25"
+                Padding="30,0, 30, 10">
+            <Grid 
+                VerticalOptions="Start"
+                HorizontalOptions="Fill">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" 
+                    Clicked="OnOpenSettingsClicked" 
+                    Text="≡"
+                    TextColor="Black"
+                    FontSize="34"
+                    BackgroundColor="White"/>
+                <Button
+                    Grid.Column="1"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="End" 
+                    Clicked="OnButtonClicked" 
+                    Text="︙"
+                    TextColor="Black"
+                    FontSize="24"
+                    BackgroundColor="White"/>
+            </Grid>
+            
+            <Label
+                Text="- aLice -"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="36"
+                FontFamily="TimesNewRoman"
+                HorizontalOptions="Center" />
 
-        <Label
-            Text="Sign with your Symbol account."
-            SemanticProperties.HeadingLevel="Level2"
-            SemanticProperties.Description="Sign with your Symbol account."
-            FontSize="14"
-            HorizontalOptions="Center" />
-        
-        <ScrollView 
-            Orientation="Vertical"
-            VerticalOptions="FillAndExpand">
-            <StackLayout x:Name="AccountList"/>
-        </ScrollView>
-
-        <ImageButton 
-            VerticalOptions="End" 
-            HorizontalOptions="End" 
-            Source="qr_code_icon"
-            Clicked="OnQRButtonClicked"
-            Aspect="AspectFit"
-            HeightRequest="80"
-            WidthRequest="80"
-            BackgroundColor="Transparent"/>
-    </StackLayout>
+            <Label
+                Text="Sign with your Symbol account."
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Sign with your Symbol account."
+                FontSize="14"
+                HorizontalOptions="Center" />
+            
+            <StackLayout x:Name="AccountList" />
+                
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

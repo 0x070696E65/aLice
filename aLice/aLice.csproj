@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net7.0-android;net7.0-ios;</TargetFrameworks>
+        <!--<TargetFrameworks>net7.0-android;net7.0-ios;</TargetFrameworks>-->
         <!--<TargetFrameworks>net7.0-android;</TargetFrameworks>-->
+        <TargetFrameworks>net7.0-ios;</TargetFrameworks>
         <!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>-->
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
         <!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
@@ -20,8 +21,8 @@
         <ApplicationIdGuid>1E47EC8D-2DC8-4A49-8AF0-BBCFCA12D518</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.8.2</ApplicationDisplayVersion>
-        <ApplicationVersion>35</ApplicationVersion>
+        <ApplicationDisplayVersion>1.9.1</ApplicationDisplayVersion>
+        <ApplicationVersion>37</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
@@ -33,9 +34,10 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
         <CreatePackage>false</CreatePackage>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
         <CodesignProvision>alice</CodesignProvision>
         <CodesignKey>iPhone Developer</CodesignKey>
+        <MtouchLink>None</MtouchLink>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
       <CreatePackage>false</CreatePackage>
@@ -45,6 +47,9 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <MtouchLink>None</MtouchLink>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
       <CreatePackage>false</CreatePackage>

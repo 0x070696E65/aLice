@@ -74,7 +74,7 @@ public partial class MainPage : ContentPage
                     Text = acc.accountName,
                     VerticalOptions = LayoutOptions.Center,
                     HorizontalOptions = LayoutOptions.Start,
-                    FontSize = 14,
+                    FontSize = 16,
                     Margin = new Thickness(10, 0, 0, 0)
                 };
                 Grid.SetColumn(nameLabel, 0);
@@ -84,9 +84,7 @@ public partial class MainPage : ContentPage
                 {
                     BackgroundColor = Color.FromRgba(255, 255, 255, 0),
                     HorizontalOptions = LayoutOptions.End,
-                    Text = "▼",
-                    TextColor = Colors.Black,
-                    FontSize = 20,
+                    ImageSource = "menu.png",
                 };
 
                 pullDownButton.Clicked += async (sender, args) =>
@@ -94,11 +92,11 @@ public partial class MainPage : ContentPage
                     string action;
                     if (acc.isMain)
                     {
-                        action = await DisplayActionSheet("Select", "cancel", null, "アドレスコピー", "秘密鍵コピー");
+                        action = await DisplayActionSheet("Select", "cancel", null, "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "削除");
                     }
                     else
                     {
-                        action = await DisplayActionSheet("Select", "cancel", null, "メインアカウントに設定する", "アドレスコピー", "秘密鍵コピー", "削除");
+                        action = await DisplayActionSheet("Select", "cancel", null, "メインアカウントに設定する", "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "削除");
                     }
                 
                     switch (action)
@@ -108,6 +106,9 @@ public partial class MainPage : ContentPage
                             break;
                         case "アドレスコピー":
                             await OnAddressCopyButtonClicked(acc.address);
+                            break;
+                        case "公開鍵コピー":
+                            await OnPublicKeyCopyButtonClicked(acc.publicKey);
                             break;
                         case "秘密鍵コピー":
                             await OnExportButtonClicked(acc.address);
@@ -193,6 +194,19 @@ public partial class MainPage : ContentPage
         {
             await Clipboard.SetTextAsync(address);
             await DisplayAlert("Copied", "クリップボードにアドレスをコピーしました", "閉じる");
+        }
+        catch (Exception error)
+        {
+            await DisplayAlert("Error", error.Message, "閉じる");
+        }
+    }
+    
+    private async Task OnPublicKeyCopyButtonClicked(string publicKey)
+    {
+        try
+        {
+            await Clipboard.SetTextAsync(publicKey);
+            await DisplayAlert("Copied", "クリップボードに公開鍵をコピーしました", "閉じる");
         }
         catch (Exception error)
         {
