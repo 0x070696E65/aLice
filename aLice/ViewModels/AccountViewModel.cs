@@ -202,4 +202,22 @@ public abstract class AccountViewModel
         token.ThrowIfCancellationRequested();
         SecureStorage.Remove("CurrentPassword");
     }
+
+    public static void DeletePasswordByTimestamp()
+    {
+        try
+        {
+            var p = SecureStorage.GetAsync("CurrentPassword").Result.Split("_");
+            var memoryPasswordSeconds = int.Parse(SecureStorage.GetAsync("MemoryPasswordSeconds").Result);
+            if (long.Parse(p[1]) + memoryPasswordSeconds < DateTimeOffset.Now.ToUnixTimeSeconds())
+            {
+                SecureStorage.Remove("CurrentPassword");
+            }
+        }
+        catch
+        {
+            // 念のため削除
+            SecureStorage.Remove("CurrentPassword");
+        }
+    }
 }

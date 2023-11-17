@@ -16,6 +16,7 @@ public partial class RequestSign : ContentPage
 
         try
         {
+            AccountViewModel.DeletePasswordByTimestamp();
             if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey !=
                 RequestViewModel.Notification.SetPublicKey)
             {
@@ -34,7 +35,6 @@ public partial class RequestSign : ContentPage
                     }
                 }
             }
-
             await ShowRequestSign();
         }
         catch (Exception exception)
@@ -57,6 +57,7 @@ public partial class RequestSign : ContentPage
             Type.Text = typeText;
             Data.Text = dataText;
             Ask.Text = askText;
+            Password.Text = "";
 
             try
             {

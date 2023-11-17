@@ -15,6 +15,7 @@ public partial class RequestSignBatches : ContentPage
         base.OnAppearing();
         try
         {
+            AccountViewModel.DeletePasswordByTimestamp();
             if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
             {
                 var requestAccount = RequestViewModel.GetRequestAccount();
@@ -53,6 +54,7 @@ public partial class RequestSignBatches : ContentPage
             Type.Text = typeText;
             Data.Text = dataText;
             Ask.Text = askText;
+            Password.Text = "";
             
             try
             {

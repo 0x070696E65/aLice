@@ -103,20 +103,10 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState activationState)
     {
         var window = base.CreateWindow(activationState);
-        try
+        window.Created += (sender, args) =>
         {
-            var p = SecureStorage.GetAsync("CurrentPassword").Result.Split("_");
-            var memoryPasswordSeconds = int.Parse(SecureStorage.GetAsync("MemoryPasswordSeconds").Result);
-            if (long.Parse(p[1]) +memoryPasswordSeconds < DateTimeOffset.Now.ToUnixTimeSeconds())
-            {
-                SecureStorage.Remove("CurrentPassword");
-            }
-        }
-        catch
-        {
-            // 念のため削除
-            SecureStorage.Remove("CurrentPassword");
-        }
+            AccountViewModel.DeletePasswordByTimestamp();
+        };
         return window;
     }
     
