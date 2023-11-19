@@ -1080,7 +1080,8 @@ public static class SymbolTransaction
         if (CatSdk.Symbol.Network.TestNet.epocTime == null) throw new NullReferenceException("ネットワークのエポックタイムが設定されていません");
         var timeSpan = TimeSpan.FromSeconds(timestamp.Value);
         var deadline = CatSdk.Symbol.Network.TestNet.epocTime.Value.Add(timeSpan / 1000);
-        return deadline.ToString(CultureInfo.InvariantCulture);
+        var deadlineLocal = deadline.ToLocalTime();
+        return deadlineLocal.ToString(CultureInfo.InvariantCulture);
     }
 
     static string ParseMessage(byte[] bytes)
