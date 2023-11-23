@@ -32,11 +32,6 @@
                     Placeholder="PrivateKey"
                     PlaceholderColor="#BFBFBF"
                     x:Name="PrivateKey"/>
-
-                <Entry
-                    Placeholder="Address"
-                    PlaceholderColor="#BFBFBF"
-                    x:Name="Address" />
                 
                 <StackLayout Orientation="Horizontal">
                     <Entry

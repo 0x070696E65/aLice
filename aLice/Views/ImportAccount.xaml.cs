@@ -1,5 +1,6 @@
 using aLice.ViewModels;
 using CatSdk.CryptoTypes;
+using CatSdk.Facade;
 using CatSdk.Symbol;
 using CatSdk.Utils;
 
@@ -21,11 +22,14 @@ public partial class ImportAccount : ContentPage
         try
         {
             var keyPair = new KeyPair(new PrivateKey(PrivateKey.Text));
-            
+            var facade = NetworkType == "MainNet"
+                ? new SymbolFacade(CatSdk.Symbol.Network.MainNet)
+                : new SymbolFacade(CatSdk.Symbol.Network.TestNet);
+            var address = facade.Network.PublicKeyToAddress(keyPair.PublicKey).ToString();
             // バリデーション
             var validate = AccountViewModel.ValidationAccount(
-                Name.Text, 
-                Address.Text, 
+                Name.Text,
+                address,
                 PrivateKey.Text != null,
                 keyPair.PublicKey.bytes,
                 Password.Text,
@@ -34,7 +38,7 @@ public partial class ImportAccount : ContentPage
             if (!validate.isValid)
                 throw new Exception(validate.message);
             
-            var showText = $"AccountName: {Name.Text}\nAddress: {Address.Text}\n";
+            var showText = $"AccountName: {Name.Text}\nAddress: {address}\n";
 
             // ダイアログを表示
             var result = 
@@ -46,12 +50,12 @@ public partial class ImportAccount : ContentPage
             if (!result) return;
             
             // 秘密鍵を暗号化
-            var encryptedPrivateKey = CatSdk.Crypto.Crypto.EncryptString(PrivateKey.Text, Password.Text, Address.Text);
+            var encryptedPrivateKey = CatSdk.Crypto.Crypto.EncryptString(PrivateKey.Text, Password.Text, address);
 
             // 保存処理
             await AccountViewModel.SaveAccount(
                 Name.Text,
-                Address.Text,
+                address,
                 Converter.BytesToHex(keyPair.PublicKey.bytes),
                 encryptedPrivateKey,
                 NetworkType
@@ -108,7 +112,6 @@ public partial class ImportAccount : ContentPage
         await Dispatcher.DispatchAsync(async () =>
         {
             PrivateKey.Text = e.privateKey;
-            Address.Text = e.address;
             switch (e.network)
             {
                 case 104:
