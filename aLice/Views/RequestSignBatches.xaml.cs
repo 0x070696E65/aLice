@@ -109,6 +109,8 @@ public partial class RequestSignBatches : ContentPage
             }
             var address = AccountViewModel.Accounts.accounts.ToList().Find(a=>a.accountName == accName).address;
             await AccountViewModel.ChangeMainAccount(address);
+            RequestViewModel.SetMainAccountSignerPublicKey();
+            Password.Text = "";
             Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
         }
         catch (Exception exception)
