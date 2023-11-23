@@ -13,7 +13,7 @@ public class NotificationModel
     public readonly string RecipientPublicKeyForEncryptMessage;
     public readonly string FeeMultiplier;
     public readonly List<string> Batches = new();
-    public readonly string SetPublicKey;
+    public string SetPublicKey;
     public readonly string Node;
     public readonly string Deadline;
     public readonly SdkVersion SdkVersion = SdkVersion.V3;
@@ -92,12 +92,6 @@ public class NotificationModel
                 Batches.Add(metal);
                 count++;
             }   
-        }
-        
-        var hasSetPublicKey = dict.TryGetValue("set_public_key", out var _setPublicKey);
-        if (hasSetPublicKey)
-        {
-            SetPublicKey = _setPublicKey;
         }
         
         var hasDeadline = dict.TryGetValue("deadline", out var _deadline);

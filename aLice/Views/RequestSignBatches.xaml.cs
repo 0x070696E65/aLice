@@ -16,6 +16,7 @@ public partial class RequestSignBatches : ContentPage
         try
         {
             AccountViewModel.DeletePasswordByTimestamp();
+            await ShowRequestSign();
             if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
             {
                 var requestAccount = RequestViewModel.GetRequestAccount();
@@ -23,6 +24,9 @@ public partial class RequestSignBatches : ContentPage
                 if (isChangeMainAccount)
                 {
                     await AccountViewModel.ChangeMainAccount(requestAccount.address);
+                    RequestViewModel.SetMainAccountSignerPublicKey();
+                    Password.Text = "";
+                    Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
                 }
                 else
                 {
@@ -32,7 +36,6 @@ public partial class RequestSignBatches : ContentPage
                     }
                 }
             }
-            await ShowRequestSign();   
         }
         catch (Exception exception)
         {

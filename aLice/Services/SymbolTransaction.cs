@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using aLice.ViewModels;
 using CatSdk;
 using CatSdk.Crypto;
 using CatSdk.CryptoTypes;
@@ -14,6 +15,10 @@ public static class SymbolTransaction
     public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex, string recipientPublicKeyForEncryptMessage, string feeMultiplier, string deadline)
     {
         var transaction = TransactionFactory.Deserialize(hex);
+        if (transaction.SignerPublicKey.bytes != Converter.HexToBytes("0000000000000000000000000000000000000000000000000000000000000000"))
+        {
+            RequestViewModel.Notification.SetPublicKey = Converter.BytesToHex(transaction.SignerPublicKey.bytes);
+        }
         if (deadline != null)
         {
             var facade = new SymbolFacade(transaction.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
