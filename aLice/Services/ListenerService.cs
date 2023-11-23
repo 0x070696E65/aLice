@@ -177,6 +177,11 @@ public class ListenerService
 
     public void Close(string reason = "Closing")
     {
+        if (webSocket.State == WebSocketState.Closed)
+        {
+            Console.WriteLine("websocket is already closed");
+            return;
+        }
         webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, reason, CancellationToken.None);
         Console.WriteLine($@"Closed WebSocket connection. uid:{uid}");
         webSocket.Dispose();
