@@ -28,12 +28,18 @@
                 <Grid Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <Button Text="Explorer"
+                            Clicked="OnToExplorer"
+                            BackgroundColor="Black"
+                            Grid.Column="0" 
+                            Margin="10,0,0,0"/>
                     <Button Text="Close"
-                            Clicked="Close"
+                            Clicked="OnClose"
                             BackgroundColor="Gray"
                             TextColor="White"
-                            Grid.Column="0" 
+                            Grid.Column="1" 
                             Margin="10,0,0,0"/>
                 </Grid>
             </StackLayout>
