@@ -18,9 +18,9 @@ public partial class RequestSign : ContentPage
         {
             AccountViewModel.DeletePasswordByTimestamp();
             await ShowRequestSign();
-            
-            if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey !=
-                RequestViewModel.Notification.SetPublicKey)
+
+            if (RequestViewModel.Notification.SetPublicKey != null 
+                && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
             {
                 var requestAccount = RequestViewModel.GetRequestAccount();
                 var isChangeMainAccount = await DisplayAlert("確認",

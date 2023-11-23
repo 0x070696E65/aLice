@@ -15,7 +15,7 @@ public static class SymbolTransaction
     public static (ITransaction transaction, string parsedTransaction) ParseTransaction(string hex, string recipientPublicKeyForEncryptMessage, string feeMultiplier, string deadline)
     {
         var transaction = TransactionFactory.Deserialize(hex);
-        if (transaction.SignerPublicKey.bytes != Converter.HexToBytes("0000000000000000000000000000000000000000000000000000000000000000"))
+        if (Converter.BytesToHex(transaction.SignerPublicKey.bytes) != "0000000000000000000000000000000000000000000000000000000000000000")
         {
             RequestViewModel.Notification.SetPublicKey = Converter.BytesToHex(transaction.SignerPublicKey.bytes);
         }
