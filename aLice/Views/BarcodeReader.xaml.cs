@@ -82,7 +82,7 @@ public partial class BarcodeReader : ContentPage
         try
         {
             // 暗号化されていない場合はそのまま返却
-            string privateKey = qrFormat.data.privateKey;
+            var privateKey = qrFormat.data.privateKey;
             if (privateKey != null) return privateKey;
 
             // 暗号化されたQRコードの場合は復号化する
@@ -96,26 +96,22 @@ public partial class BarcodeReader : ContentPage
                 var iv = StringToBytes(qrFormat.data.ciphertext.Substring(0, 32));
                 var chiper = qrFormat.data.ciphertext.Substring(32);
                 var key = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(password), salt, 2000, HashAlgorithmName.SHA1).GetBytes(32);
-                using (var aes = Aes.Create())
+                using var aes = Aes.Create();
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+                aes.Key = key;
+                aes.IV = iv;
+                using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+                using var mstream = new MemoryStream(Convert.FromBase64String(chiper));
+                await using var cstream = new CryptoStream(mstream, decryptor, CryptoStreamMode.Read);
+                using var sreader = new StreamReader(cstream);
+                try
                 {
-                    aes.Mode = CipherMode.CBC;
-                    aes.Padding = PaddingMode.PKCS7;
-                    aes.Key = key;
-                    aes.IV = iv;
-                    using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
-                    using (var mstream = new MemoryStream(Convert.FromBase64String(chiper)))
-                    using (var cstream = new CryptoStream(mstream, decryptor, CryptoStreamMode.Read))
-                    using (var sreader = new StreamReader(cstream))
-                    {
-                        try
-                        {
-                            privateKey = sreader.ReadToEnd();
-                        }
-                        catch (CryptographicException)
-                        {
-                            await DisplayAlert("Failed", "パスワードが異なります", "OK");
-                        }
-                    }
+                    privateKey = await sreader.ReadToEndAsync();
+                }
+                catch (CryptographicException)
+                {
+                    await DisplayAlert("Failed", "パスワードが異なります", "OK");
                 }
             }
             return privateKey;
@@ -126,10 +122,10 @@ public partial class BarcodeReader : ContentPage
         }
     }
 
-    byte[] StringToBytes(string str)
+    static byte[] StringToBytes(string str)
     {
         var bs = new List<byte>();
-        for (int i = 0; i < str.Length / 2; i++)
+        for (var i = 0; i < str.Length / 2; i++)
         {
             bs.Add(Convert.ToByte(str.Substring(i * 2, 2), 16));
         }
