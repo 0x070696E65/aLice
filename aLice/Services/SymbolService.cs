@@ -39,15 +39,16 @@ public class Symbol
         if (json != null) return (string) json["code"];
         throw new Exception("json is not correct format");
     }
-    
-    public async Task<string> Announce(string payload)
+
+    public async Task<string> Announce(string payload, bool isBonded = false)
     {
         using var client = new HttpClient();
         var content = new StringContent("{\"payload\": \"" + payload + "\"}", Encoding.UTF8, "application/json");
-        var response =  client.PutAsync(Node + "/transactions", content).Result;
+        var endPoint = isBonded ? "/transactions/partial" : "/transactions";
+        var response =  client.PutAsync(Node + endPoint, content).Result;
         return await response.Content.ReadAsStringAsync();
     }
-
+    
     public static (string hash, string address) GetHash(string payload)
     {
         var tx = TransactionFactory.Deserialize(payload);

@@ -12,10 +12,12 @@ public partial class WaitConfirmed : ContentPage
     private CancellationTokenSource CancellationTokenSource;
     private string Hash;
     private bool IsConfirmed;
-    public WaitConfirmed(string payload)
+    private bool IsBonded;
+    public WaitConfirmed(string payload, bool isBonded = false)
     {
         InitializeComponent();
         Payload = payload;
+        IsBonded = isBonded;
     }
     
     protected override async void OnAppearing()
@@ -49,7 +51,6 @@ public partial class WaitConfirmed : ContentPage
             var websocket2 = new ListenerService(node, w2);
             
             await websocket.Open();
-            Console.WriteLine(address);
             var confirmedTask = websocket.Confirmed(address, token, async (tx) =>
             {
                 Console.WriteLine("CONFIRMED");
@@ -82,8 +83,7 @@ public partial class WaitConfirmed : ContentPage
             });
             
             var symbol = new Symbol(node);
-            var announceTask = symbol.Announce(Payload);
-
+            var announceTask = symbol.Announce(Payload, IsBonded);
             await Task.WhenAll(confirmedTask, statusTask, announceTask);
         }
         catch (Exception exception)

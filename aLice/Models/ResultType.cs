@@ -5,4 +5,5 @@ public enum ResultType
     Callback,
     ShowData,
     Announce,
+    AnnounceBonded,
 }

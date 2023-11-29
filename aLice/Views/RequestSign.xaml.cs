@@ -96,6 +96,9 @@ public partial class RequestSign : ContentPage
                 case ResultType.Announce:
                     await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result));
                     break;
+                case ResultType.AnnounceBonded:
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, true));
+                    break;
                 case ResultType.ShowData:
                     await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
                     break;

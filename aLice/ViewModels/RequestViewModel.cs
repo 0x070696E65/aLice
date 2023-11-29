@@ -195,6 +195,8 @@ public abstract class RequestViewModel
                     return Get(signedPayload, "signed_payload");
                 case "announce":
                     return await Announce(signedPayload);
+                case "announce_bonded":
+                    return await Announce(signedPayload, true);
                 default:
                     throw new Exception("不正なリクエストです");
             }
@@ -294,7 +296,7 @@ public abstract class RequestViewModel
         return (ResultType.Callback, callbackUrl);
     }
 
-    private static async Task<(ResultType resultType, string result)> Announce(string signedPayload)
+    private static async Task<(ResultType resultType, string result)> Announce(string signedPayload, bool isBonded = false)
     {
         var symbolService = new Symbol(Notification.Node);
         if (!await symbolService.CheckNodeHealth())
@@ -303,7 +305,7 @@ public abstract class RequestViewModel
         };
         try
         {
-            return (ResultType.Announce, signedPayload);
+            return isBonded ? (ResultType.AnnounceBonded, signedPayload) : (ResultType.Announce, signedPayload);
         }
         catch
         {
