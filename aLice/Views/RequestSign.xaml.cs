@@ -94,10 +94,13 @@ public partial class RequestSign : ContentPage
                     await Launcher.OpenAsync(new Uri(result));
                     break;
                 case ResultType.Announce:
-                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result));
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, AnnounceType.Normal));
                     break;
                 case ResultType.AnnounceBonded:
-                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, true));
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, AnnounceType.Bonded));
+                    break;
+                case ResultType.AnnounceCosignature:
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, AnnounceType.Cosignature));
                     break;
                 case ResultType.ShowData:
                     await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));

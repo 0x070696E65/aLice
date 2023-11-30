@@ -12,12 +12,12 @@ public partial class WaitConfirmed : ContentPage
     private CancellationTokenSource CancellationTokenSource;
     private string Hash;
     private bool IsConfirmed;
-    private bool IsBonded;
-    public WaitConfirmed(string payload, bool isBonded = false)
+    private AnnounceType AnnounceType;
+    public WaitConfirmed(string payload, AnnounceType announceType)
     {
         InitializeComponent();
         Payload = payload;
-        IsBonded = isBonded;
+        AnnounceType = announceType;
     }
     
     protected override async void OnAppearing()
@@ -41,9 +41,31 @@ public partial class WaitConfirmed : ContentPage
             Indicator.IsRunning = true;
             CancellationTokenSource = new CancellationTokenSource();
             var token = CancellationTokenSource.Token;
-            var (hash, address) = Symbol.GetHash(Payload);
+
+            var hash = "";
+            var address = "";
+
+            try
+            {
+                if (AnnounceType == AnnounceType.Cosignature)
+                {
+                    var arr = Payload.Split("_");
+                    hash = arr[0];
+                    address = AccountViewModel.MainAccount.address;
+                    Data.Text = "連署をアナウンスしました";
+                }
+                else
+                {
+                    (hash, address) = Symbol.GetHash(Payload);
+                    Data.Text = RequestViewModel.ParseTransaction[0].parsedTransaction;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            
             Hash = hash;
-            Data.Text = RequestViewModel.ParseTransaction[0].parsedTransaction;
             var node = RequestViewModel.Notification.Node;
             using var w = new ClientWebSocket();
             var websocket = new ListenerService(node, w);
@@ -83,7 +105,7 @@ public partial class WaitConfirmed : ContentPage
             });
             
             var symbol = new Symbol(node);
-            var announceTask = symbol.Announce(Payload, IsBonded);
+            var announceTask = symbol.Announce(Payload, AnnounceType);
             await Task.WhenAll(confirmedTask, statusTask, announceTask);
         }
         catch (Exception exception)
@@ -96,7 +118,7 @@ public partial class WaitConfirmed : ContentPage
     
     private async void OnToExplorer(object sender, EventArgs e)
     {
-        var explorer = RequestViewModel.ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? "https://symbol.fyi/transactions/" : "https://testnet.symbol.fyi/transactions/";
+        var explorer = AccountViewModel.MainAccount.networkType == "MainNet" ? "https://symbol.fyi/transactions/" : "https://testnet.symbol.fyi/transactions/";
         await Launcher.OpenAsync(new Uri($"{explorer}{Hash}"));
         if (IsConfirmed) await Close();
     }

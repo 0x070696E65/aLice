@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using aLice.Models;
 using CatSdk.Facade;
 using CatSdk.Symbol;
 
@@ -40,11 +42,37 @@ public class Symbol
         throw new Exception("json is not correct format");
     }
 
-    public async Task<string> Announce(string payload, bool isBonded = false)
+    public async Task<string> Announce(string payload, AnnounceType announceType)
     {
         using var client = new HttpClient();
-        var content = new StringContent("{\"payload\": \"" + payload + "\"}", Encoding.UTF8, "application/json");
-        var endPoint = isBonded ? "/transactions/partial" : "/transactions";
+        StringContent content;
+        string endPoint;
+        switch (announceType)
+        {
+            case AnnounceType.Bonded:
+                content = new StringContent("{\"payload\": \"" + payload + "\"}", Encoding.UTF8, "application/json");
+                endPoint = "/transactions/partial";
+                break;
+            case AnnounceType.Normal:
+                content = new StringContent("{\"payload\": \"" + payload + "\"}", Encoding.UTF8, "application/json");
+                endPoint = "/transactions";
+                break;
+            case AnnounceType.Cosignature:
+                var arr = payload.Split("_");
+                var data = new Dictionary<string, string>()
+                {
+                    {"parentHash", arr[0]},
+                    {"signature", arr[1]},
+                    {"signerPublicKey", arr[2]},
+                    {"version", "0"}
+                };
+                var json = JsonSerializer.Serialize(data);
+                content = new StringContent(json, Encoding.UTF8, "application/json");
+                endPoint = "/transactions/cosignature";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(announceType), announceType, null);
+        }
         var response =  client.PutAsync(Node + endPoint, content).Result;
         return await response.Content.ReadAsStringAsync();
     }

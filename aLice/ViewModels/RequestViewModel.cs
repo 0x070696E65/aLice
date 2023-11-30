@@ -46,6 +46,12 @@ public abstract class RequestViewModel
             dataText = Notification.Data;
             BytesData = Converter.HexToBytes(Notification.Data);
         }
+        else if(Notification.RequestType == RequestType.SignCosignature)
+        {
+            typeText = "トランザクションの連署要求です";
+            dataText = Notification.Data;
+            BytesData = Converter.HexToBytes(Notification.Data);
+        }
         else if (Notification.RequestType == RequestType.SignTransaction)
         {
             ParseTransaction.Clear();
@@ -81,7 +87,7 @@ public abstract class RequestViewModel
         return Notification.RequestType switch
         {
             RequestType.Pubkey => AcceptRequestPublicKey(),
-            RequestType.SignTransaction or RequestType.SignUtf8 or RequestType.SignBinaryHex =>
+            RequestType.SignTransaction or RequestType.SignUtf8 or RequestType.SignBinaryHex or RequestType.SignCosignature =>
                 await AcceptRequestSign(password),
             RequestType.Batches => await AcceptRequestBatches(password),
             _ => throw new Exception("不正なリクエストです")
@@ -196,10 +202,20 @@ public abstract class RequestViewModel
                 case "announce":
                     return await Announce(signedPayload);
                 case "announce_bonded":
-                    return await Announce(signedPayload, true);
+                    return await Announce(signedPayload, AnnounceType.Bonded);
                 default:
                     throw new Exception("不正なリクエストです");
             }
+        }
+        else if (Notification.RequestType == RequestType.SignCosignature)
+        {
+            var signature = keyPair.Sign(BytesData);
+            return Notification.Method switch
+            {
+                "announce_cosignature" => await Announce($"{Converter.BytesToHex(BytesData)}_{Converter.BytesToHex(signature.bytes)}_{AccountViewModel.MainAccount.publicKey}", AnnounceType.Cosignature),
+                "get" => Get(Converter.BytesToHex(signature.bytes), "signature"),
+                _ => throw new Exception("不正なリクエストです")
+            };
         }
         else
         {
@@ -296,7 +312,7 @@ public abstract class RequestViewModel
         return (ResultType.Callback, callbackUrl);
     }
 
-    private static async Task<(ResultType resultType, string result)> Announce(string signedPayload, bool isBonded = false)
+    private static async Task<(ResultType resultType, string result)> Announce(string signedPayload, AnnounceType announceType = AnnounceType.Normal)
     {
         var symbolService = new Symbol(Notification.Node);
         if (!await symbolService.CheckNodeHealth())
@@ -305,7 +321,13 @@ public abstract class RequestViewModel
         };
         try
         {
-            return isBonded ? (ResultType.AnnounceBonded, signedPayload) : (ResultType.Announce, signedPayload);
+            return announceType switch
+            {
+                AnnounceType.Normal => (ResultType.Announce, signedPayload),
+                AnnounceType.Bonded => (ResultType.AnnounceBonded, signedPayload),
+                AnnounceType.Cosignature => (ResultType.AnnounceCosignature, signedPayload),
+                _ => throw new ArgumentOutOfRangeException(nameof(announceType), announceType, null)
+            };
         }
         catch
         {

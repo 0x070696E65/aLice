@@ -38,6 +38,7 @@ public class NotificationModel
             "request_sign_binary_hex" => RequestType.SignBinaryHex,
             "request_pubkey" => RequestType.Pubkey,
             "request_sign_batches" => RequestType.Batches,
+            "request_sign_cosignature" => RequestType.SignCosignature,
             _ => throw new Exception("type is invalid")
         };
         

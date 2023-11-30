@@ -4,6 +4,7 @@
 	{
 		SignUtf8,
 		SignTransaction,
+		SignCosignature,
 		SignBinaryHex,
 		Pubkey,
 		Batches,

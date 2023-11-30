@@ -6,4 +6,5 @@ public enum ResultType
     ShowData,
     Announce,
     AnnounceBonded,
+    AnnounceCosignature,
 }
