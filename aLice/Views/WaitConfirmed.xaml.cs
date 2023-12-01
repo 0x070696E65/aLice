@@ -52,13 +52,12 @@ public partial class WaitConfirmed : ContentPage
                     var arr = Payload.Split("_");
                     hash = arr[0];
                     address = AccountViewModel.MainAccount.address;
-                    Data.Text = "連署をアナウンスしました";
                 }
                 else
                 {
                     (hash, address) = Symbol.GetHash(Payload);
-                    Data.Text = RequestViewModel.ParseTransaction[0].parsedTransaction;
                 }
+                Data.Text = RequestViewModel.ParseTransaction[0].parsedTransaction;
             }
             catch (Exception e)
             {

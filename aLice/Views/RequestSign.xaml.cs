@@ -20,7 +20,8 @@ public partial class RequestSign : ContentPage
             await ShowRequestSign();
 
             if (RequestViewModel.Notification.SetPublicKey != null 
-                && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
+                && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey
+                && RequestViewModel.Notification.RequestType != RequestType.SignCosignature)
             {
                 var requestAccount = RequestViewModel.GetRequestAccount();
                 var isChangeMainAccount = await DisplayAlert("確認",

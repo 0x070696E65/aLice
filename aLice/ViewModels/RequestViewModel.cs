@@ -48,9 +48,13 @@ public abstract class RequestViewModel
         }
         else if(Notification.RequestType == RequestType.SignCosignature)
         {
+            ParseTransaction.Clear();
+            ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline));
+            
+            SetMainAccountSignerPublicKey();
+            
             typeText = "トランザクションの連署要求です";
-            dataText = Notification.Data;
-            BytesData = Converter.HexToBytes(Notification.Data);
+            dataText = ParseTransaction[0].parsedTransaction;
         }
         else if (Notification.RequestType == RequestType.SignTransaction)
         {
@@ -209,10 +213,13 @@ public abstract class RequestViewModel
         }
         else if (Notification.RequestType == RequestType.SignCosignature)
         {
-            var signature = keyPair.Sign(BytesData);
+            var tx = TransactionFactory.Deserialize(Notification.Data);
+            var facade = new SymbolFacade(tx.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
+            var hash = facade.HashTransaction(tx);
+            var signature = keyPair.Sign(hash.bytes);
             return Notification.Method switch
             {
-                "announce_cosignature" => await Announce($"{Converter.BytesToHex(BytesData)}_{Converter.BytesToHex(signature.bytes)}_{AccountViewModel.MainAccount.publicKey}", AnnounceType.Cosignature),
+                "announce_cosignature" => await Announce($"{Converter.BytesToHex(hash.bytes)}_{Converter.BytesToHex(signature.bytes)}_{AccountViewModel.MainAccount.publicKey}", AnnounceType.Cosignature),
                 "get" => Get(Converter.BytesToHex(signature.bytes), "signature"),
                 _ => throw new Exception("不正なリクエストです")
             };
