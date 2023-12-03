@@ -52,7 +52,7 @@ public class NotificationModel
         var hasMethod = dict.TryGetValue("method", out var _method);
         Method = hasMethod ? _method : "get";
         
-        if (!hasData && RequestType != RequestType.Pubkey)
+        if (!hasData && RequestType != RequestType.Pubkey && RequestType.Batches != RequestType)
         {
             throw new Exception("data is null");
         }
@@ -82,10 +82,13 @@ public class NotificationModel
 
         if (RequestType == RequestType.Batches)
         {
+            Console.WriteLine(_uri);
             var count = 0;
             while (true)
             {
                 var hasBatches = dict.TryGetValue("batch" + count, out var metal);
+                Console.WriteLine(count);
+                Console.WriteLine(metal);
                 if (!hasBatches)
                 {
                     break;

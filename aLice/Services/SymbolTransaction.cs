@@ -261,6 +261,7 @@ public static class SymbolTransaction
         var result = "";
         var transaction = (AggregateCompleteTransactionV2) _transaction;
         result += "AggregateCompleteTransaction\n";
+        result += $"SignerPublicKey: {transaction.SignerPublicKey}\n";
         result += $"TransactionsHash: {transaction.TransactionsHash}\n";
         result += $"Transactions:\n";
         result = transaction.Transactions.Aggregate(result, (current, innerTransaction) => 
@@ -277,6 +278,7 @@ public static class SymbolTransaction
         var result = "";
         var transaction = (AggregateBondedTransactionV2) _transaction;
         result += "AggregateBondedTransaction\n";
+        result += $"SignerPublicKey: {transaction.SignerPublicKey}\n";
         result += $"TransactionsHash: {transaction.TransactionsHash}\n";
         result += $"Transactions:\n";
         result = transaction.Transactions.Aggregate(result, (current, innerTransaction) => 
@@ -577,7 +579,7 @@ public static class SymbolTransaction
             result = transaction.AddressAdditions.Aggregate(result, (current, transactionAddressAdditions) => 
                 current + $"\t{Converter.AddressToString(transactionAddressAdditions.bytes)}\n");
             result += $"AddressDeletions:\n";
-            result = transaction.AddressAdditions.Aggregate(result, (current, transactionAddressDeletions) => 
+            result = transaction.AddressDeletions.Aggregate(result, (current, transactionAddressDeletions) => 
                 current + $"\t{Converter.AddressToString(transactionAddressDeletions.bytes)}\n");
         }
         else
@@ -590,7 +592,7 @@ public static class SymbolTransaction
             result = transaction.AddressAdditions.Aggregate(result, (current, transactionAddressAdditions) => 
                 current + $"\t{Converter.AddressToString(transactionAddressAdditions.bytes)}\n");
             result += $"AddressDeletions:\n";
-            result = transaction.AddressAdditions.Aggregate(result, (current, transactionAddressDeletions) => 
+            result = transaction.AddressDeletions.Aggregate(result, (current, transactionAddressDeletions) => 
                 current + $"\t{Converter.AddressToString(transactionAddressDeletions.bytes)}\n");
             result += ParseTransactionBase(transaction.Network, transaction.Deadline, transaction.Fee);
         }

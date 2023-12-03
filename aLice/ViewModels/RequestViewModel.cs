@@ -73,6 +73,7 @@ public abstract class RequestViewModel
         }
         else if (Notification.RequestType == RequestType.Batches)
         {
+            ParseTransaction.Clear();
             foreach (var s in Notification.Batches)
             {
                 var tx = SymbolTransaction.ParseEmbeddedTransaction(s);
@@ -200,6 +201,7 @@ public abstract class RequestViewModel
                         {"original_data", Notification.Data},
                         {"signed_payload", signedPayload},
                     };
+                    dic = AddQuery(Notification.CallbackUrl, dic);
                     return await Post(dic);
                 case "get":
                     return Get(signedPayload, "signed_payload");
@@ -217,12 +219,27 @@ public abstract class RequestViewModel
             var facade = new SymbolFacade(tx.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
             var hash = facade.HashTransaction(tx);
             var signature = keyPair.Sign(hash.bytes);
-            return Notification.Method switch
+            
+            switch (Notification.Method)
             {
-                "announce_cosignature" => await Announce($"{Converter.BytesToHex(hash.bytes)}_{Converter.BytesToHex(signature.bytes)}_{AccountViewModel.MainAccount.publicKey}", AnnounceType.Cosignature),
-                "get" => Get(Converter.BytesToHex(signature.bytes), "signature"),
-                _ => throw new Exception("不正なリクエストです")
-            };
+                case "announce_cosignature":
+                    return await Announce(
+                        $"{Converter.BytesToHex(hash.bytes)}_{Converter.BytesToHex(signature.bytes)}_{AccountViewModel.MainAccount.publicKey}",
+                        AnnounceType.Cosignature);
+                case "get":
+                    return Get(Converter.BytesToHex(signature.bytes), "signature");
+                case "post":
+                    var dic = new Dictionary<string, string>
+                    {
+                        {"pubkey", AccountViewModel.MainAccount.publicKey},
+                        {"original_data", Notification.Data},
+                        {"signature", Converter.BytesToHex(signature.bytes)},
+                    };
+                    dic = AddQuery(Notification.CallbackUrl, dic);
+                    return await Post(dic);
+                default:
+                    throw new Exception("不正なリクエストです");
+            }
         }
         else
         {
@@ -236,6 +253,7 @@ public abstract class RequestViewModel
                         {"original_data", Notification.Data},
                         {"signature", Converter.BytesToHex(signature.bytes)},
                     };
+                    dic = AddQuery(Notification.CallbackUrl, dic);
                     return await Post(dic);
                 case "get":
                     return Get(Converter.BytesToHex(signature.bytes), "signature");
@@ -261,9 +279,22 @@ public abstract class RequestViewModel
         
         var network = ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet;
         var metal = new Services.Metal(network);
+        Console.WriteLine(metal.symbol.Network);
         var txs = ParseTransaction.Select(valueTuple => valueTuple.transaction).ToList();
-            
+        
+        foreach (var baseTransaction in txs)
+        {
+            Console.WriteLine(baseTransaction);    
+        }
+        
         var aggs = metal.SignedAggregateCompleteTxBatches(txs, keyPair, network);
+        foreach (var aggregateCompleteTransactionV2 in aggs)
+        {
+            Console.WriteLine(aggregateCompleteTransactionV2);
+        }
+        Console.WriteLine(txs.Count);
+        Console.WriteLine(aggs.Count);
+        Console.WriteLine(aggs[0].Transactions.Length);
         switch (Notification.Method)
         {
             case "post":
@@ -271,8 +302,11 @@ public abstract class RequestViewModel
                 var dic = new Dictionary<string, string> {{"pubkey", AccountViewModel.MainAccount.publicKey}};
                 for (var i = 0; i < aggs.Count; i++)
                 {
-                    dic.Add("signed" + i, Converter.BytesToHex(aggs[i].Serialize()));   
+                    dic.Add("signed" + i, Converter.BytesToHex(aggs[i].Serialize()));
+                    Console.WriteLine("SIGNED");
+                    Console.WriteLine(Converter.BytesToHex(aggs[i].Serialize()));
                 }
+                dic = AddQuery(Notification.CallbackUrl, dic);
                 return await Post(dic);
             }
             case "get":
@@ -296,9 +330,16 @@ public abstract class RequestViewModel
     {
         using var client = new HttpClient();
         var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
-        var response = client.PostAsync(Notification.CallbackUrl, content).Result;
+        var uri = new Uri(Notification.CallbackUrl);
+        Console.WriteLine(uri.GetLeftPart(UriPartial.Path));
+        foreach (var keyValuePair in dic)
+        {
+            Console.WriteLine(keyValuePair.Key);
+            Console.WriteLine(keyValuePair.Value);
+        }
+        var response = client.PostAsync(uri.GetLeftPart(UriPartial.Path), content).Result;
         await response.Content.ReadAsStringAsync();
-        return Notification.RedirectUrl != null ? (ResultType.Callback, Notification.RedirectUrl) : (ResultType.ShowData, "");
+        return Notification.RedirectUrl != null ? (ResultType.Callback, Notification.RedirectUrl) : (ResultType.Close, "");
     }
 
     private static (ResultType resultType, string result) Get(string signedContent, string contentKey)
@@ -396,5 +437,21 @@ public abstract class RequestViewModel
                 aggregateTx.TransactionsHash = merkleHash;
             }
         }
+    }
+
+    private static Dictionary<string, string> AddQuery(string url, Dictionary<string, string> dic)
+    {
+        var queryString = url.Split('?').LastOrDefault();
+        if (queryString != null)
+        {
+            var dict = queryString.Split('&')
+                .Select(s => s.Split('='))
+                .ToDictionary(a => a[0], a => a[1]);
+            foreach (var keyValuePair in dict)
+            {
+                dic.Add(keyValuePair.Key, keyValuePair.Value);
+            }
+        }
+        return dic;
     }
 }

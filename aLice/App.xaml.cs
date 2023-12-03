@@ -60,6 +60,8 @@ public partial class App : Application
         catch (Exception e)
         {
             await NotificationError(e.Message);
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
         }
     }
     

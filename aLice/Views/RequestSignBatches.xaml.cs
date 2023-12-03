@@ -72,6 +72,8 @@ public partial class RequestSignBatches : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, "閉じる");
+            Console.WriteLine(exception.Message);
+            Console.WriteLine(exception.StackTrace);
         }
     }
     
@@ -88,6 +90,10 @@ public partial class RequestSignBatches : ContentPage
             {
                 await Launcher.OpenAsync(new Uri(result));
             }
+            else if (resultType == ResultType.Close)
+            {
+                // 何もしない
+            }
             else
             {
                 await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
@@ -98,6 +104,8 @@ public partial class RequestSignBatches : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, "閉じる");
+            Console.WriteLine(exception.Message);
+            Console.WriteLine(exception.StackTrace);
         }
     }
     

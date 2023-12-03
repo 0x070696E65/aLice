@@ -4,7 +4,7 @@ namespace aLice.Services;
 
 public class Metal
 {
-    private readonly SymbolService symbol;
+    public readonly SymbolService symbol;
     public Metal(CatSdk.Symbol.Network _network)
     {
         var config = new SymbolServiceConfig("");
