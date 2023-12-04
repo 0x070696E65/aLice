@@ -52,10 +52,18 @@ public partial class RequestSignBatches : ContentPage
     {
         try
         {
-            var (domainText, typeText, dataText, askText) = RequestViewModel.GetShowTexts();
+            var (domainText, typeText, dataText, askText) = RequestViewModel.GetShowTextsForBatch();
             Domain.Text = domainText;
             Type.Text = typeText;
-            Data.Text = dataText;
+            
+            foreach (var label in dataText.Select(s => new Label
+                 {
+                     Text = s
+                 }))
+            {
+                Datas.Add(label);
+            }
+            
             Ask.Text = askText;
             Password.Text = "";
             

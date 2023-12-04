@@ -86,6 +86,35 @@ public abstract class RequestViewModel
         var askText = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
         return (domainText, typeText, dataText, askText);
     }
+    
+    public static (string domainText, string typeText, List<string> dataText, string askText) GetShowTextsForBatch()
+    {
+        var domainText = "";
+        var typeText = "";
+        var datas = new List<string>();
+        
+        if (Notification.CallbackUrl != null)
+        {
+            var uri = new Uri(Notification.CallbackUrl);
+            var baseUrl = $"{uri.Scheme}://{uri.Authority}";
+            domainText = $"{baseUrl}からの署名要求です";    
+        }
+        
+        if (Notification.RequestType == RequestType.Batches)
+        {
+            ParseTransaction.Clear();
+            foreach (var s in Notification.Batches)
+            {
+                var tx = SymbolTransaction.ParseEmbeddedTransaction(s);
+                tx.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                datas.Add(tx.parsedTransaction);
+                ParseTransaction.Add(tx);
+            }
+            typeText = "複数のトランザクションです";
+        }
+        var askText = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
+        return (domainText, typeText, datas, askText);
+    }
 
     public static async Task<(ResultType resultType, string result)> Accept(string password = "")
     {

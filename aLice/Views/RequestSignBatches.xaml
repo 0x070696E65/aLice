@@ -17,10 +17,9 @@
                     x:Name="Type"
                     FontSize="12"
                     Margin="0, 10, 0, 0"/>
-                <Label
-                    x:Name="Data"
-                    FontSize="12"
-                    Margin="0, 10, 0, 20"/>
+                
+                <StackLayout x:Name="Datas"/>
+                
                 <Label
                     x:Name="Ask"
                     FontSize="22"
