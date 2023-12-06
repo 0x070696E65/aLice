@@ -29,7 +29,11 @@ public partial class RequestSign : ContentPage
                 if (isChangeMainAccount)
                 {
                     await AccountViewModel.ChangeMainAccount(requestAccount.address);
-                    RequestViewModel.SetMainAccountSignerPublicKey();
+                    if (RequestViewModel.Notification.RequestType != RequestType.SignUtf8
+                        && RequestViewModel.Notification.RequestType != RequestType.SignBinaryHex)
+                    {
+                        RequestViewModel.SetMainAccountSignerPublicKey();
+                    }
                     Password.Text = "";
                     Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
                 }
@@ -45,6 +49,8 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, "閉じる");
+            Console.WriteLine(exception.Message);
+            Console.WriteLine(exception.StackTrace);
             if (Navigation.ModalStack.Count > 0)
             {
                 await Navigation.PopModalAsync();

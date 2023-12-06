@@ -118,5 +118,11 @@ public class NotificationModel
                 SdkVersion = SdkVersion.V2;
             }
         }
+        
+        var hasSetPublicKey = dict.TryGetValue("set_public_key", out var _setPublicKey);
+        if (hasSetPublicKey)
+        {
+            SetPublicKey = _setPublicKey;
+        }
     }
 }
