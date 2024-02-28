@@ -2,6 +2,8 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Microsoft.Maui.Controls.PlatformConfiguration;
+using Plugin.Fingerprint;
 
 namespace aLice;
 
@@ -31,6 +33,7 @@ public class MainActivity : MauiAppCompatActivity
             Window.SetStatusBarColor(Android.Graphics.Color.White);
             Window.SetNavigationBarColor(Android.Graphics.Color.White);
         }
+        CrossFingerprint.SetCurrentActivityResolver(() => this);
 
         var uri = Intent?.Data;
         if (uri == null) return;

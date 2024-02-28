@@ -95,11 +95,11 @@ public partial class MainPage : ContentPage
                     string action;
                     if (acc.isMain)
                     {
-                        action = await DisplayActionSheet("Select", "cancel", null, "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "削除");
+                        action = await DisplayActionSheet("Select", "cancel", null, "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "生体認証", "削除");
                     }
                     else
                     {
-                        action = await DisplayActionSheet("Select", "cancel", null, "メインアカウントに設定する", "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "削除");
+                        action = await DisplayActionSheet("Select", "cancel", null, "メインアカウントに設定する", "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "生体認証", "削除");
                     }
                 
                     switch (action)
@@ -118,6 +118,9 @@ public partial class MainPage : ContentPage
                             break;
                         case "削除":
                             await OnDeleteButtonClicked(acc.address, acc.accountName);
+                            break;
+                        case "生体認証":
+                            await OnUseBionicButtonClicked(acc.address);
                             break;
                     }
                 };
@@ -244,6 +247,27 @@ public partial class MainPage : ContentPage
                 await AccountViewModel.DeleteAccount(address);
                 await DisplayAlert("Deleted", "アカウントを削除しました", "閉じる");
             }
+        }
+        catch (Exception error)
+        {
+            await DisplayAlert("Error", error.Message, "閉じる");
+        }
+    }
+    
+    private async Task OnUseBionicButtonClicked(string address)
+    {
+        try
+        {
+            var isUseBionic = AccountViewModel.IsUseBionic(address);
+            var message = isUseBionic ? "生体認証を解除します。" : "生体認証を設定します。";
+            var password = await DisplayPromptAsync("Password", $"{message}パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            if (password == null) return;
+            var privateKey = AccountViewModel.ExportAccount(address, password);
+            await AccountViewModel.UpdateUseBionic(address, privateKey, isUseBionic);
+            if(isUseBionic)
+                await DisplayAlert("Success", "生体認証を設定しました", "閉じる");
+            else
+                await DisplayAlert("Success", "生体認証を解除しました", "閉じる");
         }
         catch (Exception error)
         {

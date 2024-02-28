@@ -45,5 +45,7 @@
 	<string>このアプリでは規定フォーマットのQRコードよりアカウント情報を読み込むためにカメラを使用します。</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>このアプリは直接的にBluetoothを使用しませんが、一部の内部コンポーネントがBluetoothを必要とする可能性があります。</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Need your face to unlock secrets!</string>
 </dict>
 </plist>

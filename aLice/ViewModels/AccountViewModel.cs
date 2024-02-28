@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using aLice.Models;
 using CatSdk.Facade;
+using Plugin.Fingerprint;
+using Plugin.Fingerprint.Abstractions;
 
 namespace aLice.ViewModels;
 
@@ -94,6 +96,47 @@ public abstract class AccountViewModel
         Accounts.accounts.Add(savedAccount);
         // 保存
         await SecureStorage.SetAsync("accounts", JsonSerializer.Serialize(Accounts));
+    }
+    
+    // アカウントの生体認証を判別する
+    public static bool IsUseBionic(string address)
+    {
+        var element = Accounts.accounts.ToList().Find(acc => acc.address == address);
+        return element.isBiometrics;
+    }
+    
+    // アカウントの生体認証を更新する
+    public static async Task UpdateUseBionic(string address, string privateKey, bool isUseBionic)
+    {
+        var elementsToUpdate = Accounts.accounts.ToList().Find(acc => acc.address == address);
+        if (isUseBionic)
+        {
+            elementsToUpdate.isBiometrics = false;
+            await SecureStorage.SetAsync($"{address}_privateKey", "");
+        }
+        else
+        {
+            elementsToUpdate.isBiometrics = true;
+            await SecureStorage.SetAsync($"{address}_privateKey", privateKey);
+        }
+        var updatedAccounts = JsonSerializer.Serialize(Accounts);
+        await SecureStorage.SetAsync("accounts", updatedAccounts);
+    }
+    
+    public static async Task<string> ReturnPrivateKeyUsingBionic()
+    {
+        if (await CrossFingerprint.Current.IsAvailableAsync())
+        {
+            var request = new AuthenticationRequestConfiguration
+                ("get privateKey using biometrics", "Confirm get privateKey with your biometrics");
+
+            var result = await CrossFingerprint.Current.AuthenticateAsync(request);
+            if (result.Authenticated)
+            {
+                return await SecureStorage.GetAsync($"{MainAccount.address}_privateKey");
+            }
+        }
+        throw new Exception("生体認証に失敗しました");
     }
 
     public static (bool isValid, string message) ValidationAccount(

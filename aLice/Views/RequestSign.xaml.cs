@@ -69,6 +69,7 @@ public partial class RequestSign : ContentPage
             Data.Text = dataText;
             Ask.Text = askText;
             Password.Text = "";
+            Password.IsVisible = !AccountViewModel.MainAccount.isBiometrics;
 
             try
             {
@@ -91,8 +92,7 @@ public partial class RequestSign : ContentPage
     {
         try
         {
-            var password = Password.Text;
-            var (resultType, result) = await RequestViewModel.Accept(password);
+            var (resultType, result) = await RequestViewModel.Accept(Password.Text);
             await Application.Current.MainPage.Navigation.PopModalAsync();
         
             switch (resultType)

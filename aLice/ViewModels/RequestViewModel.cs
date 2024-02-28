@@ -165,16 +165,23 @@ public abstract class RequestViewModel
     private static async Task<(ResultType resultType, string result)> AcceptRequestSign(string password)
     {
         string privateKey;
-        try
+        if (AccountViewModel.MainAccount.isBiometrics)
         {
-            privateKey = GetPrivateKey(password);
-            if (AccountViewModel.MemoryPasswordSeconds != 0)
+            privateKey = await AccountViewModel.ReturnPrivateKeyUsingBionic();
+        }
+        else
+        {
+            try
             {
-                await SecureStorage.SetAsync("CurrentPassword", $"{password}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
-            }
-        } catch
-        {
-            throw new Exception("パスワードが間違っています");
+                privateKey = GetPrivateKey(password);
+                if (AccountViewModel.MemoryPasswordSeconds != 0)
+                {
+                    await SecureStorage.SetAsync("CurrentPassword", $"{password}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
+                }
+            } catch
+            {
+                throw new Exception("パスワードが間違っています");
+            }   
         }
         var keyPair = new KeyPair(new PrivateKey(privateKey));
 
@@ -295,20 +302,29 @@ public abstract class RequestViewModel
     private static async Task<(ResultType resultType, string result)> AcceptRequestBatches(string password)
     {
         string privateKey;
-        try
+        if (AccountViewModel.MainAccount.isBiometrics)
         {
-            privateKey = GetPrivateKey(password);
+            privateKey = await AccountViewModel.ReturnPrivateKeyUsingBionic();
         }
-        catch
+        else
         {
-            throw new Exception("パスワードが間違っています");
+            try
+            {
+                privateKey = GetPrivateKey(password);
+                if (AccountViewModel.MemoryPasswordSeconds != 0)
+                {
+                    await SecureStorage.SetAsync("CurrentPassword", $"{password}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
+                }
+            } catch
+            {
+                throw new Exception("パスワードが間違っています");
+            }   
         }
-
         var keyPair = new KeyPair(new PrivateKey(privateKey));
         
         var network = ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet;
         var metal = new Services.Metal(network);
-        Console.WriteLine(metal.symbol.Network);
+
         var txs = ParseTransaction.Select(valueTuple => valueTuple.transaction).ToList();
         
         foreach (var baseTransaction in txs)

@@ -17,6 +17,7 @@ public sealed class SavedAccount: INotifyPropertyChanged
     public string publicKey { get; set; }
     public string encryptedPrivateKey { get; set; }
     public string networkType { get; set; }
+    public bool isBiometrics { get; set; }
 
     private bool _isMain { get; set; }
     
