@@ -48,6 +48,15 @@
 	<data name="LangUtil_IncorrectNetwork" xml:space="preserve">
 		<value>NetworkTypeが正しくありません</value>
 	</data>
+	<data name="App_NoAccount" xml:space="preserve">
+		<value>アカウントが登録されていません</value>
+	</data>
+	<data name="App_NotificationError" xml:space="preserve">
+		<value>必要な情報が不足しています、遷移元開発者にお問い合わせください</value>
+	</data>
+	<data name="App_RegisterDomain" xml:space="preserve">
+		<value>{0}は未登録です。\n使用可能として登録しますか？</value>
+	</data>
 	<data name="BarcodeReader_GetPrivateKey_Discription" xml:space="preserve">
 		<value>暗号化されたQRコードです\nパスワードを入力してください</value>
 	</data>

@@ -1,9 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using CatSdk.CryptoTypes;
-using CatSdk.Facade;
-using CatSdk.Symbol;
-
 namespace aLice.Views;
 
 public partial class QrReaderForSign : ContentPage

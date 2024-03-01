@@ -3,7 +3,6 @@ using aLice.Models;
 using aLice.Resources;
 using aLice.Services;
 using aLice.ViewModels;
-using CatSdk.Symbol;
 
 namespace aLice.Views;
 

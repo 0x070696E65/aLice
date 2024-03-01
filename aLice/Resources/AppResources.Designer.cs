@@ -135,6 +135,24 @@ namespace aLice.Resources {
             }
         }
         
+        internal static string App_NoAccount {
+            get {
+                return ResourceManager.GetString("App_NoAccount", resourceCulture);
+            }
+        }
+        
+        internal static string App_NotificationError {
+            get {
+                return ResourceManager.GetString("App_NotificationError", resourceCulture);
+            }
+        }
+        
+        internal static string App_RegisterDomain {
+            get {
+                return ResourceManager.GetString("App_RegisterDomain", resourceCulture);
+            }
+        }
+        
         internal static string Account_OnClickSubmitAccount_DialigTitle {
             get {
                 return ResourceManager.GetString("Account_OnClickSubmitAccount_DialigTitle", resourceCulture);

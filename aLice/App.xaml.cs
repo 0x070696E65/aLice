@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using aLice.Models;
+using aLice.Resources;
 using aLice.ViewModels;
 using aLice.Views;
 
@@ -28,6 +29,10 @@ public partial class App : Application
                 CultureInfo.CurrentCulture = new CultureInfo("en-US");
                 CultureInfo.CurrentUICulture = new CultureInfo("en-US");
                 break;
+            default:
+                CultureInfo.CurrentCulture = new CultureInfo("ja-JP");
+                CultureInfo.CurrentUICulture = new CultureInfo("ja-JP");
+                break;
         }
     }
     
@@ -38,7 +43,7 @@ public partial class App : Application
             await AccountViewModel.SetAccounts();
             if (AccountViewModel.Accounts.accounts.Count == 0)
             {
-                throw new NullReferenceException("アカウントが登録されていません");
+                throw new NullReferenceException(AppResources.App_NoAccount);
             }
             
             var notification = new NotificationModel(_uri);
@@ -83,7 +88,7 @@ public partial class App : Application
     static private async Task NotificationError(string message)
     {
         if (Current?.MainPage != null)
-            await Current.MainPage.DisplayAlert("Error", $"必要な情報が不足しています、遷移元開発者にお問い合わせください\n{message}", "閉じる");
+            await Current.MainPage.DisplayAlert("Error", $"{AppResources.App_NotificationError}\n{message}", AppResources.LangUtil_Close);
     }
 
     static private async Task ApproveDomain(string baseUrl, string callbackUrl)
@@ -103,7 +108,7 @@ public partial class App : Application
             if (Current?.MainPage != null)
             {
                 var isRegistDomain =
-                    await Current.MainPage.DisplayAlert("確認", baseUrl + "は未登録です。\n使用可能として登録しますか？", "はい", "いいえ");
+                    await Current.MainPage.DisplayAlert("Confirm", string.Format(AppResources.App_RegisterDomain, baseUrl), AppResources.LangUtil_Yes, AppResources.LangUtil_No);
                 if (isRegistDomain)
                 {
                     var addedDomains = domains.Append(baseUrl);

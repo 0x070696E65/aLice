@@ -57,6 +57,15 @@
 	<data name="Account_OnClickSubmitAccount_Success" xml:space="preserve">
 		<value>Your account has been registered.</value>
 	</data>
+	<data name="App_NoAccount" xml:space="preserve">
+		<value>Your account is not registered.</value>
+	</data>
+	<data name="App_NotificationError" xml:space="preserve">
+		<value>Required information is missing, please contact the developer from whom you are transitioning.</value>
+	</data>
+	<data name="App_RegisterDomain" xml:space="preserve">
+		<value>{0} is unregistered. \nDo you want to register it as ɑn available?</value>
+	</data>
 	<data name="MainPage_SettingMainAccount" xml:space="preserve">
 		<value>Set up for the main account.</value>
 	</data>
