@@ -2,6 +2,7 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:strings="clr-namespace:aLice.Resources"
              x:Class="aLice.Views.Settings">
     <ContentPage.Content>
         <VerticalStackLayout
@@ -16,12 +17,12 @@
             
             <VerticalStackLayout>
                 <Label
-                    Text="パスワードの保存時間(秒)"
+                    Text="{x:Static strings:AppResources.Settings_PasswordStorageTime}"
                     SemanticProperties.HeadingLevel="Level1"
                     FontSize="20"
                     HorizontalOptions="Start" />
                 <Label
-                    Text="※ 0の場合は保存しません"
+                    Text="{x:Static strings:AppResources.Settings_PasswordStorageTimeDiscription}"
                     SemanticProperties.HeadingLevel="Level1"
                     FontSize="12"
                     HorizontalOptions="Start" />
@@ -47,6 +48,29 @@
                         Margin="20, 0, 0, 0"/>
                 </Grid>
             </VerticalStackLayout>
+            <VerticalStackLayout>
+                <Label
+                    Text="Language"
+                    SemanticProperties.HeadingLevel="Level1"
+                    FontSize="20"
+                    HorizontalOptions="Start" />
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Picker x:Name="LanguagePicker"
+                            Title="Select Language"
+                            SelectedIndexChanged="OnLanguagePickerSelectedIndexChanged">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>日本語</x:String>
+                                <x:String>English</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+                </Grid>
+            </VerticalStackLayout>
             <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -54,7 +78,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Text="Save"
-                        Clicked="OnSaveMemoryTime"
+                        Clicked="OnSave"
                         BackgroundColor="Black"
                         Grid.Column="0"
                         Margin="0,0,10,0"/>

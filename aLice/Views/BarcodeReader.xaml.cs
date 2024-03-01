@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using aLice.Resources;
 using CatSdk.CryptoTypes;
 using CatSdk.Facade;
 using CatSdk.Symbol;
@@ -89,7 +90,7 @@ public partial class BarcodeReader : ContentPage
             // @see https://github.com/symbol/qr-library/blob/main/src/services/EncryptionService.ts#L75-L113
             if (qrFormat.data.ciphertext != null && qrFormat.data.salt != null)
             {
-                var password = await DisplayPromptAsync("Password", "暗号化されたQRコードです\nパスワードを入力してください", "OK", "Cancel", "Input Password", -1, Keyboard.Text);
+                var password = await DisplayPromptAsync("Password", AppResources.BarcodeReader_GetPrivateKey_Discription, "OK", "Cancel", "Input Password", -1, Keyboard.Text);
                 if (password == null) return null;
 
                 var salt = StringToBytes(qrFormat.data.salt);
@@ -111,7 +112,7 @@ public partial class BarcodeReader : ContentPage
                 }
                 catch (CryptographicException)
                 {
-                    await DisplayAlert("Failed", "パスワードが異なります", "OK");
+                    await DisplayAlert("Failed", AppResources.LangUtil_FailedPassword, "OK");
                 }
             }
             return privateKey;

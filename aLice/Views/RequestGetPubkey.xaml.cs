@@ -1,5 +1,6 @@
 using System.Text.Json;
 using aLice.Models;
+using aLice.Resources;
 using aLice.ViewModels;
 
 namespace aLice.Views;
@@ -9,25 +10,24 @@ public partial class RequestGetPubkey : ContentPage
     public RequestGetPubkey()
     {
         InitializeComponent();
-        Ask.Text = $"{AccountViewModel.MainAccount.accountName}の公開鍵を渡しても良いですか？";
+        Ask.Text = string.Format(AppResources.RequestGetPubKey_Confirm, AccountViewModel.MainAccount.accountName);
     }
     
     private async void OnChangeAccount(object sender, EventArgs e)
     {
         try
         {
-            var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
+            var accName = await DisplayActionSheet(AppResources.RequestGetPubKey_AccountSwitching, "cancel", null, AccountViewModel.AccountNames);
             if (accName is null or "cancel")
-            {
                 return;
-            }
+            
             var address = AccountViewModel.Accounts.accounts.ToList().Find(a=>a.accountName == accName).address;
             await AccountViewModel.ChangeMainAccount(address);
-            Ask.Text = $"{AccountViewModel.MainAccount.accountName}の公開鍵を渡しても良いですか？";   
+            Ask.Text = string.Format(AppResources.RequestGetPubKey_Confirm, AccountViewModel.MainAccount.accountName);   
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -45,12 +45,12 @@ public partial class RequestGetPubkey : ContentPage
             else
             {
                 await Application.Current.MainPage.Navigation.PopModalAsync();
-                await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("公開鍵", result));
+                await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("PublicKey", result));
             }   
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -68,7 +68,7 @@ public partial class RequestGetPubkey : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
 }

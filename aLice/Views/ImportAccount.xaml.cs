@@ -1,3 +1,4 @@
+using aLice.Resources;
 using aLice.ViewModels;
 using CatSdk.CryptoTypes;
 using CatSdk.Facade;
@@ -45,7 +46,7 @@ public partial class ImportAccount : ContentPage
                 Application.Current != null 
                 && Application.Current.MainPage != null 
                 && Application.Current != null 
-                && await Application.Current.MainPage.DisplayAlert("こちらを登録します", showText, "はい", "いいえ");
+                && await Application.Current.MainPage.DisplayAlert(AppResources.Account_OnClickSubmitAccount_DialigTitle, showText, AppResources.LangUtil_Yes, AppResources.LangUtil_No);
             
             if (!result) return;
             
@@ -62,7 +63,7 @@ public partial class ImportAccount : ContentPage
             );
             
             // 保存完了のメッセージを表示
-            await DisplayAlert("Saved", "アカウントが登録されました", "OK");
+            await DisplayAlert("Saved", AppResources.Account_OnClickSubmitAccount_Success, "OK");
             
             // 画面を閉じる
             await Navigation.PopModalAsync();

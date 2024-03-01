@@ -47,5 +47,12 @@
 	<string>このアプリは直接的にBluetoothを使用しませんが、一部の内部コンポーネントがBluetoothを必要とする可能性があります。</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Need your face to unlock secrets!</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ja</string>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ja</string>
 </dict>
 </plist>

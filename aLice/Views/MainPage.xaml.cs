@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using aLice.Models;
+using aLice.Resources;
 using aLice.ViewModels;
+using System.Globalization;
 
 namespace aLice.Views;
 
@@ -9,6 +11,24 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+    }
+    
+    private void OnLocalizeChanged(object sender, EventArgs e)
+    {
+        // 現在のカルチャを取得
+        var currentCulture = CultureInfo.CurrentCulture.Name;
+
+        // 現在のカルチャが英語であれば日本語に、日本語であれば英語に切り替える
+        if (currentCulture == "en-US")
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("ja-JP");
+            CultureInfo.CurrentUICulture = new CultureInfo("ja-JP");
+        }
+        else
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("en-US");
+            CultureInfo.CurrentUICulture = new CultureInfo("en-US");
+        }
     }
     
     protected override async void OnAppearing()
@@ -40,7 +60,7 @@ public partial class MainPage : ContentPage
         }
         catch(Exception e)
         {
-            await DisplayAlert("Error", e.Message, "閉じる");
+            await DisplayAlert("Error", e.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -95,33 +115,31 @@ public partial class MainPage : ContentPage
                     string action;
                     if (acc.isMain)
                     {
-                        action = await DisplayActionSheet("Select", "cancel", null, "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "生体認証", "削除");
+                        action = await DisplayActionSheet("Select", "cancel", null, AppResources.LangUtil_AddressCopy, AppResources.LangUtil_PublicKeyCopy, AppResources.LangUtil_PrivateKeyCopy, AppResources.LangUtil_Biometrics, AppResources.LangUtil_Delete);
                     }
                     else
                     {
-                        action = await DisplayActionSheet("Select", "cancel", null, "メインアカウントに設定する", "アドレスコピー", "公開鍵コピー", "秘密鍵コピー", "生体認証", "削除");
+                        action = await DisplayActionSheet("Select", "cancel", null, AppResources.MainPage_SettingMainAccount,AppResources.LangUtil_AddressCopy, AppResources.LangUtil_PublicKeyCopy, AppResources.LangUtil_PrivateKeyCopy, AppResources.LangUtil_Biometrics, AppResources.LangUtil_Delete);
                     }
-                
-                    switch (action)
+
+                    if (action == AppResources.LangUtil_AddressCopy)
                     {
-                        case "メインアカウントに設定する":
-                            await OnChangeMainAccount(acc.address, acc.accountName);
-                            break;
-                        case "アドレスコピー":
-                            await OnAddressCopyButtonClicked(acc.address);
-                            break;
-                        case "公開鍵コピー":
-                            await OnPublicKeyCopyButtonClicked(acc.publicKey);
-                            break;
-                        case "秘密鍵コピー":
-                            await OnExportButtonClicked(acc.address);
-                            break;
-                        case "削除":
-                            await OnDeleteButtonClicked(acc.address, acc.accountName);
-                            break;
-                        case "生体認証":
-                            await OnUseBionicButtonClicked(acc.address);
-                            break;
+                        await OnChangeMainAccount(acc.address, acc.accountName);
+                    } else if (action == AppResources.LangUtil_AddressCopy)
+                    {
+                        await OnAddressCopyButtonClicked(acc.address);
+                    } else if (action == AppResources.LangUtil_PublicKeyCopy)
+                    {
+                        await OnPublicKeyCopyButtonClicked(acc.publicKey);
+                    } else if (action == AppResources.LangUtil_PrivateKeyCopy)
+                    {
+                        await OnExportButtonClicked(acc.address);
+                    } else if (action == AppResources.LangUtil_Delete)
+                    {
+                        await OnDeleteButtonClicked(acc.address, acc.accountName);
+                    } else if (action == AppResources.LangUtil_Biometrics)
+                    {
+                        await OnUseBionicButtonClicked(acc.address);
                     }
                 };
                 
@@ -186,11 +204,11 @@ public partial class MainPage : ContentPage
         try
         {
             await AccountViewModel.ChangeMainAccount(address);
-            await DisplayAlert("Success", $"Mainアカウントを{name}に変更しました", "閉じる");
+            await DisplayAlert("Success", string.Format(AppResources.MainPage_ChangedAccount, name), AppResources.LangUtil_Close);
         }
         catch (Exception error)
         {
-            await DisplayAlert("Error", error.Message, "閉じる");
+            await DisplayAlert("Error", error.Message, AppResources.LangUtil_Close);
         }
     }
 
@@ -199,11 +217,11 @@ public partial class MainPage : ContentPage
         try
         {
             await Clipboard.SetTextAsync(address);
-            await DisplayAlert("Copied", "クリップボードにアドレスをコピーしました", "閉じる");
+            await DisplayAlert("Copied", AppResources.MainPage_CopiedAddressToClipBoard, AppResources.LangUtil_Close);
         }
         catch (Exception error)
         {
-            await DisplayAlert("Error", error.Message, "閉じる");
+            await DisplayAlert("Error", error.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -212,11 +230,11 @@ public partial class MainPage : ContentPage
         try
         {
             await Clipboard.SetTextAsync(publicKey);
-            await DisplayAlert("Copied", "クリップボードに公開鍵をコピーしました", "閉じる");
+            await DisplayAlert("Copied", AppResources.MainPage_CopiedPublicKeyToClipBoard, AppResources.LangUtil_Close);
         }
         catch (Exception error)
         {
-            await DisplayAlert("Error", error.Message, "閉じる");
+            await DisplayAlert("Error", error.Message, AppResources.LangUtil_Close);
         }
     }
 
@@ -224,16 +242,16 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            var password = await DisplayPromptAsync("Password", "パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            var password = await DisplayPromptAsync("Password", AppResources.LangUtil_InputPassword, "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
             if (password == null) return;
 
             var privateKey = AccountViewModel.ExportAccount(address, password);
             await Clipboard.SetTextAsync(privateKey);
-            await DisplayAlert("クリップボードに秘密鍵をコピーしました", "秘密鍵の取り扱いには十分に注意してください", "はい");    
+            await DisplayAlert(AppResources.MainPage_CopiedPrivateKeyToClipBoard, AppResources.MainPage_WarningPrivateKey, AppResources.LangUtil_Yes);    
         }
         catch (Exception error)
         {
-            await DisplayAlert("Error", error.Message, "閉じる");
+            await DisplayAlert("Error", error.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -241,16 +259,16 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            var result = await DisplayAlert("Alert", $"本当に{name}を削除していいですか？", "はい", "いいえ");
+            var result = await DisplayAlert("Alert", string.Format(AppResources.MainPage_ConfirmDeleteAccount, name), AppResources.LangUtil_Yes, AppResources.LangUtil_No);
             if (result)
             {
                 await AccountViewModel.DeleteAccount(address);
-                await DisplayAlert("Deleted", "アカウントを削除しました", "閉じる");
+                await DisplayAlert("Deleted", AppResources.MainPage_DeletedAccount, AppResources.LangUtil_Close);
             }
         }
         catch (Exception error)
         {
-            await DisplayAlert("Error", error.Message, "閉じる");
+            await DisplayAlert("Error", error.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -259,19 +277,18 @@ public partial class MainPage : ContentPage
         try
         {
             var isUseBionic = AccountViewModel.IsUseBionic(address);
-            var message = isUseBionic ? "生体認証を解除します。" : "生体認証を設定します。";
-            var password = await DisplayPromptAsync("Password", $"{message}パスワードを入力してください", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
+            Console.WriteLine(isUseBionic);
+            var message = isUseBionic ? AppResources.MainPage_ConfirmDeactivateBionic : AppResources.MainPage_ConfirmActivateBionic;
+            var resultMessage = isUseBionic ? AppResources.MainPage_DeactivatedBionic : AppResources.MainPage_ActivatedBionic;
+            var password = await DisplayPromptAsync("Password", $"{message}\n{AppResources.LangUtil_InputPassword}", "Sign", "Cancel", "Input Password", -1, Keyboard.Numeric);
             if (password == null) return;
             var privateKey = AccountViewModel.ExportAccount(address, password);
             await AccountViewModel.UpdateUseBionic(address, privateKey, isUseBionic);
-            if(isUseBionic)
-                await DisplayAlert("Success", "生体認証を設定しました", "閉じる");
-            else
-                await DisplayAlert("Success", "生体認証を解除しました", "閉じる");
+            await DisplayAlert("Success", resultMessage, AppResources.LangUtil_Close);
         }
         catch (Exception error)
         {
-            await DisplayAlert("Error", error.Message, "閉じる");
+            await DisplayAlert("Error", error.Message, AppResources.LangUtil_Close);
         }
     }
     

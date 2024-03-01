@@ -1,3 +1,4 @@
+using aLice.Resources;
 using aLice.ViewModels;
 using CatSdk.Facade;
 using CatSdk.Symbol;
@@ -37,7 +38,7 @@ public partial class NewAccount : ContentPage
             {
                 "MainNet" => CatSdk.Symbol.Network.MainNet,
                 "TestNet" => CatSdk.Symbol.Network.TestNet,
-                _ => throw new Exception("NetworkTypeが正しくありません")
+                _ => throw new Exception(AppResources.LangUtil_IncorrectNetwork)
             };
             var facade = new SymbolFacade(networkType);
             // 秘密鍵を暗号化
@@ -49,7 +50,7 @@ public partial class NewAccount : ContentPage
                 Application.Current != null 
                 && Application.Current.MainPage != null 
                 && Application.Current != null 
-                && await Application.Current.MainPage.DisplayAlert("こちらを登録します", showText, "はい", "いいえ");
+                && await Application.Current.MainPage.DisplayAlert(AppResources.Account_OnClickSubmitAccount_DialigTitle, showText, AppResources.LangUtil_Yes, AppResources.LangUtil_No);
             
             if (!result) return;
 
@@ -65,7 +66,7 @@ public partial class NewAccount : ContentPage
             );
             
             // 保存完了のメッセージを表示
-            await DisplayAlert("Saved", "アカウントが登録されました", "OK");
+            await DisplayAlert("Saved", AppResources.Account_OnClickSubmitAccount_Success, "OK");
             
             // 画面を閉じる
             await Navigation.PopModalAsync();

@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="LangUtil_Yes" xml:space="preserve">
+		<value>はい</value>
+	</data>
+	<data name="LangUtil_No" xml:space="preserve">
+		<value>いいえ</value>
+	</data>
+	<data name="LangUtil_Close" xml:space="preserve">
+		<value>閉じる</value>
+	</data>
+	<data name="LangUtil_AddressCopy" xml:space="preserve">
+		<value>アドレスコピー</value>
+	</data>
+	<data name="LangUtil_PublicKeyCopy" xml:space="preserve">
+		<value>公開鍵コピー</value>
+	</data>
+	<data name="LangUtil_PrivateKeyCopy" xml:space="preserve">
+		<value>秘密鍵コピー</value>
+	</data>
+	<data name="LangUtil_Biometrics" xml:space="preserve">
+		<value>生体認証</value>
+	</data>
+	<data name="LangUtil_Delete" xml:space="preserve">
+		<value>削除</value>
+	</data>
+	<data name="LangUtil_InputPassword" xml:space="preserve">
+		<value>パスワードを入力してください</value>
+	</data>
+	<data name="LangUtil_FailedPassword" xml:space="preserve">
+		<value>パスワードが間違っています</value>
+	</data>
+	<data name="LangUtil_CopiedToClipBoard" xml:space="preserve">
+		<value>クリップボードにコピーしました</value>
+	</data>
+	<data name="LangUtil_IncorrectNetwork" xml:space="preserve">
+		<value>NetworkTypeが正しくありません</value>
+	</data>
+	<data name="BarcodeReader_GetPrivateKey_Discription" xml:space="preserve">
+		<value>暗号化されたQRコードです\nパスワードを入力してください</value>
+	</data>
+	<data name="Account_OnClickSubmitAccount_DialigTitle" xml:space="preserve">
+		<value>こちらを登録します</value>
+	</data>
+	<data name="Account_OnClickSubmitAccount_Success" xml:space="preserve">
+		<value>アカウントが登録されました</value>
+	</data>
+	<data name="MainPage_SettingMainAccount" xml:space="preserve">
+		<value>メインアカウントに設定する</value>
+	</data>
+	<data name="MainPage_ChangedAccount" xml:space="preserve">
+		<value>Mainアカウントを{0}に変更しました</value>
+	</data>
+	<data name="MainPage_CopiedAddressToClipBoard" xml:space="preserve">
+		<value>クリップボードにアドレスをコピーしました</value>
+	</data>
+	<data name="MainPage_CopiedPublicKeyToClipBoard" xml:space="preserve">
+		<value>クリップボードに公開鍵をコピーしました</value>
+	</data>
+	<data name="MainPage_CopiedPrivateKeyToClipBoard" xml:space="preserve">
+		<value>クリップボードに秘密鍵をコピーしました</value>
+	</data>
+	<data name="MainPage_WarningPrivateKey" xml:space="preserve">
+		<value>秘密鍵の取り扱いには十分に注意してください</value>
+	</data>
+	<data name="MainPage_ConfirmDeleteAccount" xml:space="preserve">
+		<value>本当に{0}を削除していいですか？</value>
+	</data>
+	<data name="MainPage_DeletedAccount" xml:space="preserve">
+		<value>アカウントを削除しました</value>
+	</data>
+	<data name="MainPage_ConfirmActivateBionic" xml:space="preserve">
+		<value>生体認証を設定します</value>
+	</data>
+	<data name="MainPage_ConfirmDeactivateBionic" xml:space="preserve">
+		<value>生体認証を解除します</value>
+	</data>
+	<data name="MainPage_ActivatedBionic" xml:space="preserve">
+		<value>生体認証を設定しました</value>
+	</data>
+	<data name="MainPage_DeactivatedBionic" xml:space="preserve">
+		<value>生体認証を解除しました</value>
+	</data>
+	<data name="RequestGetPubKey_Confirm" xml:space="preserve">
+		<value>{0}の公開鍵を渡しても良いですか？</value>
+	</data>
+	<data name="RequestGetPubKey_AccountSwitching" xml:space="preserve">
+		<value>アカウント切り替え</value>
+	</data>
+	<data name="RequestSign_ConfirmChangeAccount" xml:space="preserve">
+		<value>{0}をメインアカウントに変更しますか？</value>
+	</data>
+	<data name="RequestSign_ConfirmChangeAccountDescription" xml:space="preserve">
+		<value>いいえを選択するとこのページを閉じます</value>
+	</data>
+	<data name="RequestSign_ConfirmSign" xml:space="preserve">
+		<value>{0}で署名しますか？</value>
+	</data>
+	<data name="Settings_PasswordStorageTime" xml:space="preserve">
+		<value>パスワードの保存時間(秒)</value>
+	</data>
+	<data name="Settings_PasswordStorageTimeDiscription" xml:space="preserve">
+		<value>※ 0の場合は保存しません</value>
+	</data>
+	<data name="WaitConfirmed_SuccessTransaction" xml:space="preserve">
+		<value>トランザクションが承認されました</value>
+	</data>
+</root>

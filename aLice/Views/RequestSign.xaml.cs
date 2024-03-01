@@ -1,4 +1,5 @@
 using aLice.Models;
+using aLice.Resources;
 using aLice.ViewModels;
 
 namespace aLice.Views;
@@ -24,8 +25,8 @@ public partial class RequestSign : ContentPage
                 && RequestViewModel.Notification.RequestType != RequestType.SignCosignature)
             {
                 var requestAccount = RequestViewModel.GetRequestAccount();
-                var isChangeMainAccount = await DisplayAlert("確認",
-                    requestAccount.accountName + "をメインアカウントに変更しますか？\nいいえを選択するとこのページを閉じます", "はい", "いいえ");
+                var isChangeMainAccount = await DisplayAlert("Confirm",
+                    $"{string.Format(AppResources.RequestSign_ConfirmChangeAccount, requestAccount.accountName)}\n{AppResources.RequestSign_ConfirmChangeAccountDescription}", AppResources.LangUtil_Yes, AppResources.LangUtil_No);
                 if (isChangeMainAccount)
                 {
                     await AccountViewModel.ChangeMainAccount(requestAccount.address);
@@ -35,7 +36,7 @@ public partial class RequestSign : ContentPage
                         RequestViewModel.SetMainAccountSignerPublicKey();
                     }
                     Password.Text = "";
-                    Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
+                    Ask.Text = string.Format(AppResources.RequestSign_ConfirmSign, AccountViewModel.MainAccount.accountName);
                 }
                 else
                 {
@@ -48,7 +49,7 @@ public partial class RequestSign : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
             Console.WriteLine(exception.Message);
             Console.WriteLine(exception.StackTrace);
             if (Navigation.ModalStack.Count > 0)
@@ -83,7 +84,7 @@ public partial class RequestSign : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -110,7 +111,7 @@ public partial class RequestSign : ContentPage
                     await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, AnnounceType.Cosignature));
                     break;
                 case ResultType.ShowData:
-                    await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("Signature", result));
                     break;
                 default:
                     throw new Exception("指定されたタイプは存在しません");
@@ -120,7 +121,7 @@ public partial class RequestSign : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -128,7 +129,7 @@ public partial class RequestSign : ContentPage
     {
         try
         {
-            var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
+            var accName = await DisplayActionSheet(AppResources.RequestGetPubKey_AccountSwitching, "cancel", null, AccountViewModel.AccountNames);
             if (accName is null or "cancel")
             {
                 return;
@@ -137,11 +138,11 @@ public partial class RequestSign : ContentPage
             await AccountViewModel.ChangeMainAccount(address);
             RequestViewModel.SetMainAccountSignerPublicKey();
             Password.Text = "";
-            Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";   
+            Ask.Text = string.Format(AppResources.RequestSign_ConfirmSign, AccountViewModel.MainAccount.accountName);   
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -159,7 +160,7 @@ public partial class RequestSign : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
 }

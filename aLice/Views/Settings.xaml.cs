@@ -6,6 +6,7 @@ namespace aLice.Views;
 public partial class Settings : ContentPage
 {
     private int memoryPasswordSeconds;
+    private string language;
     public Settings()
     {
         InitializeComponent();
@@ -15,6 +16,7 @@ public partial class Settings : ContentPage
     {
         base.OnAppearing();
         MemoryTimeSlider.Value = AccountViewModel.MemoryPasswordSeconds;
+        LanguagePicker.SelectedIndex = SecureStorage.GetAsync("Language").Result == "en" ? 1 : 0;
     }
 
     private void MemoryTimeSliderChanged(object sender, ValueChangedEventArgs e)
@@ -24,11 +26,36 @@ public partial class Settings : ContentPage
         slider.Value = memoryPasswordSeconds;
         MemoryTimeValue.Text = memoryPasswordSeconds.ToString(CultureInfo.InvariantCulture);
     }
+    
+    private void OnLanguagePickerSelectedIndexChanged(object sender, EventArgs e)
+    {
+        var picker = (Picker)sender;
+        var selectedIndex = picker.SelectedIndex;
+        
+        if (selectedIndex != -1)
+        {
+            // 選択された言語に基づいてカルチャを設定
+            switch (picker.ItemsSource[selectedIndex])
+            {
+                case "日本語":
+                    CultureInfo.CurrentCulture = new CultureInfo("ja-JP");
+                    CultureInfo.CurrentUICulture = new CultureInfo("ja-JP");
+                    language = "ja";
+                    break;
+                case "English":
+                    CultureInfo.CurrentCulture = new CultureInfo("en-US");
+                    CultureInfo.CurrentUICulture = new CultureInfo("en-US");
+                    language = "en";
+                    break;
+            }
+        }
+    }
 
-    private async void OnSaveMemoryTime(object sender, EventArgs e)
+    private async void OnSave(object sender, EventArgs e)
     {
         AccountViewModel.MemoryPasswordSeconds = memoryPasswordSeconds;
         await SecureStorage.SetAsync("MemoryPasswordSeconds", AccountViewModel.MemoryPasswordSeconds.ToString(CultureInfo.InvariantCulture));
+        await SecureStorage.SetAsync("Language", language);
         await Navigation.PopModalAsync();
     }
 

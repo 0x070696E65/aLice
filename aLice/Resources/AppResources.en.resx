@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="LangUtil_Yes" xml:space="preserve">
+		<value>Yes</value>
+	</data>
+	<data name="LangUtil_No" xml:space="preserve">
+		<value>No</value>
+	</data>
+	<data name="LangUtil_Close" xml:space="preserve">
+		<value>Close</value>
+	</data>
+	<data name="LangUtil_AddressCopy" xml:space="preserve">
+		<value>Address Copy</value>
+	</data>
+	<data name="LangUtil_PublicKeyCopy" xml:space="preserve">
+		<value>PublicKey Copy</value>
+	</data>
+	<data name="LangUtil_PrivateKeyCopy" xml:space="preserve">
+		<value>PrivateKey Copy</value>
+	</data>
+	<data name="LangUtil_Biometrics" xml:space="preserve">
+		<value>Biometrics</value>
+	</data>
+	<data name="LangUtil_Delete" xml:space="preserve">
+		<value>Delete</value>
+	</data>
+	<data name="LangUtil_InputPassword" xml:space="preserve">
+		<value>Please enter your password.</value>
+	</data>
+	<data name="LangUtil_FailedPassword" xml:space="preserve">
+		<value>Wrong password.</value>
+	</data>
+	<data name="LangUtil_IncorrectNetwork" xml:space="preserve">
+		<value>Incorrect NetworkType.</value>
+	</data>
+	<data name="LangUtil_CopiedToClipBoard" xml:space="preserve">
+		<value>Copied to clipboard.</value>
+	</data>
+	<data name="BarcodeReader_GetPrivateKey_Discription" xml:space="preserve">
+		<value>Encrypted QR Code.\nPlease enter your password.</value>
+	</data>
+	<data name="Account_OnClickSubmitAccount_DialigTitle" xml:space="preserve">
+		<value>Register this.</value>
+	</data>
+	<data name="Account_OnClickSubmitAccount_Success" xml:space="preserve">
+		<value>Your account has been registered.</value>
+	</data>
+	<data name="MainPage_SettingMainAccount" xml:space="preserve">
+		<value>Set up for the main account.</value>
+	</data>
+	<data name="MainPage_ChangedAccount" xml:space="preserve">
+		<value>Main account changed to {0}.</value>
+	</data>
+	<data name="MainPage_CopiedAddressToClipBoard" xml:space="preserve">
+		<value>Copied Address to the clipboard.</value>
+	</data>
+	<data name="MainPage_CopiedPublicKeyToClipBoard" xml:space="preserve">
+		<value>Copied PublicKey to the clipboard.</value>
+	</data>
+	<data name="MainPage_CopiedPrivateKeyToClipBoard" xml:space="preserve">
+		<value>Copied PrivateKey to the clipboard.</value>
+	</data>
+	<data name="MainPage_WarningPrivateKey" xml:space="preserve">
+		<value>Please handle private keys with care.</value>
+	</data>
+	<data name="MainPage_ConfirmDeleteAccount" xml:space="preserve">
+		<value>Are you sure you want to remove {0}?</value>
+	</data>
+	<data name="MainPage_DeletedAccount" xml:space="preserve">
+		<value>Account deleted.</value>
+	</data>
+	<data name="MainPage_ConfirmActivateBionic" xml:space="preserve">
+		<value>Set up biometric authentication.</value>
+	</data>
+	<data name="MainPage_ConfirmDeactivateBionic" xml:space="preserve">
+		<value>Deactivate biometric authentication.</value>
+	</data>
+	<data name="MainPage_ActivatedBionic" xml:space="preserve">
+		<value>Biometric authentication has been set up.</value>
+	</data>
+	<data name="MainPage_DeactivatedBionic" xml:space="preserve">
+		<value>Biometrics deactivated.</value>
+	</data>
+	<data name="RequestGetPubKey_Confirm" xml:space="preserve">
+		<value>Are you sure can I pass PublicKey of {0}?</value>
+	</data>
+	<data name="RequestGetPubKey_AccountSwitching" xml:space="preserve">
+		<value>account switching</value>
+	</data>
+	<data name="RequestSign_ConfirmChangeAccount" xml:space="preserve">
+		<value>Would you like to change {0} to your main account?</value>
+	</data>
+	<data name="RequestSign_ConfirmChangeAccountDescription" xml:space="preserve">
+		<value>Select No to close this page</value>
+	</data>
+	<data name="RequestSign_ConfirmSign" xml:space="preserve">
+		<value>Do you want to sign with {0}?</value>
+	</data>
+	<data name="Settings_PasswordStorageTime" xml:space="preserve">
+		<value>Password storage time.(second)</value>
+	</data>
+	<data name="Settings_PasswordStorageTimeDiscription" xml:space="preserve">
+		<value>※ If 0, no storage.</value>
+	</data>
+	<data name="WaitConfirmed_SuccessTransaction" xml:space="preserve">
+		<value>Transaction has been approved.</value>
+	</data>
+</root>

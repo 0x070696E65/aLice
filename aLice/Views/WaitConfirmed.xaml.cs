@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using aLice.Models;
+using aLice.Resources;
 using aLice.Services;
 using aLice.ViewModels;
 using CatSdk.Symbol;
@@ -74,7 +75,6 @@ public partial class WaitConfirmed : ContentPage
             await websocket.Open();
             var confirmedTask = websocket.Confirmed(address, token, async (tx) =>
             {
-                Console.WriteLine("CONFIRMED");
                 if (token.IsCancellationRequested)
                 {
                     websocket.Close();
@@ -84,7 +84,7 @@ public partial class WaitConfirmed : ContentPage
                 {
                     IsConfirmed = true;
                     Indicator.IsRunning = false;
-                    Result.Text = "トランザクションが承認されました";
+                    Result.Text = AppResources.WaitConfirmed_SuccessTransaction;
                     websocket.Close();
                 };
             });
@@ -92,7 +92,6 @@ public partial class WaitConfirmed : ContentPage
             await websocket2.Open();
             var statusTask = websocket2.Status(address, token, (n) =>
             {
-                Console.WriteLine("STATUS");
                 if (token.IsCancellationRequested)
                 {
                     websocket2.Close();
@@ -111,7 +110,7 @@ public partial class WaitConfirmed : ContentPage
         {
             await Console.Error.WriteLineAsync(exception.Message);
             await Console.Error.WriteLineAsync(exception.StackTrace);
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     

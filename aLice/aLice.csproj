@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
+        <NeutralLanguage>ja</NeutralLanguage>
         <TargetFrameworks>net7.0-android;net7.0-ios;</TargetFrameworks>
         <!--<TargetFrameworks>net7.0-android;</TargetFrameworks>-->
         <!--<TargetFrameworks>net7.0-ios;</TargetFrameworks>-->
@@ -21,8 +21,8 @@
         <ApplicationIdGuid>1E47EC8D-2DC8-4A49-8AF0-BBCFCA12D518</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.12.4</ApplicationDisplayVersion>
-        <ApplicationVersion>51</ApplicationVersion>
+        <ApplicationDisplayVersion>1.14.0</ApplicationDisplayVersion>
+        <ApplicationVersion>55</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
@@ -34,16 +34,16 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
         <CreatePackage>false</CreatePackage>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
         <CodesignProvision>alice</CodesignProvision>
         <CodesignKey>iPhone Developer</CodesignKey>
-        <MtouchLink>None</MtouchLink>
+        <MtouchLink>SdkOnly</MtouchLink>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
       <CreatePackage>false</CreatePackage>
       <CodesignProvision>alice_product</CodesignProvision>
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
@@ -177,6 +177,9 @@
         <DependentUpon>WaitConfirmed.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Resources\Resources.Designer.cs">
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -194,4 +197,10 @@
       <Folder Include="Utils\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
 </Project>

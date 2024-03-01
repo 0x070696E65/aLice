@@ -1,4 +1,5 @@
-﻿using aLice.Models;
+﻿using System.Globalization;
+using aLice.Models;
 using aLice.ViewModels;
 using aLice.Views;
 
@@ -14,6 +15,20 @@ public partial class App : Application
         if (Current != null) Current.UserAppTheme = AppTheme.Light;
 
         MainPage = new MainPage();
+        
+        // 言語設定
+        var language = SecureStorage.GetAsync("Language").Result;
+        switch (language)
+        {
+            case "ja":
+                CultureInfo.CurrentCulture = new CultureInfo("ja-JP");
+                CultureInfo.CurrentUICulture = new CultureInfo("ja-JP");
+                break;
+            case "en":
+                CultureInfo.CurrentCulture = new CultureInfo("en-US");
+                CultureInfo.CurrentUICulture = new CultureInfo("en-US");
+                break;
+        }
     }
     
     public static async void RequestNotification(string _uri, CancellationToken token)

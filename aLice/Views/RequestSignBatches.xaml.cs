@@ -1,4 +1,5 @@
 using aLice.Models;
+using aLice.Resources;
 using aLice.ViewModels;
 
 namespace aLice.Views;
@@ -20,13 +21,14 @@ public partial class RequestSignBatches : ContentPage
             if (RequestViewModel.Notification.SetPublicKey != null && AccountViewModel.MainAccount.publicKey != RequestViewModel.Notification.SetPublicKey)
             {
                 var requestAccount = RequestViewModel.GetRequestAccount();
-                var isChangeMainAccount = await DisplayAlert("確認", requestAccount.accountName + "をメインアカウントに変更しますか？\nいいえを選択するとこのページを閉じます", "はい", "いいえ");
+                var isChangeMainAccount = await DisplayAlert("Confirm",
+                    $"{string.Format(AppResources.RequestSign_ConfirmChangeAccount, requestAccount.accountName)}\n{AppResources.RequestSign_ConfirmChangeAccountDescription}", AppResources.LangUtil_Yes, AppResources.LangUtil_No);
                 if (isChangeMainAccount)
                 {
                     await AccountViewModel.ChangeMainAccount(requestAccount.address);
                     RequestViewModel.SetMainAccountSignerPublicKey();
                     Password.Text = "";
-                    Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
+                    Ask.Text = string.Format(AppResources.RequestSign_ConfirmSign, AccountViewModel.MainAccount.accountName);
                 }
                 else
                 {
@@ -39,7 +41,7 @@ public partial class RequestSignBatches : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
             if (Navigation.ModalStack.Count > 0)
             {
                 await Navigation.PopModalAsync();
@@ -79,7 +81,7 @@ public partial class RequestSignBatches : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
             Console.WriteLine(exception.Message);
             Console.WriteLine(exception.StackTrace);
         }
@@ -104,7 +106,7 @@ public partial class RequestSignBatches : ContentPage
             }
             else
             {
-                await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("署名データ", result));
+                await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("Signature", result));
             }
 
             await AccountViewModel.DeletePassword();
@@ -121,7 +123,7 @@ public partial class RequestSignBatches : ContentPage
     {
         try
         {
-            var accName = await DisplayActionSheet("アカウント切り替え", "cancel", null, AccountViewModel.AccountNames);
+            var accName = await DisplayActionSheet(AppResources.RequestGetPubKey_AccountSwitching, "cancel", null, AccountViewModel.AccountNames);
             if (accName is null or "cancel")
             {
                 return;
@@ -130,11 +132,11 @@ public partial class RequestSignBatches : ContentPage
             await AccountViewModel.ChangeMainAccount(address);
             RequestViewModel.SetMainAccountSignerPublicKey();
             Password.Text = "";
-            Ask.Text = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
+            Ask.Text = string.Format(AppResources.RequestSign_ConfirmSign, AccountViewModel.MainAccount.accountName);
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
     
@@ -152,7 +154,7 @@ public partial class RequestSignBatches : ContentPage
         }
         catch (Exception exception)
         {
-            await DisplayAlert("Error", exception.Message, "閉じる");
+            await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
         }
     }
 }
