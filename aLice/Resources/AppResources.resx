@@ -126,4 +126,67 @@
 	<data name="WaitConfirmed_SuccessTransaction" xml:space="preserve">
 		<value>トランザクションが承認されました</value>
 	</data>
+	<data name="AccountViewModel_FailedBionic" xml:space="preserve">
+		<value>生体認証に失敗しました</value>
+	</data>
+	<data name="AccountViewModel_RequiredAccountName" xml:space="preserve">
+		<value>アカウント名は必須です</value>
+	</data>
+	<data name="AccountViewModel_RequiredPassword" xml:space="preserve">
+		<value>パスワードは必須です</value>
+	</data>
+	<data name="AccountViewModel_RequiredAddress" xml:space="preserve">
+		<value>アドレスは必須です</value>
+	</data>
+	<data name="AccountViewModel_RequiredPrivateKey" xml:space="preserve">
+		<value>秘密鍵は必須です</value>
+	</data>
+	<data name="AccountViewModel_NotMatchPrivateKeyAndAddress" xml:space="preserve">
+		<value>秘密鍵とアドレスが一致しません</value>
+	</data>
+	<data name="AccountViewModel_AccountAlreadyRegistered" xml:space="preserve">
+		<value>アカウント名はすでに登録されています</value>
+	</data>
+	<data name="AccountViewModel_AddressAlreadyRegistered" xml:space="preserve">
+		<value>アドレスはすでに登録されています</value>
+	</data>
+	<data name="RequestViewModel_RequestSignature" xml:space="preserve">
+		<value>{0}からの署名要求です</value>
+	</data>
+	<data name="RequestViewModel_Utf8String" xml:space="preserve">
+		<value>UTF8文字列です</value>
+	</data>
+	<data name="RequestViewModel_Hex" xml:space="preserve">
+		<value>バイナリデータの16進数文字列です</value>
+	</data>
+	<data name="RequestViewModel_Cosignature" xml:space="preserve">
+		<value>トランザクションの連署要求です</value>
+	</data>
+	<data name="RequestViewModel_SymbolTransaction" xml:space="preserve">
+		<value>Symbolのトランザクションです</value>
+	</data>
+	<data name="RequestViewModel_EncryptionMessage" xml:space="preserve">
+		<value>メッセージの暗号化を行います</value>
+	</data>
+	<data name="RequestViewModel_MultipleTransactions" xml:space="preserve">
+		<value>複数のトランザクションです</value>
+	</data>
+	<data name="RequestViewModel_IncorrectRequest" xml:space="preserve">
+		<value>不正なリクエストです</value>
+	</data>
+	<data name="RequestViewModel_IncorrectNodeUrl" xml:space="preserve">
+		<value>指定されたノードがダウンしているか、正しいノードURLではありません</value>
+	</data>
+	<data name="RequestViewModel_FailedAnnounce" xml:space="preserve">
+		<value>アナウンスに失敗しました</value>
+	</data>
+	<data name="RequestViewModel_NoAccount" xml:space="preserve">
+		<value>指定されたアカウントが存在しません</value>
+	</data>
+	<data name="SymbolTranasction_NoPublicKey" xml:space="preserve">
+		<value>※公開鍵が設定されていません、署名するとあなたのメインアカウントが設定せれます</value>
+	</data>
+	<data name="SymbolTranasction_NoEpocTime" xml:space="preserve">
+		<value>ネットワークのエポックタイムが設定されていません</value>
+	</data>
 </root>

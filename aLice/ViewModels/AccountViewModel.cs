@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using aLice.Models;
+using aLice.Resources;
 using CatSdk.Facade;
 using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;
@@ -45,7 +46,7 @@ public abstract class AccountViewModel
             return CatSdk.Crypto.Crypto.DecryptString(acc.encryptedPrivateKey, password, acc.address);
         }
         catch {
-            throw new Exception("パスワードが正しくありません");
+            throw new Exception(AppResources.LangUtil_FailedPassword);
         }
     }
     
@@ -61,7 +62,7 @@ public abstract class AccountViewModel
             await SecureStorage.SetAsync("accounts", updatedAccounts);
         }
         catch {
-            throw new Exception("パスワードが正しくありません");
+            throw new Exception(AppResources.LangUtil_FailedPassword);
         }
     }
     
@@ -136,7 +137,7 @@ public abstract class AccountViewModel
                 return await SecureStorage.GetAsync($"{MainAccount.address}_privateKey");
             }
         }
-        throw new Exception("生体認証に失敗しました");
+        throw new Exception(AppResources.AccountViewModel_FailedBionic);
     }
 
     public static (bool isValid, string message) ValidationAccount(
@@ -148,13 +149,13 @@ public abstract class AccountViewModel
 
         if (Name == null)
         {
-            message += "アカウント名は必須です\n";
+            message += $"{AppResources.AccountViewModel_RequiredAccountName}\n";
             isValid = false;
         }
         
         if (Password == null)
         {
-            message += "パスワードは必須です\n";
+            message += $"{AppResources.AccountViewModel_RequiredPassword}\n";
             isValid = false;
         }
         
@@ -162,13 +163,13 @@ public abstract class AccountViewModel
         {
             if (Address == null)
             {
-                message += "アドレスは必須です\n";
+                message += $"{AppResources.AccountViewModel_RequiredAddress}\n";
                 isValid = false;
             }
             
             if (!hasPrivateKey)
             {
-                message += "秘密鍵は必須です\n";
+                message += $"{AppResources.AccountViewModel_RequiredPrivateKey}\n";
                 isValid = false;
             }
 
@@ -178,7 +179,7 @@ public abstract class AccountViewModel
                 {
                     "MainNet" => CatSdk.Symbol.Network.MainNet,
                     "TestNet" => CatSdk.Symbol.Network.TestNet,
-                    _ => throw new Exception("NetworkTypeが正しくありません")
+                    _ => throw new Exception(AppResources.LangUtil_IncorrectNetwork)
                 };
                 var facade = new SymbolFacade(networkType);
 
@@ -187,7 +188,7 @@ public abstract class AccountViewModel
 
                 if (address.ToString() != Address)
                 {
-                    message += "秘密鍵とアドレスが一致しません\n";
+                    message += $"{AppResources.AccountViewModel_NotMatchPrivateKeyAndAddress}\n";
                     isValid = false;
                 }
             }
@@ -204,13 +205,13 @@ public abstract class AccountViewModel
             {
                 if (savedAccount.accountName == Name)
                 {
-                    message += "アカウント名はすでに登録されています\n";
+                    message += $"{AppResources.AccountViewModel_AccountAlreadyRegistered}\n";
                     isValid = false;
                 }
 
                 if (savedAccount.address == Address)
                 {
-                    message += "アドレスはすでに登録されています\n";
+                    message += $"{AppResources.AccountViewModel_AddressAlreadyRegistered}\n";
                     isValid = false;
                 }
             }

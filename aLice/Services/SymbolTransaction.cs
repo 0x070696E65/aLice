@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using aLice.Resources;
 using aLice.ViewModels;
 using CatSdk;
 using CatSdk.Crypto;
@@ -1015,7 +1016,7 @@ public static class SymbolTransaction
 
     static string ParseDeadline(BaseValue timestamp)
     {
-        if (CatSdk.Symbol.Network.TestNet.epocTime == null) throw new NullReferenceException("ネットワークのエポックタイムが設定されていません");
+        if (CatSdk.Symbol.Network.TestNet.epocTime == null) throw new NullReferenceException(AppResources.SymbolTranasction_NoEpocTime);
         var timeSpan = TimeSpan.FromSeconds(timestamp.Value);
         var deadline = CatSdk.Symbol.Network.TestNet.epocTime.Value.Add(timeSpan / 1000);
         var deadlineLocal = deadline.ToLocalTime();
@@ -1031,7 +1032,7 @@ public static class SymbolTransaction
     static string ParseSignerPublicKey(byte[] bytes)
     {
         return Converter.BytesToHex(bytes) == "0000000000000000000000000000000000000000000000000000000000000000" 
-            ? "※公開鍵が設定されていません、署名するとあなたのメインアカウントが設定せれます\n" 
+            ? $"{AppResources.SymbolTranasction_NoPublicKey}\n" 
             : $"SignerPublicKey: {Converter.BytesToHex(bytes)}\n";
     }
 }

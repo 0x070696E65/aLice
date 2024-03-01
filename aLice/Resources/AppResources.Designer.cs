@@ -284,5 +284,131 @@ namespace aLice.Resources {
                 return ResourceManager.GetString("WaitConfirmed_SuccessTransaction", resourceCulture);
             }
         }
+        
+        internal static string AccountViewModel_FailedBionic {
+            get {
+                return ResourceManager.GetString("AccountViewModel_FailedBionic", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_RequiredAccountName {
+            get {
+                return ResourceManager.GetString("AccountViewModel_RequiredAccountName", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_RequiredPassword {
+            get {
+                return ResourceManager.GetString("AccountViewModel_RequiredPassword", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_RequiredAddress {
+            get {
+                return ResourceManager.GetString("AccountViewModel_RequiredAddress", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_RequiredPrivateKey {
+            get {
+                return ResourceManager.GetString("AccountViewModel_RequiredPrivateKey", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_NotMatchPrivateKeyAndAddress {
+            get {
+                return ResourceManager.GetString("AccountViewModel_NotMatchPrivateKeyAndAddress", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_AccountAlreadyRegistered {
+            get {
+                return ResourceManager.GetString("AccountViewModel_AccountAlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        internal static string AccountViewModel_AddressAlreadyRegistered {
+            get {
+                return ResourceManager.GetString("AccountViewModel_AddressAlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_RequestSignature {
+            get {
+                return ResourceManager.GetString("RequestViewModel_RequestSignature", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_Utf8String {
+            get {
+                return ResourceManager.GetString("RequestViewModel_Utf8String", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_Hex {
+            get {
+                return ResourceManager.GetString("RequestViewModel_Hex", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_Cosignature {
+            get {
+                return ResourceManager.GetString("RequestViewModel_Cosignature", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_SymbolTransaction {
+            get {
+                return ResourceManager.GetString("RequestViewModel_SymbolTransaction", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_EncryptionMessage {
+            get {
+                return ResourceManager.GetString("RequestViewModel_EncryptionMessage", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_MultipleTransactions {
+            get {
+                return ResourceManager.GetString("RequestViewModel_MultipleTransactions", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_IncorrectRequest {
+            get {
+                return ResourceManager.GetString("RequestViewModel_IncorrectRequest", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_IncorrectNodeUrl {
+            get {
+                return ResourceManager.GetString("RequestViewModel_IncorrectNodeUrl", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_FailedAnnounce {
+            get {
+                return ResourceManager.GetString("RequestViewModel_FailedAnnounce", resourceCulture);
+            }
+        }
+        
+        internal static string RequestViewModel_NoAccount {
+            get {
+                return ResourceManager.GetString("RequestViewModel_NoAccount", resourceCulture);
+            }
+        }
+        
+        internal static string SymbolTranasction_NoPublicKey {
+            get {
+                return ResourceManager.GetString("SymbolTranasction_NoPublicKey", resourceCulture);
+            }
+        }
+        
+        internal static string SymbolTranasction_NoEpocTime {
+            get {
+                return ResourceManager.GetString("SymbolTranasction_NoEpocTime", resourceCulture);
+            }
+        }
     }
 }

@@ -126,4 +126,67 @@
 	<data name="WaitConfirmed_SuccessTransaction" xml:space="preserve">
 		<value>Transaction has been approved.</value>
 	</data>
+	<data name="AccountViewModel_FailedBionic" xml:space="preserve">
+		<value>Biometric authentication failed.</value>
+	</data>
+	<data name="AccountViewModel_RequiredAccountName" xml:space="preserve">
+		<value>Account name is required.</value>
+	</data>
+	<data name="AccountViewModel_RequiredPassword" xml:space="preserve">
+		<value>Password is required.</value>
+	</data>
+	<data name="AccountViewModel_RequiredAddress" xml:space="preserve">
+		<value>Address is required.</value>
+	</data>
+	<data name="AccountViewModel_RequiredPrivateKey" xml:space="preserve">
+		<value>Private key is required.</value>
+	</data>
+	<data name="AccountViewModel_NotMatchPrivateKeyAndAddress" xml:space="preserve">
+		<value>Private key and address do not match.</value>
+	</data>
+	<data name="AccountViewModel_AccountAlreadyRegistered" xml:space="preserve">
+		<value>Account name already registered.</value>
+	</data>
+	<data name="AccountViewModel_AddressAlreadyRegistered" xml:space="preserve">
+		<value>Address is already registered.</value>
+	</data>
+	<data name="RequestViewModel_RequestSignature" xml:space="preserve">
+		<value>Signature request from {0}.</value>
+	</data>
+	<data name="RequestViewModel_Utf8String" xml:space="preserve">
+		<value>UTF8 string.</value>
+	</data>
+	<data name="RequestViewModel_Hex" xml:space="preserve">
+		<value>Hexadecimal string of binary data.</value>
+	</data>
+	<data name="RequestViewModel_Cosignature" xml:space="preserve">
+		<value>Transaction co-signing request.</value>
+	</data>
+	<data name="RequestViewModel_SymbolTransaction" xml:space="preserve">
+		<value>Symbol transaction.</value>
+	</data>
+	<data name="RequestViewModel_EncryptionMessage" xml:space="preserve">
+		<value>Message encryption.</value>
+	</data>
+	<data name="RequestViewModel_MultipleTransactions" xml:space="preserve">
+		<value>Multiple transactions.</value>
+	</data>
+	<data name="RequestViewModel_IncorrectRequest" xml:space="preserve">
+		<value>Incorrect request.</value>
+	</data>
+	<data name="RequestViewModel_IncorrectNodeUrl" xml:space="preserve">
+		<value>The specified node is down or is not the correct node URL.</value>
+	</data>
+	<data name="RequestViewModel_FailedAnnounce" xml:space="preserve">
+		<value>Announcement failed.</value>
+	</data>
+	<data name="RequestViewModel_NoAccount" xml:space="preserve">
+		<value>The specified account does not exist.</value>
+	</data>
+	<data name="SymbolTranasction_NoPublicKey" xml:space="preserve">
+		<value>※ No public key is set, your main account will be set when you sign.</value>
+	</data>
+	<data name="SymbolTranasction_NoEpocTime" xml:space="preserve">
+		<value>Network epoch time is not set.</value>
+	</data>
 </root>

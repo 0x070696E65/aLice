@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using aLice.Models;
+using aLice.Resources;
 using aLice.Services;
 using CatSdk.Crypto;
 using CatSdk.CryptoTypes;
@@ -33,16 +34,16 @@ public abstract class RequestViewModel
         {
             var uri = new Uri(Notification.CallbackUrl);
             var baseUrl = $"{uri.Scheme}://{uri.Authority}";
-            domainText = $"{baseUrl}からの署名要求です";    
+            domainText = string.Format(AppResources.RequestViewModel_RequestSignature, baseUrl);    
         }
         if(Notification.RequestType == RequestType.SignUtf8)
         {
-            typeText = "UTF8文字列です";
+            typeText = AppResources.RequestViewModel_Utf8String;
             dataText = Converter.HexToUtf8(Notification.Data);
             BytesData = Converter.HexToBytes(Notification.Data);
         } else if(Notification.RequestType == RequestType.SignBinaryHex)
         {
-            typeText = "バイナリデータの16進数文字列です";
+            typeText = AppResources.RequestViewModel_Hex;
             dataText = Notification.Data;
             BytesData = Converter.HexToBytes(Notification.Data);
         }
@@ -53,7 +54,7 @@ public abstract class RequestViewModel
             
             SetMainAccountSignerPublicKey();
             
-            typeText = "トランザクションの連署要求です";
+            typeText = AppResources.RequestViewModel_Cosignature;
             dataText = ParseTransaction[0].parsedTransaction;
         }
         else if (Notification.RequestType == RequestType.SignTransaction)
@@ -63,12 +64,12 @@ public abstract class RequestViewModel
             
             SetMainAccountSignerPublicKey();
             
-            typeText = "Symbolのトランザクションです";
+            typeText = AppResources.RequestViewModel_SymbolTransaction;
             dataText = ParseTransaction[0].parsedTransaction;
 
             if (Notification.RecipientPublicKeyForEncryptMessage != null && ParseTransaction[0].transaction.Type == TransactionType.TRANSFER)
             {
-                typeText += "\nメッセージの暗号化を行います。";
+                typeText += $"\n{AppResources.RequestViewModel_EncryptionMessage}";
             }
         }
         else if (Notification.RequestType == RequestType.Batches)
@@ -81,9 +82,9 @@ public abstract class RequestViewModel
                 dataText += tx.parsedTransaction;
                 ParseTransaction.Add(tx);
             }
-            typeText = "複数のトランザクションです";
+            typeText = AppResources.RequestViewModel_MultipleTransactions;
         }
-        var askText = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
+        var askText = string.Format(AppResources.RequestSign_ConfirmSign, AccountViewModel.MainAccount.accountName);
         return (domainText, typeText, dataText, askText);
     }
     
@@ -97,7 +98,7 @@ public abstract class RequestViewModel
         {
             var uri = new Uri(Notification.CallbackUrl);
             var baseUrl = $"{uri.Scheme}://{uri.Authority}";
-            domainText = $"{baseUrl}からの署名要求です";    
+            domainText = string.Format(AppResources.RequestViewModel_RequestSignature, baseUrl);  
         }
         
         if (Notification.RequestType == RequestType.Batches)
@@ -110,9 +111,9 @@ public abstract class RequestViewModel
                 datas.Add(tx.parsedTransaction);
                 ParseTransaction.Add(tx);
             }
-            typeText = "複数のトランザクションです";
+            typeText = AppResources.RequestViewModel_MultipleTransactions;
         }
-        var askText = $"{AccountViewModel.MainAccount.accountName}で署名しますか？";
+        var askText = string.Format(AppResources.RequestSign_ConfirmSign, AccountViewModel.MainAccount.accountName);
         return (domainText, typeText, datas, askText);
     }
 
@@ -124,7 +125,7 @@ public abstract class RequestViewModel
             RequestType.SignTransaction or RequestType.SignUtf8 or RequestType.SignBinaryHex or RequestType.SignCosignature =>
                 await AcceptRequestSign(password),
             RequestType.Batches => await AcceptRequestBatches(password),
-            _ => throw new Exception("不正なリクエストです")
+            _ => throw new Exception(AppResources.RequestViewModel_IncorrectRequest)
         };
     }
 
@@ -180,7 +181,7 @@ public abstract class RequestViewModel
                 }
             } catch
             {
-                throw new Exception("パスワードが間違っています");
+                throw new Exception(AppResources.LangUtil_FailedPassword);
             }   
         }
         var keyPair = new KeyPair(new PrivateKey(privateKey));
@@ -246,7 +247,7 @@ public abstract class RequestViewModel
                 case "announce_bonded":
                     return await Announce(signedPayload, AnnounceType.Bonded);
                 default:
-                    throw new Exception("不正なリクエストです");
+                    throw new Exception(AppResources.RequestViewModel_IncorrectRequest);
             }
         }
         else if (Notification.RequestType == RequestType.SignCosignature)
@@ -274,7 +275,7 @@ public abstract class RequestViewModel
                     dic = AddQuery(Notification.CallbackUrl, dic);
                     return await Post(dic);
                 default:
-                    throw new Exception("不正なリクエストです");
+                    throw new Exception(AppResources.RequestViewModel_IncorrectRequest);
             }
         }
         else
@@ -294,7 +295,7 @@ public abstract class RequestViewModel
                 case "get":
                     return Get(Converter.BytesToHex(signature.bytes), "signature");
                 default:
-                    throw new Exception("不正なリクエストです");
+                    throw new Exception(AppResources.RequestViewModel_IncorrectRequest);
             }
         }
     }
@@ -317,7 +318,7 @@ public abstract class RequestViewModel
                 }
             } catch
             {
-                throw new Exception("パスワードが間違っています");
+                throw new Exception(AppResources.LangUtil_FailedPassword);
             }   
         }
         var keyPair = new KeyPair(new PrivateKey(privateKey));
@@ -367,7 +368,7 @@ public abstract class RequestViewModel
                 return (ResultType.Callback, callbackUrl);
             }
             default:
-                throw new Exception("不正なリクエストです");
+                throw new Exception(AppResources.RequestViewModel_IncorrectRequest);
         }
     }
 
@@ -410,7 +411,7 @@ public abstract class RequestViewModel
         var symbolService = new Symbol(Notification.Node);
         if (!await symbolService.CheckNodeHealth())
         {
-            throw new Exception("指定されたノードがダウンしているか、正しいノードURLではありません");
+            throw new Exception(AppResources.RequestViewModel_IncorrectNodeUrl);
         };
         try
         {
@@ -424,14 +425,14 @@ public abstract class RequestViewModel
         }
         catch
         {
-            throw new Exception("アナウンスに失敗しました");
+            throw new Exception(AppResources.RequestViewModel_FailedAnnounce);
         }
     }
     
     public static SavedAccount GetRequestAccount()
     {
         var list = AccountViewModel.Accounts.accounts.ToList().Find(acc => acc.publicKey == Notification.SetPublicKey);
-        if(list == null) throw new Exception("指定されたアカウントが存在しません");
+        if(list == null) throw new Exception(AppResources.RequestViewModel_NoAccount);
         return list;
     }
     
