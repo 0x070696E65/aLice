@@ -122,7 +122,7 @@ public partial class MainPage : ContentPage
                         action = await DisplayActionSheet("Select", "cancel", null, AppResources.MainPage_SettingMainAccount,AppResources.LangUtil_AddressCopy, AppResources.LangUtil_PublicKeyCopy, AppResources.LangUtil_PrivateKeyCopy, AppResources.LangUtil_Biometrics, AppResources.LangUtil_Delete);
                     }
 
-                    if (action == AppResources.LangUtil_AddressCopy)
+                    if (action == AppResources.MainPage_SettingMainAccount)
                     {
                         await OnChangeMainAccount(acc.address, acc.accountName);
                     } else if (action == AppResources.LangUtil_AddressCopy)
