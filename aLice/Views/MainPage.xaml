@@ -35,6 +35,17 @@
                     BackgroundColor="White"/>
             </Grid>
             
+            <Button
+                x:Name="DebugPostButton"
+                Text="POST Test"
+                Clicked="OnDebugButton"
+                BackgroundColor="Green"
+                TextColor="White"
+                FontSize="18"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                IsVisible="False" />
+            
             <Label
                 Text="- aLice -"
                 SemanticProperties.HeadingLevel="Level1"
@@ -48,6 +59,7 @@
                 SemanticProperties.Description="Sign with your Symbol account."
                 FontSize="14"
                 HorizontalOptions="Center" />
+            
             
             <StackLayout x:Name="AccountList" />
                 

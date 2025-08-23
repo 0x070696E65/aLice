@@ -58,7 +58,6 @@ public abstract class RequestViewModel
         else if (Notification.RequestType == RequestType.SignTransaction)
         {
             ParseTransaction.Clear();
-            ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline));
             
             SetMainAccountSignerPublicKey();
             
@@ -75,10 +74,21 @@ public abstract class RequestViewModel
             ParseTransaction.Clear();
             foreach (var s in Notification.Batches)
             {
-                var tx = SymbolTransaction.ParseEmbeddedTransaction(s);
-                tx.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
-                dataText += tx.parsedTransaction;
-                ParseTransaction.Add(tx);
+                try
+                {
+                    var tx = SymbolTransaction.ParseEmbeddedTransaction(s);
+                    tx.transaction.SignerPublicKey =
+                        new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                    dataText += tx.parsedTransaction;
+                    ParseTransaction.Add(tx);
+                }
+                catch
+                {
+                    var tx = SymbolTransaction.ParseTransaction(s, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline);
+                    tx.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                    dataText += tx.parsedTransaction;
+                    ParseTransaction.Add(tx);
+                }
             }
             typeText = AppResources.RequestViewModel_MultipleTransactions;
         }
@@ -102,10 +112,20 @@ public abstract class RequestViewModel
             ParseTransaction.Clear();
             foreach (var s in Notification.Batches)
             {
-                var tx = SymbolTransaction.ParseEmbeddedTransaction(s);
-                tx.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
-                datas.Add(tx.parsedTransaction);
-                ParseTransaction.Add(tx);
+                try
+                {
+                    var tx = SymbolTransaction.ParseEmbeddedTransaction(s);
+                    tx.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                    datas.Add(tx.parsedTransaction);
+                    ParseTransaction.Add(tx);
+                }
+                catch
+                {
+                    var tx = SymbolTransaction.ParseTransaction(s, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline);
+                    tx.transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                    datas.Add(tx.parsedTransaction);
+                    ParseTransaction.Add(tx);
+                }
             }
             typeText = AppResources.RequestViewModel_MultipleTransactions;
         }
@@ -331,22 +351,26 @@ public abstract class RequestViewModel
         var keyPair = new KeyPair(new PrivateKey(privateKey));
         
         var network = ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet;
-        var metal = new Services.Metal(network);
-
         var txs = ParseTransaction.Select(valueTuple => valueTuple.transaction).ToList();
         
-        var aggs = metal.SignedAggregateCompleteTxBatches(txs, keyPair, network);
+        var facade = new CatSdk.Facade.SymbolFacade(network);
+        var transactions = new List<ITransaction>();
+        foreach (var t in txs)
+        {
+            var signature = facade.SignTransaction(keyPair, t);
+            transactions.Add(CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction((ITransaction)t,
+                signature));
+        }
         switch (Notification.Method)
         {
             case "post":
             {
                 var dic = new Dictionary<string, string> {{"pubkey", AccountViewModel.MainAccount.publicKey}};
-                for (var i = 0; i < aggs.Count; i++)
+                for (var i = 0; i < transactions.Count; i++)
                 {
-                    dic.Add("signed" + i, Converter.BytesToHex(aggs[i].Serialize()));
-                    Console.WriteLine("SIGNED");
+                    Console.WriteLine(transactions[i].Type);
+                    dic.Add("signed" + i, Converter.BytesToHex(transactions[i].Serialize()));
                 }
-                Console.WriteLine(dic);
                 dic = AddQuery(Notification.CallbackUrl, dic);
                 return await Post(dic);
             }
@@ -355,9 +379,9 @@ public abstract class RequestViewModel
                 var callbackUrl = "";
                 var additionalParam = $"pubkey={AccountViewModel.MainAccount.publicKey}";
                 callbackUrl = Notification.CallbackUrl.Contains('?') ? $"{Notification.CallbackUrl}&{additionalParam}" : $"{Notification.CallbackUrl}?{additionalParam}";
-                for (var i = 0; i < aggs.Count; i++)
+                for (var i = 0; i < transactions.Count; i++)
                 {
-                    var signedPayload = Converter.BytesToHex(aggs[i].Serialize());
+                    var signedPayload = Converter.BytesToHex(transactions[i].Serialize());
                     callbackUrl += $"&signed{i}={signedPayload}";
                 }
                 return (ResultType.Callback, callbackUrl);

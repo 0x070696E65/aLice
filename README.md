@@ -169,10 +169,10 @@ const data = Convert.uint8ToHex(new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x
 `{callbackUrl}?signature=${signature}&pubkey=${publicKey}&original_data=${data}`
 
 #### request_sign_batches
-複数のInnerTransactionに全て署名します。
-今の所Metal用です。
+複数のTransactionに全て署名します。
 以下のようにtxsの16進数文字列をbatchクエリに追加してください。
-データ数が大きくなることが想定されます。`&method=post`にしてください。URLが長すぎると画面遷移できません。
+データ数が大きくなることが想定されます。`&method=post`推奨です。URLが長すぎると画面遷移できません。
+getでも戻り値が長すぎなければ使えますが、ご理解の上使ってください。
 ```javascript
 import {MetalService} from "metal-on-symbol";
 const { txs, key, additive } = await metalService.createForgeTxs(

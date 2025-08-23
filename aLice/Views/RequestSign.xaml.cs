@@ -127,7 +127,7 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
-            await Console.Error.WriteLineAsync(exception.Message);
+            await Console.Error.WriteLineAsync($"AcceptRequestSignError: {exception.Message}");
             await Console.Error.WriteLineAsync(exception.StackTrace);
         }
     }

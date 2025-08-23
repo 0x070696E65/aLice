@@ -3,6 +3,7 @@ using aLice.Models;
 using aLice.Resources;
 using aLice.ViewModels;
 using System.Globalization;
+using System.Net.Http.Json;
 
 namespace aLice.Views;
 
@@ -11,6 +12,25 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+#if DEBUG
+        DebugPostButton.IsVisible = true;
+#endif
+    }
+    
+    private async void OnDebugButton(object sender, EventArgs e)
+    {
+        try
+        {
+            using var client = new HttpClient();
+            var payload = new { text = "MAUIから送信！" };
+            var response = await client.PostAsJsonAsync("http://10.0.2.2:3000/request", payload);
+            var result = await response.Content.ReadAsStringAsync();
+            await DisplayAlert("Response", result, "OK");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
     }
     
     private void OnLocalizeChanged(object sender, EventArgs e)
