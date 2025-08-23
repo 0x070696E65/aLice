@@ -5,3 +5,7 @@ obj/
 .vs/
 .git/
 aLice.ipa
+my-release-key.keystore
+my-release-key.pem
+aLice.sln.DotSettings.user
+global.json

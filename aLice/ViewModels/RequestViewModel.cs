@@ -32,9 +32,7 @@ public abstract class RequestViewModel
         var dataText = "";
         if (Notification.CallbackUrl != null)
         {
-            var uri = new Uri(Notification.CallbackUrl);
-            var baseUrl = $"{uri.Scheme}://{uri.Authority}";
-            domainText = string.Format(AppResources.RequestViewModel_RequestSignature, baseUrl);    
+            domainText = string.Format(AppResources.RequestViewModel_RequestSignature, Notification.BaseUrl);    
         }
         if(Notification.RequestType == RequestType.SignUtf8)
         {
@@ -96,9 +94,7 @@ public abstract class RequestViewModel
         
         if (Notification.CallbackUrl != null)
         {
-            var uri = new Uri(Notification.CallbackUrl);
-            var baseUrl = $"{uri.Scheme}://{uri.Authority}";
-            domainText = string.Format(AppResources.RequestViewModel_RequestSignature, baseUrl);  
+            domainText = string.Format(AppResources.RequestViewModel_RequestSignature, Notification.BaseUrl);  
         }
         
         if (Notification.RequestType == RequestType.Batches)
@@ -131,9 +127,21 @@ public abstract class RequestViewModel
 
     public static (bool isCallBack, string result) Reject()
     {
-        if (Notification.CallbackUrl == null)
+        if (Notification.CallbackUrl == null || Notification.Method == "post")
         {
             return (false, "");
+        }
+
+        if (Notification.Method == "post")
+        {
+            var redirectUrl = Notification.CallbackUrl;
+            if (Notification.CallbackUrl.Contains('?')) {
+                redirectUrl += "&" + RejectParam;
+            }
+            else {
+                redirectUrl += "?" + RejectParam;
+            }
+            return (true, redirectUrl);
         }
         
         var callbackUrl = Notification.CallbackUrl;
@@ -204,7 +212,6 @@ public abstract class RequestViewModel
                         var newArr = new byte[m.Length + 1];
                         zero.CopyTo(newArr, 0);
                         m.CopyTo(newArr, 1);
-                        Console.WriteLine(Converter.BytesToHex(newArr));
                         ((TransferTransactionV1) ParseTransaction[0].transaction).Message = newArr;
                         TransactionHelper.SetMaxFee(transferTransaction, Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100);
                     }
@@ -328,19 +335,7 @@ public abstract class RequestViewModel
 
         var txs = ParseTransaction.Select(valueTuple => valueTuple.transaction).ToList();
         
-        foreach (var baseTransaction in txs)
-        {
-            Console.WriteLine(baseTransaction);    
-        }
-        
         var aggs = metal.SignedAggregateCompleteTxBatches(txs, keyPair, network);
-        foreach (var aggregateCompleteTransactionV2 in aggs)
-        {
-            Console.WriteLine(aggregateCompleteTransactionV2);
-        }
-        Console.WriteLine(txs.Count);
-        Console.WriteLine(aggs.Count);
-        Console.WriteLine(aggs[0].Transactions.Length);
         switch (Notification.Method)
         {
             case "post":
@@ -350,8 +345,8 @@ public abstract class RequestViewModel
                 {
                     dic.Add("signed" + i, Converter.BytesToHex(aggs[i].Serialize()));
                     Console.WriteLine("SIGNED");
-                    Console.WriteLine(Converter.BytesToHex(aggs[i].Serialize()));
                 }
+                Console.WriteLine(dic);
                 dic = AddQuery(Notification.CallbackUrl, dic);
                 return await Post(dic);
             }
@@ -377,14 +372,8 @@ public abstract class RequestViewModel
         using var client = new HttpClient();
         var content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json");
         var uri = new Uri(Notification.CallbackUrl);
-        Console.WriteLine(uri.GetLeftPart(UriPartial.Path));
-        foreach (var keyValuePair in dic)
-        {
-            Console.WriteLine(keyValuePair.Key);
-            Console.WriteLine(keyValuePair.Value);
-        }
         var response = client.PostAsync(uri.GetLeftPart(UriPartial.Path), content).Result;
-        await response.Content.ReadAsStringAsync();
+        Console.WriteLine(await response.Content.ReadAsStringAsync());
         return Notification.RedirectUrl != null ? (ResultType.Callback, Notification.RedirectUrl) : (ResultType.Close, "");
     }
 
@@ -463,7 +452,6 @@ public abstract class RequestViewModel
                 aggregateTx.TransactionsHash = merkleHash;
             }
         }
-        Console.WriteLine(Converter.BytesToHex(ParseTransaction[0].transaction.Serialize()));
         
         if (ParseTransaction[0].transaction is AggregateBondedTransactionV2)
         {
@@ -484,18 +472,21 @@ public abstract class RequestViewModel
             }
         }
     }
-
+    
     private static Dictionary<string, string> AddQuery(string url, Dictionary<string, string> dic)
     {
-        var queryString = url.Split('?').LastOrDefault();
-        if (queryString != null)
+        var parts = url.Split('?');
+        if (parts.Length > 1)
         {
+            var queryString = parts[1];
             var dict = queryString.Split('&')
                 .Select(s => s.Split('='))
+                .Where(a => a.Length == 2)
                 .ToDictionary(a => a[0], a => a[1]);
+
             foreach (var keyValuePair in dict)
             {
-                dic.Add(keyValuePair.Key, keyValuePair.Value);
+                dic[keyValuePair.Key] = keyValuePair.Value;
             }
         }
         return dic;

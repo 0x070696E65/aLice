@@ -85,6 +85,8 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
+            await Console.Error.WriteLineAsync(exception.Message);
+            await Console.Error.WriteLineAsync(exception.StackTrace);
         }
     }
     
@@ -99,7 +101,8 @@ public partial class RequestSign : ContentPage
             switch (resultType)
             {
                 case ResultType.Callback:
-                    await Launcher.OpenAsync(new Uri(result));
+                    var uri = new Uri(result);
+                    await Launcher.OpenAsync(uri);
                     break;
                 case ResultType.Announce:
                     await Application.Current.MainPage.Navigation.PushModalAsync(new WaitConfirmed(result, AnnounceType.Normal));
@@ -113,6 +116,8 @@ public partial class RequestSign : ContentPage
                 case ResultType.ShowData:
                     await Application.Current.MainPage.Navigation.PushModalAsync(new ShowPage("Signature", result));
                     break;
+                case ResultType.Close:
+                    break;
                 default:
                     throw new Exception("指定されたタイプは存在しません");
             }
@@ -122,6 +127,8 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
+            await Console.Error.WriteLineAsync(exception.Message);
+            await Console.Error.WriteLineAsync(exception.StackTrace);
         }
     }
     
@@ -143,6 +150,8 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
+            await Console.Error.WriteLineAsync(exception.Message);
+            await Console.Error.WriteLineAsync(exception.StackTrace);
         }
     }
     
@@ -161,6 +170,8 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
+            await Console.Error.WriteLineAsync(exception.Message);
+            await Console.Error.WriteLineAsync(exception.StackTrace);
         }
     }
 }

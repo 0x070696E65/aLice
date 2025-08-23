@@ -88,7 +88,10 @@ public partial class App : Application
     static private async Task NotificationError(string message)
     {
         if (Current?.MainPage != null)
+        {
             await Current.MainPage.DisplayAlert("Error", $"{AppResources.App_NotificationError}\n{message}", AppResources.LangUtil_Close);
+            await Console.Error.WriteLineAsync(message);
+        }
     }
 
     static private async Task ApproveDomain(string baseUrl, string callbackUrl)

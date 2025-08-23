@@ -994,7 +994,7 @@ public static class SymbolTransaction
     {
         var result = "";
         result += $"Network: {ParseNetworkType(networkType)}\n";
-        result += $"Deadline: {ParseDeadline(deadline)}\n";
+        result += $"Deadline: {ParseDeadline(networkType, deadline)}\n";
         result += $"MaxFee: {ParseFee(fee)}\n";
         return result;
     }
@@ -1014,11 +1014,11 @@ public static class SymbolTransaction
         return ((double)fee.Value / 1000000).ToString(CultureInfo.InvariantCulture);
     }
 
-    static string ParseDeadline(BaseValue timestamp)
+    static string ParseDeadline(NetworkType networkType, BaseValue timestamp)
     {
-        if (CatSdk.Symbol.Network.TestNet.epocTime == null) throw new NullReferenceException(AppResources.SymbolTranasction_NoEpocTime);
+        if (CatSdk.Symbol.Network.TestNet.epocTime == null || CatSdk.Symbol.Network.MainNet.epocTime == null) throw new NullReferenceException(AppResources.SymbolTranasction_NoEpocTime);
         var timeSpan = TimeSpan.FromSeconds(timestamp.Value);
-        var deadline = CatSdk.Symbol.Network.TestNet.epocTime.Value.Add(timeSpan / 1000);
+        var deadline = networkType == NetworkType.TESTNET ? CatSdk.Symbol.Network.TestNet.epocTime.Value.Add(timeSpan / 1000) : CatSdk.Symbol.Network.MainNet.epocTime.Value.Add(timeSpan / 1000);
         var deadlineLocal = deadline.ToLocalTime();
         return deadlineLocal.ToString(CultureInfo.InvariantCulture);
     }
