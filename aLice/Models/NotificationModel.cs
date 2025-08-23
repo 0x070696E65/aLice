@@ -16,6 +16,7 @@ public class NotificationModel
     public string SetPublicKey;
     public readonly string Node;
     public readonly string Deadline;
+    public readonly string HashLockDuration;
     public readonly SdkVersion SdkVersion = SdkVersion.V3;
     public NotificationModel(string _uri)
     {
@@ -66,6 +67,11 @@ public class NotificationModel
         if (hasFeeMultiplier)
         {
             FeeMultiplier = _feeMultiplier;
+        }
+        var hasHashLockDuration = dict.TryGetValue("hash_lock_duration", out var _hashLockDuration);
+        if (hasHashLockDuration)
+        {
+            HashLockDuration = _hashLockDuration;
         }
 
         var hasRedirectUrl = dict.TryGetValue("redirect_url", out var _redirectUrl);

@@ -21,26 +21,22 @@
         <ApplicationIdGuid>1E47EC8D-2DC8-4A49-8AF0-BBCFCA12D518</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.17.1</ApplicationDisplayVersion>
-        <ApplicationVersion>61</ApplicationVersion>
+        <ApplicationDisplayVersion>1.17.2</ApplicationDisplayVersion>
+        <ApplicationVersion>63</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
         <TargetFrameworkVersion>v15.0</TargetFrameworkVersion>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-ios|AnyCPU'">
         <CreatePackage>false</CreatePackage>
         <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
         <CodesignProvision>alice</CodesignProvision>
         <CodesignKey>iPhone Developer</CodesignKey>
         <MtouchLink>SdkOnly</MtouchLink>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
       <CreatePackage>false</CreatePackage>
         <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs><SelfContained>true</SelfContained>
 <CodesignProvision>alice_release_2024</CodesignProvision>
@@ -49,22 +45,12 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <MtouchLink>None</MtouchLink>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-      <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
         <AndroidKeyStore>true</AndroidKeyStore>
         <AndroidSigningKeyStore>/Users/matsukawatoshiya/Desktop/aLice/my-release-key.keystore</AndroidSigningKeyStore>
         <AndroidSigningStorePass>toshiya5955</AndroidSigningStorePass>
         <AndroidSigningKeyAlias>my-key-alias</AndroidSigningKeyAlias>
         <AndroidSigningKeyPass>toshiya5955</AndroidSigningKeyPass>
-        <AndroidMinSdkVersion>24</AndroidMinSdkVersion>
-        <AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>
-        <AndroidCompileSdkVersion>35</AndroidCompileSdkVersion>
-        <AndroidManifestTargetSdkVersion>35</AndroidManifestTargetSdkVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
         <AndroidMinSdkVersion>24</AndroidMinSdkVersion>
         <AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>
         <AndroidCompileSdkVersion>35</AndroidCompileSdkVersion>
@@ -109,6 +95,10 @@
         <Reference Include="MetalOnSymbol">
           <HintPath>Plugins\MetalOnSymbol.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.82" />
     </ItemGroup>
 
     <ItemGroup>

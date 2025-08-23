@@ -58,6 +58,7 @@ public abstract class RequestViewModel
         else if (Notification.RequestType == RequestType.SignTransaction)
         {
             ParseTransaction.Clear();
+            ParseTransaction.Add(SymbolTransaction.ParseTransaction(Notification.Data, Notification.RecipientPublicKeyForEncryptMessage, Notification.FeeMultiplier, Notification.Deadline));
             
             SetMainAccountSignerPublicKey();
             
@@ -210,7 +211,7 @@ public abstract class RequestViewModel
             } catch
             {
                 throw new Exception(AppResources.LangUtil_FailedPassword);
-            }   
+            }
         }
         var keyPair = new KeyPair(new PrivateKey(privateKey));
 
@@ -255,7 +256,7 @@ public abstract class RequestViewModel
                 CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction((ITransaction)ParseTransaction[0].transaction,
                     signature);
             var signedPayload = Converter.BytesToHex(signedTransaction.Serialize());
-
+            
             switch (Notification.Method)
             {
                 case "post":
@@ -265,10 +266,21 @@ public abstract class RequestViewModel
                         {"original_data", Notification.Data},
                         {"signed_payload", signedPayload},
                     };
+                    if (Notification.HashLockDuration != null)
+                    {
+                        var signedHashLockPayload = GenerateHashLockTransaction(signedTransaction, facade, keyPair);
+                        dic.Add("signed_hash_lock_payload", signedHashLockPayload);
+                    }
                     dic = AddQuery(Notification.CallbackUrl, dic);
                     return await Post(dic);
                 case "get":
-                    return Get(signedPayload, "signed_payload");
+                    var optionParam = "";
+                    if (Notification.HashLockDuration != null)
+                    {
+                        var signedHashLockPayload = GenerateHashLockTransaction(signedTransaction, facade, keyPair);
+                        optionParam = $"&signed_hash_lock_payload={signedHashLockPayload}";
+                    }
+                    return Get(signedPayload, "signed_payload", optionParam);
                 case "announce":
                     return await Announce(signedPayload);
                 case "announce_bonded":
@@ -401,12 +413,12 @@ public abstract class RequestViewModel
         return Notification.RedirectUrl != null ? (ResultType.Callback, Notification.RedirectUrl) : (ResultType.Close, "");
     }
 
-    private static (ResultType resultType, string result) Get(string signedContent, string contentKey)
+    private static (ResultType resultType, string result) Get(string signedContent, string contentKey, string optionParam = "")
     {
         if (Notification.CallbackUrl == null) return (ResultType.ShowData, signedContent);
         var callbackUrl = "";
         var additionalParam =
-            $"{contentKey}={signedContent}&original_data={Notification.Data}&pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}";
+            $"{contentKey}={signedContent}&original_data={Notification.Data}&pubkey={AccountViewModel.MainAccount.publicKey}&network={AccountViewModel.MainAccount.networkType}{optionParam}";
         if (Notification.CallbackUrl.Contains('?'))
         {
             callbackUrl += $"{Notification.CallbackUrl}&{additionalParam}";
@@ -451,7 +463,7 @@ public abstract class RequestViewModel
     
     private static string GetPrivateKey(string password)
     {
-        return CatSdk.Crypto.Crypto.DecryptString(AccountViewModel.MainAccount.encryptedPrivateKey, password, AccountViewModel.MainAccount.address);
+        return Crypto.DecryptString(AccountViewModel.MainAccount.encryptedPrivateKey, password, AccountViewModel.MainAccount.address);
     }
 
     public static void SetMainAccountSignerPublicKey()
@@ -514,5 +526,30 @@ public abstract class RequestViewModel
             }
         }
         return dic;
+    }
+
+    private static string GenerateHashLockTransaction(ITransaction signedTransaction, SymbolFacade facade, KeyPair keyPair)
+    {
+        var lockMosaic = signedTransaction.Network == NetworkType.MAINNET ? 0x6BED913FA20223F8 : 0x72C0212E67A08BCE;
+        var hashLockTransaction = new HashLockTransactionV1()
+        {
+            Deadline = new Timestamp(signedTransaction.Deadline.Value),
+            Duration = new BlockDuration(ulong.Parse(Notification.HashLockDuration)),
+            Hash = facade.HashTransaction(signedTransaction),
+            Network = signedTransaction.Network,
+            Mosaic = new UnresolvedMosaic()
+            {
+                MosaicId = new UnresolvedMosaicId((ulong) lockMosaic),
+                Amount = new Amount(10 * 1000000)
+            },
+            SignerPublicKey = signedTransaction.SignerPublicKey
+        };
+        var feeMultiplier = Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100;
+        hashLockTransaction.Fee = new Amount((ulong)(hashLockTransaction.Size * feeMultiplier));
+        var signatureHashLock = facade.SignTransaction(keyPair, hashLockTransaction);
+        var signedHashLockTransaction =
+            CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction(hashLockTransaction,
+                signatureHashLock);
+        return Converter.BytesToHex(signedHashLockTransaction.Serialize());
     }
 }

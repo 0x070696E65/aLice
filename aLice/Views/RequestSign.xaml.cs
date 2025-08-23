@@ -50,8 +50,8 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
-            Console.WriteLine(exception.Message);
-            Console.WriteLine(exception.StackTrace);
+            await Console.Error.WriteLineAsync($"RequestSign OnAppearing: {exception.Message}");
+            await Console.Error.WriteLineAsync(exception.StackTrace);
             if (Navigation.ModalStack.Count > 0)
             {
                 await Navigation.PopModalAsync();
@@ -85,7 +85,7 @@ public partial class RequestSign : ContentPage
         catch (Exception exception)
         {
             await DisplayAlert("Error", exception.Message, AppResources.LangUtil_Close);
-            await Console.Error.WriteLineAsync(exception.Message);
+            await Console.Error.WriteLineAsync($"ShowRequestSignError: {exception.Message}");
             await Console.Error.WriteLineAsync(exception.StackTrace);
         }
     }

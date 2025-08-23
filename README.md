@@ -18,17 +18,18 @@
 \- aLice \- のカスタムURLスキームは `alice://` です。prefixには`sign`を使います。
 
 ### クエリパラメータ
-| クエリパラメータ       | 値                                                                                                        | 
-|----------------|----------------------------------------------------------------------------------------------------------| 
+| クエリパラメータ       | 値                                                                                                          | 
+|----------------|------------------------------------------------------------------------------------------------------------| 
 | type           | request_sign_transaction, request_sign_utf8, request_sign_binary_hex, request_pubkey, request_sign_batches |
-| data           | 署名するデータ(string)                                                                                          |
-| callback       | これらをhexにする（https://hogehoge.com/callback）                                           |
-| batch          | batch0, batch1, batch2 ...                                                                               |
-| method         | get, post, announce                                                                                      |
-| redirect_url   | これらをhexにする (https://google.com)                                                                          |
-| set_public_key | 公開鍵を渡してアカウントを指定する                                                                                        |
-| deadline       | トランザクションのDeadlineをaLiceで設定する                                                                             |
-| node           | request_sign_transactionのみノードを指定することでaLiceがアナウンスします（method=announce)                                     |
+| data           | 署名するデータ(string)                                                                                            |
+| callback       | これらをhexにする（https://hogehoge.com/callback）                                                                  |
+| batch          | batch0, batch1, batch2 ...                                                                                 |
+| method         | get, post, announce                                                                                        |
+| redirect_url   | これらをhexにする (https://google.com)                                                                            |
+| set_public_key | 公開鍵を渡してアカウントを指定する                                                                                          |
+| deadline       | トランザクションのDeadlineをaLiceで設定する                                                                               |
+| node           | request_sign_transactionのみノードを指定することでaLiceがアナウンスします（method=announce)                                       |
+| hash_lock_duration | 指定することでBondedに対してHashLockTxを作成しハッシュを返します                                                                   |
 <br>
 ex)
 `alice://sign?data=${data}&type=${request_type}&callback=${callbackURL}`
@@ -138,6 +139,11 @@ const tx = TransferTransaction.create(
 ```
 
 v3の場合はMessage領域にUTF8をbyte[]に変換し冒頭に[0x01]を追加してください
+
+#### AggregateBonded & HashLock
+クエリhash_lock_durationに値を与えることで、自動的にaLice内でHashLockTransactionを作成し、署名後signed_hash_lock_payloadを返します。
+type=request_sign_transactionとし、dataにはアグリゲートボンデッドのペイロードを与えてください。
+戻り値が長くなるのでmethodはpost推奨です。おそらくgetではエラーになります。
 
 #### 注意点
 トランザクションやインナートランザクションに公開鍵が設定されていない場合、aLiceのメインアカウントを自動的に設定します。
