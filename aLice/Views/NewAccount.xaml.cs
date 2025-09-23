@@ -1,8 +1,7 @@
 using aLice.Resources;
 using aLice.ViewModels;
-using CatSdk.Facade;
-using CatSdk.Symbol;
-using CatSdk.Utils;
+using SymbolSdk;
+using SymbolSdk.Symbol;
 
 namespace aLice.Views;
 
@@ -36,8 +35,8 @@ public partial class NewAccount : ContentPage
             
             var networkType = NetworkType switch
             {
-                "MainNet" => CatSdk.Symbol.Network.MainNet,
-                "TestNet" => CatSdk.Symbol.Network.TestNet,
+                "MainNet" => SymbolSdk.Symbol.Network.MainNet,
+                "TestNet" => SymbolSdk.Symbol.Network.TestNet,
                 _ => throw new Exception(AppResources.LangUtil_IncorrectNetwork)
             };
             var facade = new SymbolFacade(networkType);
@@ -54,7 +53,7 @@ public partial class NewAccount : ContentPage
             
             if (!result) return;
 
-            var encryptedPrivateKey = CatSdk.Crypto.Crypto.EncryptString(keyPair.PrivateKey.ToString(), Password.Text, address);
+            var encryptedPrivateKey = SymbolSdk.Crypto.EncryptString(keyPair.PrivateKey.ToString(), Password.Text, address);
 
             // 保存処理
             await AccountViewModel.SaveAccount(

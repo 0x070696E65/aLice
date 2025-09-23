@@ -2,9 +2,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using aLice.Resources;
-using CatSdk.CryptoTypes;
-using CatSdk.Facade;
-using CatSdk.Symbol;
+using SymbolSdk;
+using SymbolSdk.Symbol;
 
 namespace aLice.Views;
 
@@ -46,8 +45,8 @@ public partial class BarcodeReader : ContentPage
             if (!isCorrectFormat) return;
             var network = networkId switch
             {
-                152 => CatSdk.Symbol.Network.TestNet,
-                104 => CatSdk.Symbol.Network.MainNet,
+                152 => SymbolSdk.Symbol.Network.TestNet,
+                104 => SymbolSdk.Symbol.Network.MainNet,
                 _ => throw new Exception("Invalid network id")
             };
             var facade = new SymbolFacade(network);

@@ -2,9 +2,10 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using aLice.Models;
 using aLice.Resources;
-using CatSdk.Facade;
+using SymbolSdk;
 using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;
+using SymbolSdk.Symbol;
 
 namespace aLice.ViewModels;
 
@@ -43,7 +44,7 @@ public abstract class AccountViewModel
     {
         try {
             var acc = Accounts.accounts.ToList().Find(acc => acc.address == address);
-            return CatSdk.Crypto.Crypto.DecryptString(acc.encryptedPrivateKey, password, acc.address);
+            return SymbolSdk.Crypto.DecryptString(acc.encryptedPrivateKey, password, acc.address);
         }
         catch {
             throw new Exception(AppResources.LangUtil_FailedPassword);
@@ -177,8 +178,8 @@ public abstract class AccountViewModel
             {
                 var networkType = NetworkType switch
                 {
-                    "MainNet" => CatSdk.Symbol.Network.MainNet,
-                    "TestNet" => CatSdk.Symbol.Network.TestNet,
+                    "MainNet" => SymbolSdk.Symbol.Network.MainNet,
+                    "TestNet" => SymbolSdk.Symbol.Network.TestNet,
                     _ => throw new Exception(AppResources.LangUtil_IncorrectNetwork)
                 };
                 var facade = new SymbolFacade(networkType);

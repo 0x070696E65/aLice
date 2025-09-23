@@ -3,8 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using aLice.Models;
-using CatSdk.Facade;
-using CatSdk.Symbol;
+using SymbolSdk.Symbol;
 
 namespace aLice.Services;
 
@@ -80,7 +79,7 @@ public class Symbol
     public static (string hash, string address) GetHash(string payload)
     {
         var tx = TransactionFactory.Deserialize(payload);
-        var facade = new SymbolFacade(tx.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
+        var facade = new SymbolFacade(tx.Network == NetworkType.MAINNET ? SymbolSdk.Symbol.Network.MainNet : SymbolSdk.Symbol.Network.TestNet);
         return (facade.HashTransaction(tx).ToString(), facade.Network.PublicKeyToAddress(tx.SignerPublicKey).ToString());
     }
 }

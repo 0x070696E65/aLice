@@ -1,4 +1,4 @@
-using CatSdk.Utils;
+using SymbolSdk;
 
 namespace aLice.Models;
 

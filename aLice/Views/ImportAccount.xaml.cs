@@ -1,9 +1,7 @@
 using aLice.Resources;
 using aLice.ViewModels;
-using CatSdk.CryptoTypes;
-using CatSdk.Facade;
-using CatSdk.Symbol;
-using CatSdk.Utils;
+using SymbolSdk;
+using SymbolSdk.Symbol;
 
 namespace aLice.Views;
 
@@ -24,8 +22,8 @@ public partial class ImportAccount : ContentPage
         {
             var keyPair = new KeyPair(new PrivateKey(PrivateKey.Text));
             var facade = NetworkType == "MainNet"
-                ? new SymbolFacade(CatSdk.Symbol.Network.MainNet)
-                : new SymbolFacade(CatSdk.Symbol.Network.TestNet);
+                ? new SymbolFacade(SymbolSdk.Symbol.Network.MainNet)
+                : new SymbolFacade(SymbolSdk.Symbol.Network.TestNet);
             var address = facade.Network.PublicKeyToAddress(keyPair.PublicKey).ToString();
             // バリデーション
             var validate = AccountViewModel.ValidationAccount(
@@ -51,7 +49,7 @@ public partial class ImportAccount : ContentPage
             if (!result) return;
             
             // 秘密鍵を暗号化
-            var encryptedPrivateKey = CatSdk.Crypto.Crypto.EncryptString(PrivateKey.Text, Password.Text, address);
+            var encryptedPrivateKey = SymbolSdk.Crypto.EncryptString(PrivateKey.Text, Password.Text, address);
 
             // 保存処理
             await AccountViewModel.SaveAccount(

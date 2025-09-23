@@ -2,12 +2,8 @@ using System.Globalization;
 using System.Text;
 using aLice.Resources;
 using aLice.ViewModels;
-using CatSdk;
-using CatSdk.Crypto;
-using CatSdk.CryptoTypes;
-using CatSdk.Facade;
-using CatSdk.Symbol;
-using CatSdk.Utils;
+using SymbolSdk;
+using SymbolSdk.Symbol;
 
 namespace aLice.Services;
 
@@ -22,8 +18,8 @@ public static class SymbolTransaction
         }
         if (deadline != null)
         {
-            var facade = new SymbolFacade(transaction.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
-            transaction.Deadline = new Timestamp(facade.Network.FromDatetime<CatSdk.Symbol.NetworkTimestamp>(DateTime.UtcNow).AddSeconds(ulong.Parse(deadline)).Timestamp);   
+            var facade = new SymbolFacade(transaction.Network == NetworkType.MAINNET ? SymbolSdk.Symbol.Network.MainNet : SymbolSdk.Symbol.Network.TestNet);
+            transaction.Deadline = facade.Network.CreateDeadline(int.Parse(deadline));   
         }
         if (transaction.Type == TransactionType.TRANSFER)
         {
@@ -1016,9 +1012,9 @@ public static class SymbolTransaction
 
     static string ParseDeadline(NetworkType networkType, BaseValue timestamp)
     {
-        if (CatSdk.Symbol.Network.TestNet.epocTime == null || CatSdk.Symbol.Network.MainNet.epocTime == null) throw new NullReferenceException(AppResources.SymbolTranasction_NoEpocTime);
+        if (SymbolSdk.Symbol.Network.TestNet.epocTime == null || SymbolSdk.Symbol.Network.MainNet.epocTime == null) throw new NullReferenceException(AppResources.SymbolTranasction_NoEpocTime);
         var timeSpan = TimeSpan.FromSeconds(timestamp.Value);
-        var deadline = networkType == NetworkType.TESTNET ? CatSdk.Symbol.Network.TestNet.epocTime.Value.Add(timeSpan / 1000) : CatSdk.Symbol.Network.MainNet.epocTime.Value.Add(timeSpan / 1000);
+        var deadline = networkType == NetworkType.TESTNET ? SymbolSdk.Symbol.Network.TestNet.epocTime.Value.Add(timeSpan / 1000) : SymbolSdk.Symbol.Network.MainNet.epocTime.Value.Add(timeSpan / 1000);
         var deadlineLocal = deadline.ToLocalTime();
         return deadlineLocal.ToString(CultureInfo.InvariantCulture);
     }

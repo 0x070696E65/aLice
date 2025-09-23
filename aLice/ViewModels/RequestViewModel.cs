@@ -5,11 +5,8 @@ using System.Text.Json.Nodes;
 using aLice.Models;
 using aLice.Resources;
 using aLice.Services;
-using CatSdk.Crypto;
-using CatSdk.CryptoTypes;
-using CatSdk.Facade;
-using CatSdk.Symbol;
-using CatSdk.Utils;
+using SymbolSdk;
+using SymbolSdk.Symbol;
 
 namespace aLice.ViewModels;
 
@@ -247,14 +244,15 @@ public abstract class RequestViewModel
                 }
             }
 
-            var network = ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET
-                ? CatSdk.Symbol.Network.MainNet
-                : CatSdk.Symbol.Network.TestNet;
-            var facade = new CatSdk.Facade.SymbolFacade(network);
+            var network = ParseTransaction[0].transaction.Network == SymbolSdk.Symbol.NetworkType.MAINNET
+                ? SymbolSdk.Symbol.Network.MainNet
+                : SymbolSdk.Symbol.Network.TestNet;
+            var facade = new SymbolFacade(network);
             var signature = facade.SignTransaction(keyPair, ParseTransaction[0].transaction);
-            var signedTransaction =
-                CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction((ITransaction)ParseTransaction[0].transaction,
+            
+            TransactionHelper.AttachSignature((ITransaction)ParseTransaction[0].transaction,
                     signature);
+            var signedTransaction = (ITransaction)ParseTransaction[0].transaction;
             var signedPayload = Converter.BytesToHex(signedTransaction.Serialize());
             
             switch (Notification.Method)
@@ -292,7 +290,7 @@ public abstract class RequestViewModel
         else if (Notification.RequestType == RequestType.SignCosignature)
         {
             var tx = TransactionFactory.Deserialize(Notification.Data);
-            var facade = new SymbolFacade(tx.Network == NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet);
+            var facade = new SymbolFacade(tx.Network == NetworkType.MAINNET ? SymbolSdk.Symbol.Network.MainNet : SymbolSdk.Symbol.Network.TestNet);
             var hash = facade.HashTransaction(tx);
             var signature = keyPair.Sign(hash.bytes);
             
@@ -362,16 +360,16 @@ public abstract class RequestViewModel
         }
         var keyPair = new KeyPair(new PrivateKey(privateKey));
         
-        var network = ParseTransaction[0].transaction.Network == CatSdk.Symbol.NetworkType.MAINNET ? CatSdk.Symbol.Network.MainNet : CatSdk.Symbol.Network.TestNet;
+        var network = ParseTransaction[0].transaction.Network == SymbolSdk.Symbol.NetworkType.MAINNET ? SymbolSdk.Symbol.Network.MainNet : SymbolSdk.Symbol.Network.TestNet;
         var txs = ParseTransaction.Select(valueTuple => valueTuple.transaction).ToList();
         
-        var facade = new CatSdk.Facade.SymbolFacade(network);
+        var facade = new SymbolFacade(network);
         var transactions = new List<ITransaction>();
         foreach (var t in txs)
         {
             var signature = facade.SignTransaction(keyPair, t);
-            transactions.Add(CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction((ITransaction)t,
-                signature));
+            TransactionHelper.AttachSignature((ITransaction)t, signature);
+            transactions.Add((ITransaction)t);
         }
         switch (Notification.Method)
         {
@@ -547,9 +545,7 @@ public abstract class RequestViewModel
         var feeMultiplier = Notification.FeeMultiplier != null ? int.Parse(Notification.FeeMultiplier) : 100;
         hashLockTransaction.Fee = new Amount((ulong)(hashLockTransaction.Size * feeMultiplier));
         var signatureHashLock = facade.SignTransaction(keyPair, hashLockTransaction);
-        var signedHashLockTransaction =
-            CatSdk.Symbol.Factory.TransactionsFactory.AttachSignatureTransaction(hashLockTransaction,
-                signatureHashLock);
-        return Converter.BytesToHex(signedHashLockTransaction.Serialize());
+        TransactionHelper.AttachSignature(hashLockTransaction, signatureHashLock);
+        return Converter.BytesToHex(hashLockTransaction.Serialize());
     }
 }
