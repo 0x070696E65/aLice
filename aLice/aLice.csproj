@@ -31,16 +31,16 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-ios|AnyCPU'">
         <CreatePackage>false</CreatePackage>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit</MtouchExtraArgs> 
         <CodesignProvision>alice</CodesignProvision>
         <CodesignKey>iPhone Developer</CodesignKey>
         <MtouchLink>SdkOnly</MtouchLink>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-        <MtouchExtraArgs>--weak-framework=NewsstandKit.framework/NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit --weak-framework=NewsstandKit</MtouchExtraArgs><SelfContained>true</SelfContained>
-<CodesignProvision>alice_release_2024</CodesignProvision>
-<CodesignKey>iPhone Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
+      <CreatePackage>true</CreatePackage>
+        <MtouchExtraArgs>--weak-framework=NewsstandKit</MtouchExtraArgs>
+<CodesignProvision>alice_release</CodesignProvision>
+<CodesignKey>Apple Distribution: PINE, K.K. (VNQZSSK9HD)</CodesignKey>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <MtouchLink>None</MtouchLink>
