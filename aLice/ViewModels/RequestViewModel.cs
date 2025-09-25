@@ -469,40 +469,37 @@ public abstract class RequestViewModel
         ParseTransaction[0].transaction.SignerPublicKey = new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
         
         // もしトランザクションがアグリゲートでかつ公開鍵が空なら内部トランザクションの署名者をメインアカウントに変更する
-        if (ParseTransaction[0].transaction is AggregateCompleteTransactionV2)
+        var tx = ParseTransaction[0].transaction;
+
+        object? aggregateTx = tx switch
         {
-            var aggregateTx = ParseTransaction[0].transaction as AggregateCompleteTransactionV2;
-            var baseTransactions = aggregateTx?.Transactions;
+            AggregateCompleteTransactionV2 v2 => v2,
+            AggregateCompleteTransactionV3 v3 => v3,
+            AggregateBondedTransactionV2 b2   => b2,
+            AggregateBondedTransactionV3 b3   => b3,
+            _ => null
+        };
+
+        if (aggregateTx is not null)
+        {
+            // dynamicにすると Transactions プロパティを呼べる
+            dynamic dynTx = aggregateTx;
+
+            var baseTransactions = dynTx.Transactions;
             if (baseTransactions != null)
             {
-                foreach (var tx in baseTransactions)
+                foreach (var t in baseTransactions)
                 {
-                    if (Converter.BytesToHex(tx.SignerPublicKey.bytes) == "0000000000000000000000000000000000000000000000000000000000000000")
+                    if (Converter.BytesToHex(t.SignerPublicKey.bytes) == 
+                        "0000000000000000000000000000000000000000000000000000000000000000")
                     {
-                        tx.SignerPublicKey =  new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
+                        t.SignerPublicKey = new PublicKey(
+                            Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
                     }
                 }
+
                 var merkleHash = SymbolFacade.HashEmbeddedTransactions(baseTransactions);
-                aggregateTx.TransactionsHash = merkleHash;
-            }
-        }
-        
-        if (ParseTransaction[0].transaction is AggregateBondedTransactionV2)
-        {
-            var aggregateTx = ParseTransaction[0].transaction as AggregateCompleteTransactionV2;
-            var baseTransactions = aggregateTx?.Transactions;
-            if (baseTransactions != null)
-            {
-                foreach (var tx in baseTransactions)
-                {
-                    if (tx.SignerPublicKey.bytes ==
-                        Converter.HexToBytes("0000000000000000000000000000000000000000000000000000000000000000"))
-                    {
-                        tx.SignerPublicKey =  new PublicKey(Converter.HexToBytes(AccountViewModel.MainAccount.publicKey));
-                    }
-                }   
-                var merkleHash = SymbolFacade.HashEmbeddedTransactions(baseTransactions);
-                aggregateTx.TransactionsHash = merkleHash;
+                dynTx.TransactionsHash = merkleHash;
             }
         }
     }

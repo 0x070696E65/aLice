@@ -17,6 +17,7 @@ public partial class NewAccount : ContentPage
     // 登録ボタンが押されたときに呼び出される
     private async void OnClickSubmitAccount(object sender, EventArgs e)
     {
+        Console.WriteLine("SUBMIT");
         try
         {
             var keyPair = KeyPair.GenerateNewKeyPair();
@@ -94,6 +95,7 @@ public partial class NewAccount : ContentPage
     
     private async void OnClickCloseAccount(object sender, EventArgs e)
     {
+        Console.WriteLine("CLOSE");
         // 画面を閉じる
         await Navigation.PopModalAsync();
     }

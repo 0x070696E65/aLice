@@ -256,7 +256,7 @@ public static class SymbolTransaction
     static string ParseAggregateCompleteTransaction(IBaseTransaction _transaction)
     {
         var result = "";
-        var transaction = (AggregateCompleteTransactionV2) _transaction;
+        var transaction = (AggregateCompleteTransactionV3) _transaction;
         result += "AggregateCompleteTransaction\n";
         result += $"SignerPublicKey: {transaction.SignerPublicKey}\n";
         result += $"TransactionsHash: {transaction.TransactionsHash}\n";
@@ -273,7 +273,7 @@ public static class SymbolTransaction
     static string ParseAggregateBondedTransaction(IBaseTransaction _transaction)
     {
         var result = "";
-        var transaction = (AggregateBondedTransactionV2) _transaction;
+        var transaction = (AggregateBondedTransactionV3) _transaction;
         result += "AggregateBondedTransaction\n";
         result += $"SignerPublicKey: {transaction.SignerPublicKey}\n";
         result += $"TransactionsHash: {transaction.TransactionsHash}\n";

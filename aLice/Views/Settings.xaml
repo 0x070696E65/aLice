@@ -5,91 +5,96 @@
              xmlns:strings="clr-namespace:aLice.Resources"
              x:Class="aLice.Views.Settings">
     <ContentPage.Content>
-        <VerticalStackLayout
-            Spacing="25"
-            Padding="30,50, 30, 0"
-            VerticalOptions="Start">
-            <Label
-                Text="Settings"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                HorizontalOptions="Center" />
-            
-            <VerticalStackLayout>
+        <ScrollView>
+            <VerticalStackLayout
+                Spacing="25"
+                Padding="30,50,30,50"
+                VerticalOptions="FillAndExpand">
                 <Label
-                    Text="{x:Static strings:AppResources.Settings_PasswordStorageTime}"
+                    Text="Settings"
                     SemanticProperties.HeadingLevel="Level1"
-                    FontSize="20"
-                    HorizontalOptions="Start" />
-                <Label
-                    Text="{x:Static strings:AppResources.Settings_PasswordStorageTimeDiscription}"
-                    SemanticProperties.HeadingLevel="Level1"
-                    FontSize="12"
-                    HorizontalOptions="Start" />
-                <Grid Margin="0,20,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="5*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Slider
-                        Grid.Column="0"
-                        Minimum="0"
-                        Maximum="300"
-                        x:Name="MemoryTimeSlider"
-                        ThumbColor="Gray"
-                        MaximumTrackColor="Black"
-                        ValueChanged="MemoryTimeSliderChanged">
-                    </Slider>
+                    FontSize="32"
+                    HorizontalOptions="Center" />
+                
+                <VerticalStackLayout>
                     <Label
-                        Grid.Column="1"
-                        Text="0"
-                        x:Name="MemoryTimeValue"
+                        Text="{x:Static strings:AppResources.Settings_PasswordStorageTime}"
+                        SemanticProperties.HeadingLevel="Level1"
                         FontSize="20"
-                        Margin="20, 0, 0, 0"/>
-                </Grid>
-            </VerticalStackLayout>
-            <VerticalStackLayout>
-                <Label
-                    Text="Language"
-                    SemanticProperties.HeadingLevel="Level1"
-                    FontSize="20"
-                    HorizontalOptions="Start" />
+                        HorizontalOptions="Start" />
+                    <Label
+                        Text="{x:Static strings:AppResources.Settings_PasswordStorageTimeDiscription}"
+                        SemanticProperties.HeadingLevel="Level1"
+                        FontSize="12"
+                        HorizontalOptions="Start" />
+                    <Grid Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Slider
+                            Grid.Column="0"
+                            Minimum="0"
+                            Maximum="300"
+                            x:Name="MemoryTimeSlider"
+                            ThumbColor="Gray"
+                            MaximumTrackColor="Black"
+                            ValueChanged="MemoryTimeSliderChanged">
+                        </Slider>
+                        <Label
+                            Grid.Column="1"
+                            Text="0"
+                            x:Name="MemoryTimeValue"
+                            FontSize="20"
+                            Margin="20,0,0,0"/>
+                    </Grid>
+                </VerticalStackLayout>
+                
+                <VerticalStackLayout>
+                    <Label
+                        Text="Language"
+                        SemanticProperties.HeadingLevel="Level1"
+                        FontSize="20"
+                        HorizontalOptions="Start" />
+                    <Grid Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Picker x:Name="LanguagePicker"
+                                Title="Select Language"
+                                SelectedIndexChanged="OnLanguagePickerSelectedIndexChanged">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>日本語</x:String>
+                                    <x:String>English</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Grid>
+                </VerticalStackLayout>
+                
                 <Grid Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Picker x:Name="LanguagePicker"
-                            Title="Select Language"
-                            SelectedIndexChanged="OnLanguagePickerSelectedIndexChanged">
-                        <Picker.ItemsSource>
-                            <x:Array Type="{x:Type x:String}">
-                                <x:String>日本語</x:String>
-                                <x:String>English</x:String>
-                            </x:Array>
-                        </Picker.ItemsSource>
-                    </Picker>
+
+                    <Button Text="Save"
+                            Clicked="OnSave"
+                            BackgroundColor="Black"
+                            TextColor="White"
+                            Grid.Column="0"
+                            Margin="0,0,10,0"/>
+
+                    <Button Text="Close"
+                            Clicked="OnClickedCliseButton"
+                            BackgroundColor="Gray"
+                            TextColor="White"
+                            Grid.Column="1"
+                            Margin="10,0,0,0"/>
                 </Grid>
             </VerticalStackLayout>
-            <Grid Margin="0,20,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Button Text="Save"
-                        Clicked="OnSave"
-                        BackgroundColor="Black"
-                        Grid.Column="0"
-                        Margin="0,0,10,0"/>
-
-                <Button Text="Close"
-                        Clicked="OnClickedCliseButton"
-                        BackgroundColor="Gray"
-                        TextColor="White"
-                        Grid.Column="1"
-                        Margin="10,0,0,0"/>
-            </Grid>
-        </VerticalStackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

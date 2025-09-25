@@ -5,9 +5,10 @@
     <ScrollView 
         Orientation="Vertical"
         VerticalOptions="FillAndExpand">
-        <StackLayout
+        <VerticalStackLayout
                 Spacing="25"
-                Padding="30,0, 30, 10">
+                Padding="30,0,30,50"
+                VerticalOptions="FillAndExpand">
             <Grid 
                 VerticalOptions="Start"
                 HorizontalOptions="Fill">
@@ -63,6 +64,6 @@
             
             <StackLayout x:Name="AccountList" />
                 
-        </StackLayout>
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
